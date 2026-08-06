@@ -1,0 +1,9 @@
+<div>
+  <h1 class="font-bold text-4xl">Welcome to Lumière Dining</h1>
+  <p>A luxury restaurant from Vietnam</p>
+  <% @users&.each do |user| %>
+    <li>
+      <%= user.full_name %> - <%= user.email %>
+    </li>
+  <%end%>
+</div>
