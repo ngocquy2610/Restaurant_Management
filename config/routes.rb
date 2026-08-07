@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :users
   # get "path", to: "controller#action"
 
   
@@ -17,13 +18,16 @@ Rails.application.routes.draw do
   devise_for :users,
     controllers: {
       sessions: 'users/sessions',
-      registrations: 'users/registrations'
+      registrations: 'users/registrations',
+      passwords: 'users/passwords'
     },
     path: '',
-    path_names: { sign_in: 'login', sign_out: 'logout', sign_up: 'signup' }
+    path_names: { sign_in: 'login', sign_out: 'logout', sign_up: 'register', password: 'forgot-password' }
 
   authenticated :user do
     root to: 'home#index', as: :authenticated_root
   end
   root to: 'home#index'
+  
+  resources :users
 end

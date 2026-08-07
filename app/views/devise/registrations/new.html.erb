@@ -1,39 +1,116 @@
-<h2>Sign up</h2>
+<div class="relative"><%= render "layouts/header" %></div>
+<div class="relative">
+  <div class="min-h-screen flex items-center justify-center bg-cover bg-center relative w-full"
+       style="background-image: url('/authen_image/login_bg.jpeg');">
 
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+    <div class="absolute inset-0"></div>
 
-  <div class="field">
-    <p><%= f.label :email %></p>
-    <p><%= f.email_field :email, autofocus: true, autocomplete: "email" %></p>
+    <div class="relative z-10 w-full max-w-md mx-4">
+      <div class="bg-[#FBF0EC] rounded-2xl shadow-2xl px-10 py-10">
+
+        <div class="flex justify-center mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-[#8F000D]" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8.5 2a.5.5 0 0 1 .5.5v6a1.5 1.5 0 0 1-1 1.415V21.5a.5.5 0 0 1-1 0v-11.585A1.5 1.5 0 0 1 6 8.5v-6a.5.5 0 0 1 1 0v5.5h.5v-5.5a.5.5 0 0 1 1 0v5.5H9v-5.5a.5.5 0 0 1 .5-.5z"/>
+            <path d="M15.5 2c-2 0-3.5 2.5-3.5 6s1.2 5.6 2.5 6.1V21.5a.5.5 0 0 0 1 0v-7.4C16.8 13.6 18 11.5 18 8c0-3.5-1.5-6-2.5-6z"/>
+          </svg>
+        </div>
+
+        <h1 class="text-center font-serif text-4xl text-[#8F000D] mb-2">Lumière Dining</h1>
+        <p class="text-center text-sm text-gray-500 mb-8">
+          Join our table. Experience culinary tradition.
+        </p>
+
+        <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+          <%= render "devise/shared/error_messages", resource: resource %>
+
+          <div class="mb-5">
+            <%= f.label :full_name, "Full Name", class: "block text-sm font-semibold text-gray-800 mb-1.5" %>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A7.962 7.962 0 0112 15a7.962 7.962 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </span>
+              <%= f.text_field :full_name,
+                    autofocus: true,
+                    placeholder: "e.g. Marie Dubois",
+                    class: "w-full rounded-lg border border-gray-300 bg-white pl-10 pr-3 py-2.5 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8A1C2B]/30 focus:border-[#8A1C2B]" %>
+            </div>
+          </div>
+
+          <div class="mb-5">
+            <%= f.label :email, "Email Address", class: "block text-sm font-semibold text-gray-800 mb-1.5" %>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </span>
+              <%= f.email_field :email,
+                    autocomplete: "email",
+                    placeholder: "marie@example.com",
+                    class: "w-full rounded-lg border border-gray-300 bg-white pl-10 pr-3 py-2.5 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8A1C2B]/30 focus:border-[#8A1C2B]" %>
+            </div>
+          </div>
+
+          <div class="mb-5">
+            <%= f.label :phone, "Phone", class: "block text-sm font-semibold text-gray-800 mb-1.5" %>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2 8.5A6.5 6.5 0 018.5 2h7A6.5 6.5 0 0122 8.5v7a6.5 6.5 0 01-6.5 6.5h-7A6.5 6.5 0 012 15.5v-7z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h8" />
+                </svg>
+              </span>
+              <%= f.text_field :phone,
+                    autocomplete: "tel",
+                    placeholder: "e.g. 08123456789",
+                    class: "w-full rounded-lg border border-gray-300 bg-white pl-10 pr-3 py-2.5 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8A1C2B]/30 focus:border-[#8A1C2B]" %>
+            </div>
+          </div>
+
+          <div class="mb-5">
+            <%= f.label :password, class: "block text-sm font-semibold text-gray-800 mb-1.5" %>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </span>
+              <%= f.password_field :password,
+                    autocomplete: "new-password",
+                    placeholder: "••••••••",
+                    class: "w-full rounded-lg border border-gray-300 bg-white pl-10 pr-3 py-2.5 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8A1C2B]/30 focus:border-[#8A1C2B]" %>
+            </div>
+            <% if @minimum_password_length %>
+              <p class="mt-2 text-xs text-gray-500">(<%= @minimum_password_length %> characters minimum)</p>
+            <% end %>
+          </div>
+
+          <div class="mb-6">
+            <%= f.label :password_confirmation, "Confirm Password", class: "block text-sm font-semibold text-gray-800 mb-1.5" %>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </span>
+              <%= f.password_field :password_confirmation,
+                    autocomplete: "new-password",
+                    placeholder: "••••••••",
+                    class: "w-full rounded-lg border border-gray-300 bg-white pl-10 pr-3 py-2.5 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8A1C2B]/30 focus:border-[#8A1C2B]" %>
+            </div>
+          </div>
+
+          <%= f.submit "Register",
+                class: "w-full flex items-center justify-center gap-2 rounded-lg bg-[#8A1C2B] hover:bg-[#7a1826] text-white font-semibold py-3 text-sm transition-colors cursor-pointer" %>
+        <% end %>
+
+        <p class="text-center text-sm text-gray-500 mt-6">
+          Already have an account?
+          <%= link_to "Log In", new_session_path(resource_name), class: "font-semibold text-[#8A1C2B] hover:underline" %>
+        </p>
+      </div>
+    </div>
   </div>
-
-  <div class="field">
-    <p><%= f.label :password %></p>
-    <% if @minimum_password_length %>
-      <p><em>(<%= @minimum_password_length %> characters minimum)</em></p>
-    <% end %>
-    <p><%= f.password_field :password, autocomplete: "new-password" %></p>
-  </div>
-
-  <div class="field">
-    <p><%= f.label :password_confirmation %></p>
-    <p><%= f.password_field :password_confirmation, autocomplete: "new-password" %></p>
-  </div>
-
-  <div>
-    <%= f.label :full_name %>
-    <%= f.text_field :full_name, autofocus: true %>
-  </div>
-
-  <div>
-    <%= f.label :phone %>
-    <%= f.text_field :phone %>
-  </div>
-
-  <div class="actions">
-    <%= f.submit "Sign up" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>

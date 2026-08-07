@@ -1,26 +1,86 @@
-<h2>Log in</h2>
+<div class="relative"><%= render "layouts/header" %></div>
+<div class=" min-h-screen flex items-center justify-center bg-cover bg-center relative w-full"
+     style="background-image: url('/authen_image/login_bg.jpeg');">
 
-<%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-  <div class="field">
-    <p><%= f.label :email %></p>
-    <p><%= f.email_field :email, autofocus: true, autocomplete: "email" %></p>
-  </div>
+  <!-- dark overlay so the card reads clearly against the photo -->
+  <div class="absolute inset-0 "></div>
 
-  <div class="field">
-    <p><%= f.label :password %></p>
-    <p><%= f.password_field :password, autocomplete: "current-password" %></p>
-  </div>
+  <div class="relative z-10 w-full max-w-md mx-4">
+    <div class="bg-[#FBF0EC] rounded-2xl shadow-2xl px-10 py-10">
 
-  <% if devise_mapping.rememberable? %>
-    <div class="field">
-      <p><%= f.check_box :remember_me %></p>
-      <p><%= f.label :remember_me %></p>
+      <!-- Icon -->
+      <div class="flex justify-center mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-[#8F000D]" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M8.5 2a.5.5 0 0 1 .5.5v6a1.5 1.5 0 0 1-1 1.415V21.5a.5.5 0 0 1-1 0v-11.585A1.5 1.5 0 0 1 6 8.5v-6a.5.5 0 0 1 1 0v5.5h.5v-5.5a.5.5 0 0 1 1 0v5.5H9v-5.5a.5.5 0 0 1 .5-.5z"/>
+          <path d="M15.5 2c-2 0-3.5 2.5-3.5 6s1.2 5.6 2.5 6.1V21.5a.5.5 0 0 0 1 0v-7.4C16.8 13.6 18 11.5 18 8c0-3.5-1.5-6-2.5-6z"/>
+        </svg>
+      </div>
+
+      <!-- Title -->
+      <h1 class="text-center font-serif text-4xl text-[#8F000D] mb-2">Lumière Dining</h1>
+      <p class="text-center text-sm text-gray-500 mb-8">
+        Welcome back. Please login to your account.
+      </p>
+
+      <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+
+        <%# Email %>
+        <div class="mb-5">
+          <%= f.label :email, "Email Address", class: "block text-sm font-semibold text-gray-800 mb-1.5" %>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </span>
+            <%= f.email_field :email,
+                  autofocus: true,
+                  autocomplete: "email",
+                  placeholder: "your@email.com",
+                  class: "w-full rounded-lg border border-gray-300 bg-white pl-10 pr-3 py-2.5 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8A1C2B]/30 focus:border-[#8A1C2B]" %>
+          </div>
+        </div>
+
+        <%# Password %>
+        <div class="mb-4">
+          <%= f.label :password, class: "block text-sm font-semibold text-gray-800 mb-1.5" %>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </span>
+            <%= f.password_field :password,
+                  autocomplete: "current-password",
+                  placeholder: "••••••••",
+                  class: "w-full rounded-lg border border-gray-300 bg-white pl-10 pr-3 py-2.5 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8A1C2B]/30 focus:border-[#8A1C2B]" %>
+          </div>
+        </div>
+
+        <%# Remember me + Forgot password %>
+        <div class="flex items-center justify-between mb-6">
+          <% if devise_mapping.rememberable? %>
+            <label class="flex items-center gap-2 text-sm text-gray-600">
+              <%= f.check_box :remember_me, class: "rounded border-gray-300 text-[#8A1C2B] focus:ring-[#8A1C2B]/30" %>
+              <%= f.label :remember_me, "Remember me", class: "text-sm text-gray-600" %>
+            </label>
+          <% else %>
+            <span></span>
+          <% end %>
+
+          <%= link_to "Forgot Password?", new_user_password_path, class: "text-sm font-semibold text-[#8A1C2B] hover:underline" %>
+        </div>
+
+        <%# Submit %>
+        <%= f.submit "Login",
+              class: "w-full flex items-center justify-center gap-2 rounded-lg bg-[#8A1C2B] hover:bg-[#7a1826] text-white font-semibold py-3 text-sm transition-colors cursor-pointer" %>
+      <% end %>
+
+      <%# Sign up link %>
+      <p class="text-center text-sm text-gray-500 mt-6">
+        Don't have an account?
+        <%= link_to "Register", new_registration_path(resource_name), class: "font-semibold text-[#8A1C2B] hover:underline" %>
+      </p>
     </div>
-  <% end %>
-
-  <div class="actions">
-    <%= f.submit "Log in" %>
   </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>

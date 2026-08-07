@@ -1,16 +1,45 @@
-<h2>Forgot your password?</h2>
+<div class="relative"><%= render "layouts/header" %></div>
+<div class="min-h-screen flex items-center justify-center bg-cover bg-center relative"
+     style="background-image: url('/authen_image/login_bg.jpeg');">
 
-<%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+  <div class="absolute inset-0 "></div>
 
-  <div class="field">
-    <p><%= f.label :email %></p>
-    <p><%= f.email_field :email, autofocus: true, autocomplete: "email" %></p>
+  <div class="relative z-10 w-full max-w-md mx-4">
+    <div class="bg-[#FBF0EC] rounded-3xl shadow-2xl px-10 py-10">
+      <h1 class="text-center font-serif text-4xl text-[#8F000D] mb-2">Lumière Dining</h1>
+      <p class="text-center text-lg font-semibold text-gray-700 mb-2">Reset Password</p>
+      <p class="text-center text-sm text-gray-500 mb-8">
+        Enter your email address and we&apos;ll send you a link to reset your password.
+      </p>
+
+      <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
+        <%= render "devise/shared/error_messages", resource: resource %>
+
+        <div class="mb-6">
+          <%= f.label :email, "Email Address", class: "block text-sm font-semibold text-gray-800 mb-1.5" %>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </span>
+            <%= f.email_field :email,
+                  autofocus: true,
+                  autocomplete: "email",
+                  placeholder: "guest@example.com",
+                  class: "w-full rounded-lg border border-gray-300 bg-white pl-10 pr-3 py-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8A1C2B]/30 focus:border-[#8A1C2B]" %>
+          </div>
+        </div>
+
+        <%= f.submit "Send Reset Link",
+              class: "w-full rounded-lg bg-[#8A1C2B] hover:bg-[#7a1826] text-white font-semibold py-3 text-sm transition-colors" %>
+      <% end %>
+
+      <div class="border-t border-gray-200 my-6"></div>
+
+      <div class="text-center text-sm text-gray-600">
+        <%= link_to "Return to Sign In", new_session_path(resource_name), class: "font-semibold text-[#8A1C2B] hover:underline" %>
+      </div>
+    </div>
   </div>
-
-  <div class="actions">
-    <%= f.submit "Send me password reset instructions" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>
