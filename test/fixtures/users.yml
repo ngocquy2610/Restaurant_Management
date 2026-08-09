@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  full_name: John Doe
+  phone: "1234567890"
+  email: john.doe@example.com
+  location: Test Location
+  role: 1
+  status: false
+  avatar_url: http://example.com/avatar.jpg
+  jti: <%= SecureRandom.uuid %>
+
+two:
+  full_name: Jane Smith
+  phone: "0987654321"
+  email: jane.smith@example.com
+  location: Test Location 2
+  role: 1
+  status: false
+  avatar_url: http://example.com/avatar2.jpg
+  jti: <%= SecureRandom.uuid %>

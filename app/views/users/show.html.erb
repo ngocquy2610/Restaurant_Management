@@ -1,0 +1,59 @@
+<div class="relative"><%= render "layouts/header" %></div>
+<div class="min-h-screen bg-[#FBF0EC] py-10 px-4 pt-8">
+  <div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
+
+    <!-- ==================== LEFT COLUMN ==================== -->
+    <div class="space-y-6">
+
+      <!-- Profile card - REAL DATA -->
+      <div class="bg-white rounded-2xl shadow-sm p-6 text-center">
+        <div class="w-28 h-28 rounded-xl bg-[#8A1C2B]/10 flex items-center justify-center mx-auto mb-4">
+          <span class="text-3xl font-serif text-[#8A1C2B]">
+            <%= @user.full_name.to_s.first(1).upcase %>
+          </span>
+        </div>
+
+        <h1 class="font-serif text-2xl text-gray-900 mb-3"><%= @user.full_name %></h1>
+
+        <div class="space-y-1.5 text-sm text-gray-500 mb-5">
+          <p><%= @user.email %></p>
+          <% if @user.phone.present? %>
+            <p><%= @user.phone %></p>
+          <% end %>
+          <% if @user.location.present? %>
+            <p><%= @user.location %></p>
+          <% end %>
+        </div>
+
+        <%= link_to "Edit Profile", edit_user_registration_path,
+              class: "block w-full text-center rounded-lg border border-gray-300 text-gray-700 font-semibold text-sm py-2.5 hover:bg-gray-50 transition-colors" %>
+      </div>
+
+      <!-- Membership status card - PLACEHOLDER -->
+      <div class="bg-gray-200 rounded-2xl h-40"></div>
+    </div>
+
+    <!-- ==================== RIGHT COLUMN ==================== -->
+    <div class="space-y-8">
+
+      <!-- Recent reservations - PLACEHOLDER -->
+      <div>
+        <h2 class="font-serif text-xl text-gray-900 border-b border-gray-200 pb-3 mb-4">Recent Reservations</h2>
+        <div class="bg-gray-200 rounded-xl h-32"></div>
+      </div>
+
+      <!-- Culinary favorites - PLACEHOLDER -->
+      <div>
+        <h2 class="font-serif text-xl text-gray-900 border-b border-gray-200 pb-3 mb-4">Culinary Favorites</h2>
+        <div class="bg-gray-200 rounded-xl h-48"></div>
+      </div>
+
+      <!-- Account settings - PLACEHOLDER -->
+      <div>
+        <h2 class="font-serif text-xl text-gray-900 border-b border-gray-200 pb-3 mb-4">Account Settings</h2>
+        <div class="bg-gray-200 rounded-xl h-40"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
