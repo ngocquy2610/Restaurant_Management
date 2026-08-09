@@ -6,8 +6,12 @@
     <a href="#">Private Dining</a>
     <a href="#">Our Story</a>
   </div>
+  
   <%if current_user%>
-    <%= button_to "Sign out", destroy_user_session_path, method: :delete %>
+    <div class="flex gap-5">
+      <%= link_to "My Profile", user_path(current_user) %>
+      <%= button_to "Sign out", destroy_user_session_path, method: :delete %>
+    </div>
   <%else%>
     <%= link_to "Sign in", new_user_session_path %>
   <%end%>
