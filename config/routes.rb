@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
-  resources :users
+  resources :table_types
+  resources :tables
   # get "path", to: "controller#action"
 
   
@@ -29,5 +30,8 @@ Rails.application.routes.draw do
   end
   root to: 'home#index'
   
+  get 'admin/users', to: "users#index"
+  get 'admin/dashboards', to: "dashboards#index"
+
   resources :users, only: [:show]
 end

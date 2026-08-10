@@ -8,6 +8,9 @@
   </div>
   
   <%if current_user%>
+    <%if current_user.role == "admin"%>
+      <%= link_to "Dashboard", admin_dashboards_path %>
+    <%end%>
     <div class="flex gap-5">
       <%= link_to "My Profile", user_path(current_user) %>
       <%= button_to "Sign out", destroy_user_session_path, method: :delete %>
