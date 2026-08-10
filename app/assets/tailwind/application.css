@@ -1,1 +1,23 @@
 @import "tailwindcss";
+
+/* ============================================================
+   Loading screen (shown during Turbo page navigation)
+   Defined in app/views/layouts/_loading_screen.html.erb and
+   toggled by the "is-loading" class in app/javascript/application.js
+   ============================================================ */
+#loading-screen {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+#loading-screen.is-loading {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #loading-screen {
+    transition: none;
+  }
+}

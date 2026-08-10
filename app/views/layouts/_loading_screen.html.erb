@@ -1,0 +1,16 @@
+<%# Full-screen loading overlay shown while Turbo navigates between pages.
+    Marked data-turbo-permanent so Turbo keeps it in the DOM across body swaps.
+    Hidden by default; toggled via the "is-loading" class in app/javascript/application.js. %>
+<div id="loading-screen"
+     class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-amber-50"
+     data-turbo-permanent
+     aria-hidden="true">
+  <div class="flex flex-col items-center px-6 text-center">
+    <%# Spinner %>
+    <div class="h-20 w-20 rounded-full border-4 border-[#8F000D]/20 border-t-[#8F000D] animate-spin"></div>
+
+    <%# Brand %>
+    <p class="mt-10 font-serif text-3xl font-bold tracking-wide text-[#8F000D]">Lumière Dining</p>
+    <p class="mt-2 text-xs uppercase tracking-[0.4em] text-[#8F000D]/60 animate-pulse">Loading…</p>
+  </div>
+</div>

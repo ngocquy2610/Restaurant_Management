@@ -1,5 +1,7 @@
 class ApplicationController < ActionController::Base
   before_action :configure_permitted_parameters, if: :devise_controller?
+  layout :layout_by_resource
+  include Pundit
 
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
@@ -18,5 +20,9 @@ class ApplicationController < ActionController::Base
   def configure_permitted_parameters
     devise_parameter_sanitizer.permit(:sign_up, keys: [:full_name, :phone, :location])
     devise_parameter_sanitizer.permit(:account_update, keys: [:full_name, :phone, :location, :avatar_url])
+  end
+
+  def layout_by_resource
+    devise_controller? ? "application" : "application"
   end
 end
