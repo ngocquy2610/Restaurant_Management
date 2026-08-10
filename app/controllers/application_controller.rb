@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
   def after_sign_in_path_for(resource)
     case resource.role
     when 'admin' then root_path
-    else customer_home_path
+    else root_path
     end
   end
 
