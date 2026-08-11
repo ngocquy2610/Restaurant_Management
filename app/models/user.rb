@@ -12,7 +12,7 @@ class User < ApplicationRecord
     receptionist: 3,
     waiter: 4,
     customer: 5
-  }
+  }, default: :customer
 
   validates :full_name, presence: true
   validates :email, presence: true, uniqueness: true,
