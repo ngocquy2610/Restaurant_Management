@@ -12,7 +12,7 @@ class TablePolicy < ApplicationPolicy
   end
 
   def update?
-    user.admin? || user.receptionist?
+    user.admin? || user.receptionist? && scope.out_of_service!
   end
 
   def destroy?

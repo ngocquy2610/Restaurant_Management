@@ -5,7 +5,7 @@ class Table < ApplicationRecord
     available: 0,
     occupied: 1,
     reserved: 2,
-    out_off_service: 3
+    out_of_service: 3
   }
 
   validate :capacity, presence: true
