@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  table_type: one
+  capacity: 1
+  status: 1
+
+two:
+  table_type: two
+  capacity: 1
+  status: 1
