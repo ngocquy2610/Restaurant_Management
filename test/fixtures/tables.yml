@@ -2,10 +2,25 @@
 
 one:
   table_type: one
-  capacity: 1
+  area: one
+  capacity: 4
   status: 1
+  table_number: A1
+  shape: 1
+  pos_x: 120
+  pos_y: 80
+  radius: 40
+  rotation: 0
 
 two:
   table_type: two
-  capacity: 1
+  area: two
+  capacity: 4
   status: 1
+  table_number: A2
+  shape: 2
+  pos_x: 300
+  pos_y: 200
+  width: 120
+  height: 60
+  rotation: 30

@@ -1,29 +1,36 @@
-<% content_for :title, "Tables" %>
+<% content_for :title, "Restaurant Layout" %>
 
-<div class="w-full">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
-  <% end %>
+<div class="px-8 py-8">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="font-bold text-3xl"><%= @area ? @area.name : "Restaurant Layout" %></h1>
 
-  <div class="flex justify-between items-center">
-    <h1 class="font-bold text-4xl">Tables</h1>
-    <%= link_to "New table", new_table_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white block font-medium" %>
-  </div>
-
-  <div id="tables" class="min-w-full divide-y divide-gray-200 space-y-5">
-    <% if @tables.any? %>
-      <% @tables.each do |table| %>
-        <div class="flex flex-col sm:flex-row justify-between items-center pb-5 sm:pb-0">
-          <%= render table %>
-          <div class="w-full sm:w-auto flex flex-col sm:flex-row space-x-2 space-y-2">
-            <%= link_to "Show", table, class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-            <%= link_to "Edit", edit_table_path(table), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-            <%= button_to "Destroy", table, method: :delete, class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
-          </div>
-        </div>
+    <div class="flex items-center gap-2">
+      <% if @prev_area %>
+        <%= link_to "← Prev",
+                    tables_path(area_id: @prev_area.id),
+                    class: "rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 text-gray-800 font-medium" %>
+      <% else %>
+        <span class="rounded-md px-3.5 py-2.5 bg-gray-100 text-gray-300 font-medium cursor-not-allowed">← Prev</span>
       <% end %>
-    <% else %>
-      <p class="text-center my-10">No tables found.</p>
-    <% end %>
+
+      <% if @next_area %>
+        <%= link_to "Next →",
+                    tables_path(area_id: @next_area.id),
+                    class: "rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 text-gray-800 font-medium" %>
+      <% else %>
+        <span class="rounded-md px-3.5 py-2.5 bg-gray-100 text-gray-300 font-medium cursor-not-allowed">Next →</span>
+      <% end %>
+    </div>
   </div>
+
+  <% if @area %>
+    <div data-controller="floor-map"
+         data-floor-map-area-value="<%= { id: @area.id, name: @area.name, width: 1000, height: 700 }.to_json %>"
+         data-floor-map-tables-value="<%= @tables_payload.to_json %>">
+      <div id="konva-stage-container"
+           class="border border-gray-300 rounded-lg overflow-hidden shadow-sm w-full"></div>
+    </div>
+  <% else %>
+    <p class="text-center text-gray-500 py-16">No areas have been created yet.</p>
+  <% end %>
 </div>

@@ -10,9 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_10_084142) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_11_034749) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "areas", force: :cascade do |t|
+    t.integer "area_type"
+    t.datetime "created_at", null: false
+    t.integer "floor_level"
+    t.string "name"
+    t.datetime "updated_at", null: false
+  end
 
   create_table "jwt_denylists", force: :cascade do |t|
     t.datetime "exp", null: false
@@ -28,11 +36,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_084142) do
   end
 
   create_table "tables", force: :cascade do |t|
+    t.bigint "area_id", null: false
     t.integer "capacity"
     t.datetime "created_at", null: false
+    t.decimal "height", precision: 8, scale: 2
+    t.decimal "pos_x", precision: 8, scale: 2
+    t.decimal "pos_y", precision: 8, scale: 2
+    t.decimal "radius", precision: 8, scale: 2
+    t.integer "rotation"
+    t.integer "shape"
     t.integer "status"
+    t.string "table_number"
     t.bigint "table_type_id", null: false
     t.datetime "updated_at", null: false
+    t.decimal "width", precision: 8, scale: 2
+    t.index ["area_id"], name: "index_tables_on_area_id"
     t.index ["table_type_id"], name: "index_tables_on_table_type_id"
   end
 
@@ -65,5 +83,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_084142) do
     t.index ["unlock_token"], name: "index_users_on_unlock_token", unique: true
   end
 
+  add_foreign_key "tables", "areas"
   add_foreign_key "tables", "table_types"
 end
