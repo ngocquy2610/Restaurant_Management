@@ -1,15 +1,8 @@
 import { Controller } from "@hotwired/stimulus";
 import "konva";
+import { createTableImageNode } from "controllers/table_image";
 
 const Konva = window.Konva;
-
-// Fill/stroke colors keyed by the Table#status enum value.
-const STATUS_STYLES = {
-  available: { fill: "#22c55e", stroke: "#15803d" },
-  occupied: { fill: "#ef4444", stroke: "#b91c1c" },
-  reserved: { fill: "#eab308", stroke: "#a16207" },
-  out_of_service: { fill: "#9ca3af", stroke: "#6b7280" },
-};
 
 export default class extends Controller {
   static values = { area: Object, tables: Array };
@@ -28,18 +21,39 @@ export default class extends Controller {
     const layer = new Konva.Layer();
     this.stage.add(layer);
 
-    // "Restaurant layout" background: the room's bounding rectangle.
-    layer.add(
-      new Konva.Rect({
-        x: 0,
-        y: 0,
-        width: area.width,
-        height: area.height,
-        fill: "#f7f5f0",
-        stroke: "#8f000d",
-        strokeWidth: 2,
-      }),
-    );
+    // If the area has an uploaded floor-map image, use it as a full-bleed
+    // background (still drawn at the room's fixed 1200x700 size). Otherwise
+    // fall back to the plain "restaurant layout" bounding rectangle.
+    if (area.image) {
+      const img = new window.Image();
+      img.onload = () => {
+        const bg = new Konva.Image({
+          x: 0,
+          y: 0,
+          width: area.width,
+          height: area.height,
+          image: img,
+          listening: false,
+        });
+        layer.add(bg);
+        bg.moveToBottom();
+        layer.draw();
+      };
+      img.src = area.image;
+    } else {
+      // "Restaurant layout" background: the room's bounding rectangle.
+      layer.add(
+        new Konva.Rect({
+          x: 0,
+          y: 0,
+          width: area.width,
+          height: area.height,
+          fill: "#f7f5f0",
+          stroke: "#8f000d",
+          strokeWidth: 2,
+        }),
+      );
+    }
 
     this.tablesValue.forEach((table) => this.renderTable(table, layer));
 
@@ -48,10 +62,14 @@ export default class extends Controller {
 
   // Build one Konva.Group per table (label travels with the shape) and expose
   // the table id + position on click. Dragging/moving is intentionally removed
-  // — this floor map is read-only and public.
+  // — this floor map is read-only and public. Each table is drawn from its
+  // photo in public/table_image (chosen by shape + capacity).
   renderTable(table, layer) {
     const isRound = table.shape === "round";
-    const style = STATUS_STYLES[table.status] || STATUS_STYLES.out_of_service;
+    const width = isRound ? this.num(table.radius) * 2 : this.num(table.width);
+    const height = isRound
+      ? this.num(table.radius) * 2
+      : this.num(table.height);
 
     // The group sits at the table's (pos_x, pos_y) — which for round tables is
     // the center and for square/rectangle tables the top-left corner, matching
@@ -63,34 +81,23 @@ export default class extends Controller {
       draggable: false,
     });
 
-    // Shapes live at the group origin; the group carries the position.
-    const common = {
-      x: 0,
-      y: 0,
-      fill: style.fill,
-      stroke: style.stroke,
-      strokeWidth: 1.5,
-      listening: true,
-    };
-
-    // Round tables use a radius; square/rectangle tables use width + height.
-    let shape;
-    if (isRound) {
-      shape = new Konva.Circle({ ...common, radius: this.num(table.radius) });
-    } else {
-      shape = new Konva.Rect({
-        ...common,
-        width: this.num(table.width),
-        height: this.num(table.height),
-      });
-    }
+    // The table image sits at the group origin; the group carries the position.
+    // For round tables the image is offset so it stays centred on the origin.
+    const shape = createTableImageNode({
+      shape: table.shape,
+      capacity: table.capacity,
+      width,
+      height,
+      center: isRound,
+    });
+    shape.listening(true);
+    group.add(shape);
 
     // Center a table_number label on the shape (origin of the group = shape
     // top-left for rects / center for circles).
     const label = new Konva.Text({
-      x: isRound ? 0 : this.num(table.width) / 2,
-      y: isRound ? 0 : this.num(table.height) / 2,
-      text: table.table_number,
+      x: isRound ? 0 : width / 2,
+      y: isRound ? 0 : height / 2,
       fontSize: 13,
       fontFamily: "sans-serif",
       fontStyle: "bold",
@@ -106,7 +113,6 @@ export default class extends Controller {
     label.offsetX(label.width() / 2);
     label.offsetY(label.height() / 2);
 
-    group.add(shape);
     group.add(label);
 
     // Hover cursor feedback (identical pattern to a bare draggable shape).

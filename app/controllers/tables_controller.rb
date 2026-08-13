@@ -30,12 +30,20 @@ class TablesController < ApplicationController
   # GET /tables/new
   def new
     @table = Table.new
+    @areas = Area.order(:name)
+    @table_types = TableType.order(:type)
+    @area_tables = tables_by_area
     authorize @table
+    render "admin/tables/new"
   end
 
   # GET /tables/1/edit
   def edit
+    @areas = Area.order(:name)
+    @table_types = TableType.order(:type)
+    @area_tables = tables_by_area
     authorize @table
+    render "admin/tables/edit"
   end
 
   # POST /tables or /tables.json
@@ -43,28 +51,26 @@ class TablesController < ApplicationController
     @table = Table.new(table_params)
     authorize @table
 
-    respond_to do |format|
-      if @table.save
-        format.html { redirect_to @table, notice: "Table was successfully created." }
-        format.json { render :show, status: :created, location: @table }
-      else
-        format.html { render :new, status: :unprocessable_content }
-        format.json { render json: @table.errors, status: :unprocessable_content }
-      end
+    if @table.save
+      redirect_to tables_path, notice: "Table added."
+    else
+      @areas = Area.order(:name)
+      @table_types = TableType.order(:type)
+      @area_tables = tables_by_area
+      render 'admin/tables/new', status: :unprocessable_entity
     end
   end
 
   # PATCH/PUT /tables/1 or /tables/1.json
   def update
     authorize @table
-    respond_to do |format|
-      if @table.update(table_params)
-        format.html { redirect_to @table, notice: "Table was successfully updated.", status: :see_other }
-        format.json { render :show, status: :ok, location: @table }
-      else
-        format.html { render :edit, status: :unprocessable_content }
-        format.json { render json: @table.errors, status: :unprocessable_content }
-      end
+    if @table.update(table_params)
+      redirect_to tables_path, notice: "Table updated."
+    else
+      @areas = Area.order(:name)
+      @table_types = TableType.order(:type)
+      @area_tables = tables_by_area
+      render 'admin/tables/edit', status: :unprocessable_entity
     end
   end
 
@@ -73,10 +79,13 @@ class TablesController < ApplicationController
     authorize @table
     @table.destroy!
 
-    respond_to do |format|
-      format.html { redirect_to tables_path, notice: "Table was successfully destroyed.", status: :see_other }
-      format.json { head :no_content }
-    end
+    @areas = Area.order(:floor_level, :id)
+    @area = if params[:area_id].present?
+              @areas.find { |a| a.id == params[:area_id].to_i }
+            end
+    @area ||= @areas.first
+
+    redirect_to tables_path(area_id: @area&.id), notice: "Table removed."
   end
 
   private
@@ -100,11 +109,21 @@ class TablesController < ApplicationController
       id: table.id,
       table_number: table.table_number,
       shape: table.shape,
+      capacity: table.capacity,
       status: table.status,
       pos_x: table.pos_x.to_f,
       pos_y: table.pos_y.to_f,
       rotation: table.rotation.to_i
     }
     table.round? ? base.merge(radius: table.radius.to_f) : base.merge(width: table.width.to_f, height: table.height.to_f)
+  end
+
+  # Area id => existing table payloads. The wizard canvas consumes this to
+  # render the tables already placed in the selected area as read-only context
+  # while the admin positions a new/edited table.
+  def tables_by_area
+    Area.order(:name).each_with_object({}) do |area, hash|
+      hash[area.id] = area.tables.map { |t| table_json(t) }
+    end
   end
 end

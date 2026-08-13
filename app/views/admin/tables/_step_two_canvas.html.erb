@@ -1,0 +1,39 @@
+<div class="hidden space-y-6"
+     data-table-wizard-target="stepTwo"
+     data-controller="table-canvas"
+     data-table-canvas-shape-value="<%= @table.shape %>"
+     data-table-canvas-areas-value="<%= (@area_tables || {}).to_json %>"
+     data-table-canvas-area-images-value="<%= (@areas.to_h { |a| [a.id, (a.image.attached? ? url_for(a.image) : nil)] }).to_json %>">
+  <div class="rounded-[1.75rem] border border-[#8A1C2B]/10 bg-white/80 p-6 shadow-sm sm:p-8">
+    <div class="mb-6">
+      <h2 class="font-serif text-2xl font-semibold text-gray-900">Place on floor map</h2>
+      <p class="mt-1 text-sm text-gray-500">Table size is fixed by shape — drag to move and grab above the shape to rotate.</p>
+    </div>
+
+    <div data-table-canvas-target="canvasContainer"
+         id="table-canvas-stage"
+         class="w-full overflow-hidden rounded-2xl shadow-sm"></div>
+  </div>
+
+  <div class="flex items-center justify-between">
+    <button type="button"
+            data-action="table-wizard#goToStepOne"
+            class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50">
+      <span aria-hidden="true">←</span>
+      Back to details
+    </button>
+
+    <%= f.submit "Save table",
+          data: { table_canvas_target: "submitBtn" },
+          disabled: true,
+          class: "inline-flex items-center gap-2 rounded-full bg-[#8A1C2B] px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#6d1420] disabled:cursor-not-allowed disabled:opacity-50" %>
+  </div>
+
+  <%= f.hidden_field :pos_x, data: { table_canvas_target: "posX" } %>
+  <%= f.hidden_field :pos_y, data: { table_canvas_target: "posY" } %>
+  <%= f.hidden_field :width, data: { table_canvas_target: "width" } %>
+  <%= f.hidden_field :height, data: { table_canvas_target: "height" } %>
+  <%= f.hidden_field :radius, data: { table_canvas_target: "radius" } %>
+  <%= f.hidden_field :rotation, data: { table_canvas_target: "rotation" } %>
+</div>
+

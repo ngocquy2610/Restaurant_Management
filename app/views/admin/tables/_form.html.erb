@@ -1,0 +1,41 @@
+<%= form_with model: @table, data: {
+      controller: "table-wizard",
+      table_wizard_areas_value: (@areas.to_h { |a| [a.id, a.name] }).to_json,
+      table_wizard_table_types_value: (@table_types.to_h { |t| [t.id, t.type] }).to_json,
+      table_wizard_area_tables_value: (@area_tables || {}).to_json,
+      table_wizard_creating_value: @table.new_record?
+    } do |form| %>
+  <% if @table.errors.any? %>
+    <div id="error_explanation" class="mb-6 rounded-2xl bg-red-50 px-4 py-3 font-medium text-red-600">
+      <h2 class="font-semibold"><%= pluralize(@table.errors.count, "error") %> prohibited this table from being saved:</h2>
+      <ul class="ml-5 mt-1 list-disc">
+        <% @table.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <!-- Step progress indicator -->
+  <div class="mx-auto w-full max-w-3xl rounded-[1.75rem] border border-[#8A1C2B]/10 bg-white/70 px-6 py-4 shadow-sm">
+    <ol class="flex w-full items-center">
+      <li class="flex items-center gap-2.5" data-table-wizard-target="progressOne" data-state="active">
+        <span class="progress-circle flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold transition"></span>
+        <span class="hidden text-sm font-semibold sm:inline">Table details</span>
+      </li>
+
+      <li class="flex flex-1 items-center px-3 sm:px-5">
+        <span class="progress-line h-0.5 w-full rounded-full bg-gray-200 transition"></span>
+      </li>
+
+      <li class="flex items-center gap-2.5" data-table-wizard-target="progressTwo" data-state="idle">
+        <span class="text-sm font-semibold">Floor map</span>
+        <span class="progress-circle flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 text-sm font-bold transition"></span>
+      </li>
+    </ol>
+  </div>
+
+  <%= render "admin/tables/step_one_fields", f: form %>
+  <%= render "admin/tables/step_two_canvas", f: form %>
+<% end %>
+
