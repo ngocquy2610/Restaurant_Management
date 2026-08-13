@@ -56,7 +56,7 @@ tables = [
   ["M2", standard, :square, 2, :available, { pos_x: 240, pos_y: 80,  width: 60, height: 60, rotation: 0 }],
   ["M3", standard, :square, 4, :occupied,  { pos_x: 120, pos_y: 220, width: 90, height: 90, rotation: 0 }],
   ["M4", standard, :square, 4, :available, { pos_x: 260, pos_y: 220, width: 90, height: 90, rotation: 0 }],
-  ["M5", standard, :square, 6, :reserved,  { pos_x: 180, pos_y: 380, width: 110, height: 110, rotation: 0 }],
+  ["M5", standard, :square, 4, :reserved,  { pos_x: 180, pos_y: 380, width: 110, height: 110, rotation: 0 }],
   # Main Dining Floor (round tables)
   ["M6", vip,      :round,   4, :available, { pos_x: 420, pos_y: 150, radius: 50, rotation: 0 }],
   ["M7", vip,      :round,   4, :occupied,  { pos_x: 420, pos_y: 300, radius: 50, rotation: 0 }],

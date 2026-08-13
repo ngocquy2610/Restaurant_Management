@@ -3,7 +3,8 @@ Rails.application.routes.draw do
   resources :table_types
   # Public read-only floor-map viewer (single area at a time). Editing/drag-drop
   # (create/update/destroy) will be reintroduced in a later phase.
-  resources :tables, only: [:index, :show]
+  resources :tables, only: [:new, :create, :edit, :update, :destroy, :index, :show]
+  resources :areas, only: [:new, :create, :edit, :update, :destroy]
   # get "path", to: "controller#action"
 
   

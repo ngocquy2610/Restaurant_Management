@@ -15,7 +15,7 @@ one:
 two:
   table_type: two
   area: two
-  capacity: 4
+  capacity: 6
   status: 1
   table_number: A2
   shape: 2
