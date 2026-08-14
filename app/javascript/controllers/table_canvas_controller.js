@@ -329,11 +329,53 @@ export default class extends Controller {
     return field && field.value ? field.value : null;
   }
 
+  // Footprint of a shape as local X/Y offsets relative to its (x, y) position,
+  // accounting for the node's rotation and offset. Square/rectangle tables use
+  // offset (0,0), so Konva rotates them around their top-left corner — meaning a
+  // rotated `width x height` table can extend to the LEFT/UP of its stored corner
+  // (e.g. a 300x150 table at 90° reaches 150px to the left). dragBoundFunc uses
+  // these exact bounds so the whole rendered table always stays inside the stage.
+  rotatedBounds(shape) {
+    const w = shape.width();
+    const h = shape.height();
+    const ox = shape.offsetX();
+    const oy = shape.offsetY();
+    const rad = (shape.rotation() * Math.PI) / 180;
+    const cos = Math.cos(rad);
+    const sin = Math.sin(rad);
+
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+
+    // The four corners of the node's local rect, offset then rotated — the same
+    // path Konva uses when rendering (translate -> rotate -> -offset).
+    [
+      [0, 0],
+      [w, 0],
+      [w, h],
+      [0, h],
+    ].forEach(([px, py]) => {
+      const x = px - ox;
+      const y = py - oy;
+      const rx = x * cos - y * sin;
+      const ry = x * sin + y * cos;
+      minX = Math.min(minX, rx);
+      maxX = Math.max(maxX, rx);
+      minY = Math.min(minY, ry);
+      maxY = Math.max(maxY, ry);
+    });
+
+    return { minX, maxX, minY, maxY };
+  }
+
   // Keep the shape anchored to relevant drag events.
   bindShapeEvents(shape, isRound) {
-    // Keep the shape inside the stage while dragging. Round tables anchor on
-    // their center; square/rectangle tables on their top-left corner (matching
-    // the semantics the read-only viewer expects).
+    // Keep the shape inside the stage while dragging. Round tables are
+    // rotation-invariant and anchor on their center; square/rectangle tables
+    // tile the stage using their ACTUAL rotated footprint (see rotatedBounds),
+    // so a rotated table can never poke out of a container edge.
     shape.dragBoundFunc((pos) => {
       if (isRound) {
         const r = shape.width() / 2;
@@ -342,9 +384,10 @@ export default class extends Controller {
           y: Math.min(Math.max(pos.y, r), STAGE_HEIGHT - r),
         };
       }
+      const b = this.rotatedBounds(shape);
       return {
-        x: Math.min(Math.max(pos.x, 0), STAGE_WIDTH - shape.width()),
-        y: Math.min(Math.max(pos.y, 0), STAGE_HEIGHT - shape.height()),
+        x: Math.min(Math.max(pos.x, -b.minX), STAGE_WIDTH - b.maxX),
+        y: Math.min(Math.max(pos.y, -b.minY), STAGE_HEIGHT - b.maxY),
       };
     });
 
