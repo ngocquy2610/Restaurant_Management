@@ -1,0 +1,2 @@
+module FoodVariantsHelper
+end

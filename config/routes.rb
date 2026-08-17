@@ -1,4 +1,14 @@
 Rails.application.routes.draw do
+  resources :categories, except: [:show]
+
+  resources :foods do
+    resources :food_variants, only: [:create, :update, :destroy], shallow: true
+    resources :recipe_items, only: [:create, :update, :destroy], shallow: true
+  end
+
+  resources :ingredients, except: [:show]
+
+  
   resources :tables
   resources :table_types
   # Public read-only floor-map viewer (single area at a time). Editing/drag-drop

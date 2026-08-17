@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  food: one
+  food_variant: one
+  ingredient: one
+  quantity_required: 9.99
+
+two:
+  food: two
+  food_variant: two
+  ingredient: two
+  quantity_required: 9.99
