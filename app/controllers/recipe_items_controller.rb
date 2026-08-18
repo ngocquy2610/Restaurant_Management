@@ -3,58 +3,54 @@ class RecipeItemsController < ApplicationController
 
   # GET /recipe_items or /recipe_items.json
   def index
+    authorize RecipeItem, :index?
     @recipe_items = RecipeItem.all
   end
 
   # GET /recipe_items/1 or /recipe_items/1.json
   def show
+    authorize @recipe_item
   end
 
   # GET /recipe_items/new
   def new
     @recipe_item = RecipeItem.new
+    authorize @recipe_item
   end
 
   # GET /recipe_items/1/edit
   def edit
+    authorize @recipe_item
   end
 
   # POST /recipe_items or /recipe_items.json
   def create
     @recipe_item = RecipeItem.new(recipe_item_params)
+    authorize @recipe_item
 
-    respond_to do |format|
-      if @recipe_item.save
-        format.html { redirect_to @recipe_item, notice: "Recipe item was successfully created." }
-        format.json { render :show, status: :created, location: @recipe_item }
-      else
-        format.html { render :new, status: :unprocessable_content }
-        format.json { render json: @recipe_item.errors, status: :unprocessable_content }
-      end
+    if @recipe_item.save
+      redirect_to recipe_items_path, notice: "Recipe item was successfully created."
+    else
+      render "recipe_items/new", status: :unprocessable_content
     end
   end
 
   # PATCH/PUT /recipe_items/1 or /recipe_items/1.json
   def update
-    respond_to do |format|
-      if @recipe_item.update(recipe_item_params)
-        format.html { redirect_to @recipe_item, notice: "Recipe item was successfully updated.", status: :see_other }
-        format.json { render :show, status: :ok, location: @recipe_item }
-      else
-        format.html { render :edit, status: :unprocessable_content }
-        format.json { render json: @recipe_item.errors, status: :unprocessable_content }
-      end
+    authorize @recipe_item
+    if @recipe_item.update(recipe_item_params)
+      redirect_to recipe_items_path, notice: "Recipe item was successfully updated."
+    else
+      render "recipe_items/edit", status: :unprocessable_content
     end
   end
 
   # DELETE /recipe_items/1 or /recipe_items/1.json
   def destroy
+    authorize @recipe_item
     @recipe_item.destroy!
 
-    respond_to do |format|
-      format.html { redirect_to recipe_items_path, notice: "Recipe item was successfully destroyed.", status: :see_other }
-      format.json { head :no_content }
-    end
+    redirect_to recipe_items_path, notice: "Recipe item was successfully destroyed."
   end
 
   private
@@ -65,6 +61,6 @@ class RecipeItemsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def recipe_item_params
-      params.fetch(:recipe_item, {})
+      params.require(:recipe_item).permit(:food_id, :food_variant_id, :ingredient_id, :quantity_required)
     end
 end

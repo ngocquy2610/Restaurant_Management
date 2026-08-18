@@ -3,58 +3,59 @@ class FoodsController < ApplicationController
 
   # GET /foods or /foods.json
   def index
-    @foods = Food.all
+    authorize Food, :index?
+    @foods = Food.includes(:category).order(:name)
   end
 
   # GET /foods/1 or /foods/1.json
   def show
+    authorize @food
+    @food_variants = @food.food_variants.order(:name)
+    @recipe_items = @food.recipe_items.includes(:ingredient)
   end
 
   # GET /foods/new
   def new
     @food = Food.new
+    @categories = Category.order(:name)
+    authorize @food
   end
 
   # GET /foods/1/edit
   def edit
+    @categories = Category.order(:name)
+    authorize @food
   end
 
   # POST /foods or /foods.json
   def create
     @food = Food.new(food_params)
+    authorize @food
 
-    respond_to do |format|
-      if @food.save
-        format.html { redirect_to @food, notice: "Food was successfully created." }
-        format.json { render :show, status: :created, location: @food }
-      else
-        format.html { render :new, status: :unprocessable_content }
-        format.json { render json: @food.errors, status: :unprocessable_content }
-      end
+    if @food.save
+      redirect_to foods_path, notice: "Foods created"
+    else
+      @categories = Category.all
+      render 'foods/new', status: :unprocessable_entity
     end
   end
 
   # PATCH/PUT /foods/1 or /foods/1.json
   def update
-    respond_to do |format|
-      if @food.update(food_params)
-        format.html { redirect_to @food, notice: "Food was successfully updated.", status: :see_other }
-        format.json { render :show, status: :ok, location: @food }
-      else
-        format.html { render :edit, status: :unprocessable_content }
-        format.json { render json: @food.errors, status: :unprocessable_content }
-      end
+    authorize @food
+    if @food.update(food_params)
+      redirect_to foods_path, notice: "Foods updated."
+    else
+      render 'foods/edit', status: :unprocessable_entity
     end
   end
 
   # DELETE /foods/1 or /foods/1.json
   def destroy
+    authorize @food
     @food.destroy!
 
-    respond_to do |format|
-      format.html { redirect_to foods_path, notice: "Food was successfully destroyed.", status: :see_other }
-      format.json { head :no_content }
-    end
+    redirect_to foods_path, notice: "Food removed."
   end
 
   private
@@ -65,6 +66,6 @@ class FoodsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def food_params
-      params.fetch(:food, {})
+      params.require(:food).permit(:category_id, :name, :description, :base_price, :status, :image)
     end
 end

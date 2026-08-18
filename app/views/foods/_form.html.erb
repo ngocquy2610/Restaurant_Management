@@ -1,9 +1,8 @@
-<%= form_with(model: food, class: "contents") do |form| %>
+<%= form_with(model: food, class: "space-y-6") do |form| %>
   <% if food.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
-      <h2><%= pluralize(food.errors.count, "error") %> prohibited this food from being saved:</h2>
-
-      <ul class="list-disc ml-6">
+    <div id="error_explanation" class="mb-6 rounded-md border border-[#e5b3ad] bg-[#fbe9e6] px-4 py-3 text-[#8f1f2a]">
+      <h2 class="font-semibold"><%= pluralize(food.errors.count, "error") %> prohibited this food from being saved:</h2>
+      <ul class="mt-1 list-disc pl-5">
         <% food.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -11,7 +10,61 @@
     </div>
   <% end %>
 
-  <div class="inline">
-    <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <div class="sm:col-span-2">
+      <%= form.label :name, "Food name", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.text_field :name,
+            placeholder: "e.g. Grilled Salmon",
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] placeholder:text-[#7a5d5a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+    </div>
+
+    <div>
+      <%= form.label :category_id, "Category", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.collection_select :category_id, @categories, :id, :name,
+            { prompt: "Select a category" },
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+    </div>
+
+    <div>
+      <%= form.label :base_price, "Base price", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <div class="relative">
+        <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#7a5d5a]">$</span>
+        <%= form.number_field :base_price,
+              step: 0.01, min: 0, placeholder: "0.00",
+              class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] py-3 pl-8 pr-4 text-[1rem] text-[#2c1c1a] placeholder:text-[#7a5d5a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+      </div>
+    </div>
+
+    <div>
+      <%= form.label :status, "Status", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.select :status,
+            Food.statuses.keys.map { |s| [s.titleize, s] },
+            {},
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+    </div>
+
+    <div>
+      <%= form.label :image, "Image", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.file_field :image,
+            accept: "image/png,image/jpeg,image/webp",
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[0.95rem] text-[#5c4543] file:mr-4 file:rounded-md file:border-0 file:bg-[#e9d7d2] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-[#5c4543] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+
+      <% if food.image.attached? %>
+        <p class="mt-2 text-sm text-[#7a5d5a]">Currently attached: <%= food.image.filename %></p>
+      <% end %>
+    </div>
+
+    <div class="sm:col-span-2">
+      <%= form.label :description, "Description", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.text_area :description,
+            rows: 5,
+            placeholder: "Describe this dish, its ingredients, and how it is prepared...",
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] placeholder:text-[#7a5d5a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3 border-t border-[#e4d2ce] pt-6">
+    <%= form.submit class: "cursor-pointer rounded-md bg-[#7b1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#661a23]" %>
+    <%= link_to "Cancel", foods_path, class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
   </div>
 <% end %>

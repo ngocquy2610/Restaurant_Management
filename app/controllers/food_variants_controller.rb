@@ -3,58 +3,59 @@ class FoodVariantsController < ApplicationController
 
   # GET /food_variants or /food_variants.json
   def index
-    @food_variants = FoodVariant.all
+    authorize FoodVariant, :index?
+    @food_variants = FoodVariant.includes(:food).order(:name)
   end
 
   # GET /food_variants/1 or /food_variants/1.json
   def show
+    authorize @food_variant
   end
 
   # GET /food_variants/new
   def new
     @food_variant = FoodVariant.new
+    @foods = Food.order(:name)
+    authorize @food_variant
   end
 
   # GET /food_variants/1/edit
   def edit
+    @foods = Food.order(:name)
+    authorize @food_variant
   end
 
   # POST /food_variants or /food_variants.json
   def create
     @food_variant = FoodVariant.new(food_variant_params)
+    authorize @food_variant
 
-    respond_to do |format|
-      if @food_variant.save
-        format.html { redirect_to @food_variant, notice: "Food variant was successfully created." }
-        format.json { render :show, status: :created, location: @food_variant }
-      else
-        format.html { render :new, status: :unprocessable_content }
-        format.json { render json: @food_variant.errors, status: :unprocessable_content }
-      end
+    if @food_variant.save
+      redirect_to food_variants_path, notice: "Food variant was successfully created."
+    else
+      @foods = Food.order(:name)
+      render "food_variants/new", status: :unprocessable_content
     end
   end
 
   # PATCH/PUT /food_variants/1 or /food_variants/1.json
   def update
-    respond_to do |format|
-      if @food_variant.update(food_variant_params)
-        format.html { redirect_to @food_variant, notice: "Food variant was successfully updated.", status: :see_other }
-        format.json { render :show, status: :ok, location: @food_variant }
-      else
-        format.html { render :edit, status: :unprocessable_content }
-        format.json { render json: @food_variant.errors, status: :unprocessable_content }
-      end
+    authorize @food_variant
+
+    if @food_variant.update(food_variant_params)
+      redirect_to food_variant_path, notice: "Food variant was successfully updated."
+    else
+      @foods = Food.order(:name)
+      render "food_variants/edit", status: :unprocessable_content
     end
   end
 
   # DELETE /food_variants/1 or /food_variants/1.json
   def destroy
+    authorize @food_variant
     @food_variant.destroy!
 
-    respond_to do |format|
-      format.html { redirect_to food_variants_path, notice: "Food variant was successfully destroyed.", status: :see_other }
-      format.json { head :no_content }
-    end
+    redirect_to food_variants_path, notice: "Food variant was successfully destroyed."
   end
 
   private
@@ -65,6 +66,6 @@ class FoodVariantsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def food_variant_params
-      params.fetch(:food_variant, {})
+      params.require(:food_variant).permit(:food_id, :name, :price_adjustment)
     end
 end

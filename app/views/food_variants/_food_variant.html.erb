@@ -1,2 +1,26 @@
-<div id="<%= dom_id food_variant %>" class="w-full sm:w-auto my-5 space-y-5">
-</div>
+<% food_name = food_variant.food&.name || "Dish" %>
+<% price_adjustment = food_variant.price_adjustment || 0 %>
+<% final_price = food_variant.final_price rescue nil %>
+
+<article id="<%= dom_id food_variant %>" class="flex flex-col overflow-hidden rounded-[18px] border border-[#dfd0cc] bg-[#f5f0f0] p-6 shadow-[0_2px_0_rgba(82,52,46,0.02)]">
+  <div class="flex items-start justify-between gap-3">
+    <h2 class="font-serif text-[1.8rem] leading-tight tracking-[-0.04em] text-[#2d1d1d]"><%= food_variant.name %></h2>
+    <span class="whitespace-nowrap rounded-full bg-[#f0e7e5] px-2.5 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-[#5d4b49]"><%= food_name %></span>
+  </div>
+
+  <div class="mt-5 flex flex-wrap items-center gap-3">
+    <span class="rounded-md bg-[#7b1f2a] px-3 py-2 text-[1.2rem] font-semibold text-white shadow-sm">
+      $<%= number_to_currency(final_price, precision: 2, unit: "") %>
+    </span>
+    <span class="rounded-full border border-[#d8c7c2] bg-[#f1e8e5] px-3 py-1 text-[0.78rem] font-medium text-[#534642]">
+      Adj. $<%= number_to_currency(price_adjustment, precision: 2, unit: "") %>
+    </span>
+  </div>
+
+  <div class="mt-6 flex items-center gap-2 border-t border-[#e4d6d2] pt-5">
+    <%= link_to "Show", food_variant, class: "flex h-10 flex-1 items-center justify-center rounded-md border border-[#d8c1bc] bg-[#f8efee] text-sm font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+    <%= link_to "Edit", edit_food_variant_path(food_variant), class: "flex h-10 flex-1 items-center justify-center rounded-md border border-[#d8c1bc] bg-[#f8efee] text-sm font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+    <%= button_to "Delete", food_variant, method: :delete, data: { turbo_confirm: "Delete this food variant? This cannot be undone." }, class: "px-2 flex h-10 flex-1 cursor-pointer items-center justify-center rounded-md bg-[#8f1f2a] text-sm font-semibold text-white hover:bg-[#7a1a23]" %>
+  </div>
+</article>
+

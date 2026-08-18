@@ -1,15 +1,70 @@
-<% content_for :title, "Showing food variant" %>
+<% content_for :title, @food_variant.name %>
 
-<div class="md:w-2/3 w-full">
-  <% if notice.present? %>
-    <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
-  <% end %>
+<%
+  food = @food_variant.food
+  food_name = food&.name || "Unknown dish"
+  base_price = food&.base_price
+  price_adjustment = @food_variant.price_adjustment || 0
+  final_price = @food_variant.final_price rescue (base_price && base_price + price_adjustment)
+%>
 
-  <h1 class="font-bold text-4xl">Showing food variant</h1>
+<div class="min-h-screen bg-[#f4e6e2] text-[#2f1f1d]">
+  <main class="mx-auto flex w-full max-w-[860px] flex-col px-6 py-12">
+    <%= link_to food_variants_path, class: "mb-8 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-[#7b1f2a] hover:text-[#661a23]" do %>
+      <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+      Back to menu variants
+    <% end %>
 
-  <%= render @food_variant %>
+    <% if notice.present? %>
+      <div class="mb-6 rounded-md border border-[#bcd9b4] bg-[#eef7ea] px-4 py-3 text-[#3f7d2f]" id="notice"><%= notice %></div>
+    <% end %>
 
-  <%= link_to "Edit this food variant", edit_food_variant_path(@food_variant), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= link_to "Back to food variants", food_variants_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
-  <%= button_to "Destroy this food variant", @food_variant, method: :delete, form_class: "sm:inline-block mt-2 sm:mt-0 sm:ml-2", class: "w-full rounded-md px-3.5 py-2.5 text-white bg-red-600 hover:bg-red-500 font-medium cursor-pointer", data: { turbo_confirm: "Are you sure?" } %>
+    <div class="overflow-hidden rounded-[18px] border border-[#d7b9b2] bg-[#f8f3f1] shadow-sm">
+      <div class="border-b border-[#eadcd8] bg-[#7b1f2a] px-8 py-6">
+        <span class="inline-block rounded-full bg-white/15 px-3 py-1 text-[0.78rem] font-semibold uppercase tracking-[0.08em] text-white/90"><%= food_name %></span>
+      </div>
+
+      <div class="p-8">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 class="font-serif text-[3rem] leading-tight tracking-[-0.04em] text-[#2d1d1d]"><%= @food_variant.name %></h1>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <%= link_to "Edit", edit_food_variant_path(@food_variant), class: "rounded-md bg-[#7b1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#661a23]" %>
+            <%= button_to "Delete", @food_variant, method: :delete, data: { turbo_confirm: "Delete this food variant? This cannot be undone." }, class: "cursor-pointer rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+          </div>
+        </div>
+
+        <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
+          <div class="rounded-md border border-[#e4d6d2] bg-[#faf5f4] px-5 py-4">
+            <h2 class="mb-1 text-sm font-semibold uppercase tracking-wide text-[#7c5d58]">Food</h2>
+            <p class="text-[1.15rem] font-medium text-[#2f1f1d]"><%= food_name %></p>
+          </div>
+
+          <div class="rounded-md border border-[#e4d6d2] bg-[#faf5f4] px-5 py-4">
+            <h2 class="mb-1 text-sm font-semibold uppercase tracking-wide text-[#7c5d58]">Price adjustment</h2>
+            <p class="text-[1.15rem] font-medium text-[#2f1f1d]">
+              <%= price_adjustment.negative? ? "−" : "+" %>$<%= number_to_currency(price_adjustment.abs, precision: 2, unit: "") %>
+            </p>
+          </div>
+
+          <div class="rounded-md border border-[#e4d6d2] bg-[#faf5f4] px-5 py-4">
+            <h2 class="mb-1 text-sm font-semibold uppercase tracking-wide text-[#7c5d58]">Final price</h2>
+            <p class="text-[1.4rem] font-semibold text-[#7b1f2a]">$<%= number_to_currency(final_price, precision: 2, unit: "") %></p>
+          </div>
+        </div>
+
+        <% if food.present? %>
+          <div class="mt-8 border-t border-[#e6d6d2] pt-8">
+            <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-[#7c5d58]">Base price of <%= food_name %></h2>
+            <p class="max-w-[680px] text-[1.05rem] leading-[1.6] text-[#5b4a48]">
+              $<%= number_to_currency(food.base_price, precision: 2, unit: "") %> — before this variant's adjustment is applied.
+            </p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </main>
 </div>
+

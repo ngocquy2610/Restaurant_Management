@@ -1,7 +1,7 @@
-<nav class="absolute top-0 left-0 w-full z-20 flex items-center justify-between px-8 py-6 bg-amber-100">
+<nav class="fixed top-0 left-0 w-full z-30 flex items-center justify-between px-8 py-6 bg-amber-100">
   <span class="text-[#8F000D] font-serif text-3xl font-bold"><%= link_to "Lumière Dining", root_path%></span>
   <div class="flex gap-10 text-black">
-    <a href="#">Menu</a>
+    <%= link_to "Menu", menus_path %>
     <a href="#">Wine List</a>
     <a href="#">Private Dining</a>
     <a href="#">Our Story</a>

@@ -3,58 +3,61 @@ class CategoriesController < ApplicationController
 
   # GET /categories or /categories.json
   def index
+    authorize Category, :index?
     @categories = Category.all
   end
 
   # GET /categories/1 or /categories/1.json
   def show
+    authorize @category
+    @foods = @category.foods
+    @food_variants = []
+    @foods.each do |food|
+      if food.food_variants.any?
+        @food_variants.concat(food.food_variants)
+      end
+    end
   end
 
   # GET /categories/new
   def new
     @category = Category.new
+    authorize @category
   end
 
   # GET /categories/1/edit
   def edit
+    authorize @category
   end
 
   # POST /categories or /categories.json
   def create
     @category = Category.new(category_params)
+    authorize @category
 
-    respond_to do |format|
-      if @category.save
-        format.html { redirect_to @category, notice: "Category was successfully created." }
-        format.json { render :show, status: :created, location: @category }
-      else
-        format.html { render :new, status: :unprocessable_content }
-        format.json { render json: @category.errors, status: :unprocessable_content }
-      end
+    if @category.save
+      redirect_to categories_path, notice: "Category added."
+    else
+      render 'categories/new', status: :unprocessable_entity
     end
   end
 
   # PATCH/PUT /categories/1 or /categories/1.json
   def update
-    respond_to do |format|
-      if @category.update(category_params)
-        format.html { redirect_to @category, notice: "Category was successfully updated.", status: :see_other }
-        format.json { render :show, status: :ok, location: @category }
-      else
-        format.html { render :edit, status: :unprocessable_content }
-        format.json { render json: @category.errors, status: :unprocessable_content }
-      end
+    authorize @category
+    if @category.update(category_params)
+      redirect_to categories_path, notice: "Category updated."
+    else
+      render 'categories/edit', status: :unprocessable_entity
     end
   end
 
   # DELETE /categories/1 or /categories/1.json
   def destroy
+    authorize @category
     @category.destroy!
 
-    respond_to do |format|
-      format.html { redirect_to categories_path, notice: "Category was successfully destroyed.", status: :see_other }
-      format.json { head :no_content }
-    end
+    redirect_to categories_path, notice: "Category removed."
   end
 
   private
@@ -65,6 +68,6 @@ class CategoriesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def category_params
-      params.fetch(:category, {})
+     params.require(:category).permit(:name)
     end
 end

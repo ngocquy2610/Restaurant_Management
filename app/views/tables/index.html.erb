@@ -1,6 +1,6 @@
 <% content_for :title, "Restaurant Tables" %>
 
-<div class="relative"><%= render "layouts/header" %></div>
+
 
 <div class="min-h-screen bg-[#FBF0EC] px-4 py-10 pt-28">
   <div class="mx-auto max-w-7xl space-y-8">
@@ -30,10 +30,12 @@
           <%= link_to "Add Area",
                       new_area_path,
                       class: "inline-flex items-center justify-center rounded-full border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50" %>
-          <%= link_to "Edit Area", edit_area_path(id: @area.id), class: "inline-flex items-center justify-center rounded-full border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50" %>
-          <%= link_to "Delete", area_path(@area),
-            data: { turbo_method: :delete, turbo_confirm: "Delete this area and all its tables?" },
-            class: "text-red-600 inline-flex items-center justify-center rounded-full border border-gray-200 bg-white px-4 py-3 text-sm font-semibold shadow-sm transition hover:bg-gray-50" %>
+          <% if @area %>
+            <%= link_to "Edit Area", edit_area_path(id: @area.id), class: "inline-flex items-center justify-center rounded-full border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50" %>
+            <%= link_to "Delete", area_path(@area),
+              data: { turbo_method: :delete, turbo_confirm: "Delete this area and all its tables?" },
+              class: "text-red-600 inline-flex items-center justify-center rounded-full border border-gray-200 bg-white px-4 py-3 text-sm font-semibold shadow-sm transition hover:bg-gray-50" %>
+          <%end%>
         </div>
       <% end %>
     </div>

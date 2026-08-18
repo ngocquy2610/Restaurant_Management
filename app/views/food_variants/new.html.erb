@@ -1,9 +1,19 @@
 <% content_for :title, "New food variant" %>
 
-<div class="md:w-2/3 w-full">
-  <h1 class="font-bold text-4xl">New food variant</h1>
+<div class="pt-[5.25rem] min-h-screen bg-[#f4e6e2] text-[#2f1f1d]">
+  <main class="mx-auto flex w-full max-w-[720px] flex-col px-6 py-12">
+    <%= link_to food_variants_path, class: "mb-8 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-[#7b1f2a] hover:text-[#661a23]" do %>
+      <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+      Back to menu variants
+    <% end %>
 
-  <%= render "form", food_variant: @food_variant %>
+    <div class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-8 shadow-sm">
+      <h1 class="font-serif text-4xl font-semibold tracking-tight text-[#2f1f1d]">New food variant</h1>
+      <p class="mt-2 text-[1.05rem] text-[#7a5a56]">Add a new size or portion for one of your dishes.</p>
 
-  <%= link_to "Back to food variants", food_variants_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
+      <div class="mt-8">
+        <%= render "form", food_variant: @food_variant %>
+      </div>
+    </div>
+  </main>
 </div>

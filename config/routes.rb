@@ -1,10 +1,13 @@
 Rails.application.routes.draw do
-  resources :categories, except: [:show]
+  resources :menus, only: [:index, :show]
+  resources :categories
+  resources :foods
 
   resources :foods do
-    resources :food_variants, only: [:create, :update, :destroy], shallow: true
-    resources :recipe_items, only: [:create, :update, :destroy], shallow: true
+    resources :recipe_items, only: [:index, :show, :new, :edit, :create, :update, :destroy], shallow: true
   end
+
+  resources :food_variants
 
   resources :ingredients, except: [:show]
 
