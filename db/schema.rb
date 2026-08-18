@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_13_032901) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_14_033643) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -50,10 +50,60 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_13_032901) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "categories", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_categories_on_name"
+  end
+
+  create_table "food_variants", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "food_id", null: false
+    t.string "name"
+    t.decimal "price_adjustment", precision: 10, scale: 2
+    t.datetime "updated_at", null: false
+    t.index ["food_id"], name: "index_food_variants_on_food_id"
+  end
+
+  create_table "foods", force: :cascade do |t|
+    t.decimal "base_price", precision: 10, scale: 2
+    t.bigint "category_id", null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name"
+    t.integer "status"
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_foods_on_category_id"
+  end
+
+  create_table "ingredients", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.decimal "current_stock", precision: 10, scale: 2
+    t.decimal "low_stock_threshold", precision: 10, scale: 2
+    t.string "name"
+    t.string "unit"
+    t.decimal "unit_cost", precision: 10, scale: 2
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_ingredients_on_name", unique: true
+  end
+
   create_table "jwt_denylists", force: :cascade do |t|
     t.datetime "exp", null: false
     t.string "jti", null: false
     t.index ["jti"], name: "index_jwt_denylists_on_jti"
+  end
+
+  create_table "recipe_items", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "food_id", null: false
+    t.bigint "food_variant_id", null: false
+    t.bigint "ingredient_id", null: false
+    t.decimal "quantity_required", precision: 10, scale: 2
+    t.datetime "updated_at", null: false
+    t.index ["food_id"], name: "index_recipe_items_on_food_id"
+    t.index ["food_variant_id"], name: "index_recipe_items_on_food_variant_id"
+    t.index ["ingredient_id"], name: "index_recipe_items_on_ingredient_id"
   end
 
   create_table "table_types", force: :cascade do |t|
@@ -84,35 +134,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_13_032901) do
 
   create_table "users", force: :cascade do |t|
     t.string "avatar_url"
-    t.datetime "confirmation_sent_at"
-    t.string "confirmation_token"
-    t.datetime "confirmed_at"
     t.datetime "created_at", null: false
     t.string "email", null: false
     t.string "encrypted_password", default: "", null: false
-    t.integer "failed_attempts", default: 0, null: false
     t.string "full_name", null: false
     t.string "jti", null: false
     t.string "location"
-    t.datetime "locked_at"
     t.string "phone", null: false
-    t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
     t.integer "role", default: 0, null: false
     t.boolean "status", default: true, null: false
-    t.string "unconfirmed_email"
-    t.string "unlock_token"
     t.datetime "updated_at", null: false
-    t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["jti"], name: "index_users_on_jti", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
-    t.index ["unlock_token"], name: "index_users_on_unlock_token", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "food_variants", "foods"
+  add_foreign_key "foods", "categories"
+  add_foreign_key "recipe_items", "food_variants"
+  add_foreign_key "recipe_items", "foods"
+  add_foreign_key "recipe_items", "ingredients"
   add_foreign_key "tables", "areas"
   add_foreign_key "tables", "table_types"
 end

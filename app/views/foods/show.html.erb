@@ -1,0 +1,102 @@
+<% content_for :title, @food.name %>
+
+<%
+  image_url = if @food.image.attached?
+    url_for(@food.image)
+  else
+    "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80"
+  end
+  status_active = @food.active?
+  status_label = @food.status&.to_s&.titleize || "Active"
+%>
+
+<div class="min-h-screen bg-[#f4e6e2] text-[#2f1f1d]">
+  <main class="mx-auto flex w-full max-w-[860px] flex-col px-6 py-12">
+    <%= link_to foods_path, class: "mb-8 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-[#7b1f2a] hover:text-[#661a23]" do %>
+      <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+      Back to menu items
+    <% end %>
+
+    <% if notice.present? %>
+      <div class="mb-6 rounded-md border border-[#bcd9b4] bg-[#eef7ea] px-4 py-3 text-[#3f7d2f]" id="notice"><%= notice %></div>
+    <% end %>
+
+    <div class="overflow-hidden rounded-[18px] border border-[#d7b9b2] bg-[#f8f3f1] shadow-sm">
+      <div class="relative h-[300px] w-full bg-cover bg-center" style="background-image: url('<%= image_url %>');">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-black/5 to-transparent"></div>
+        <div class="absolute bottom-4 left-5 flex flex-wrap items-center gap-2">
+          <span class="rounded-md bg-[#f6efe8] px-3 py-2 text-[1.25rem] font-semibold text-[#3a2a28] shadow-sm">
+            $<%= number_to_currency(@food.base_price, precision: 2, unit: "") %>
+          </span>
+          <span class="<%= status_active ? "bg-[#25512d]/90 text-white" : "bg-[#8f1f2a]/90 text-white" %> rounded-full px-3 py-1 text-[0.75rem] font-semibold uppercase tracking-[0.08em] shadow-sm">
+            <%= status_label %>
+          </span>
+        </div>
+      </div>
+
+      <div class="p-8">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 class="font-serif text-[3rem] leading-tight tracking-[-0.04em] text-[#2d1d1d]"><%= @food.name %></h1>
+            <% if @food.category.present? %>
+              <span class="mt-2 inline-block rounded-full bg-[#f0e7e5] px-3 py-1 text-[0.75rem] font-semibold uppercase tracking-[0.08em] text-[#5d4b49]">
+                <%= @food.category.name %>
+              </span>
+            <% end %>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <%= link_to "Edit", edit_food_path(@food), class: "rounded-md bg-[#7b1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#661a23]" %>
+            <%= button_to "Delete", @food, method: :delete, data: { turbo_confirm: "Delete this food? This cannot be undone." }, class: "cursor-pointer rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+          </div>
+        </div>
+
+        <div class="mt-8 border-t border-[#e6d6d2] pt-8">
+          <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-[#7c5d58]">Description</h2>
+          <p class="max-w-[680px] text-[1.05rem] leading-[1.6] text-[#5b4a48]">
+            <%= @food.description.presence || "No description provided for this dish." %>
+          </p>
+        </div>
+
+        <% if @food_variants.any? %>
+          <div class="mt-8 border-t border-[#e6d6d2] pt-8">
+            <div class="mb-4 flex items-center justify-between">
+              <h2 class="text-sm font-semibold uppercase tracking-wide text-[#7c5d58]">Variants</h2>
+            </div>
+            <ul class="divide-y divide-[#eadcd8] overflow-hidden rounded-lg border border-[#eadcd8]">
+              <% @food_variants.each do |variant| %>
+                <li class="flex items-center justify-between gap-4 bg-[#faf5f4] px-5 py-4">
+                  <span class="text-[1.05rem] font-medium text-[#2f1f1d]"><%= variant.name %></span>
+                  <span class="font-semibold text-[#7b1f2a]">
+                    $<%= number_to_currency(variant.final_price, precision: 2, unit: "") %>
+                  </span>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <% if @recipe_items.any? %>
+          <div class="mt-8 border-t border-[#e6d6d2] pt-8">
+            <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-[#7c5d58]">Ingredients</h2>
+            <ul class="divide-y divide-[#eadcd8] overflow-hidden rounded-lg border border-[#eadcd8]">
+              <% @recipe_items.each do |item| %>
+                <li class="flex items-center justify-between gap-4 bg-[#faf5f4] px-5 py-4">
+                  <span class="text-[1.05rem] font-medium text-[#2f1f1d]">
+                    <%= item.ingredient&.name || "Unknown ingredient" %>
+                  </span>
+                  <span class="text-[0.95rem] text-[#7a5d5a]">
+                    <%= item.quantity_required %>
+                    <% if item.ingredient.present? && item.ingredient.unit.present? %>
+                      <%= item.ingredient.unit %>
+                    <% end %>
+                  </span>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </main>
+</div>
