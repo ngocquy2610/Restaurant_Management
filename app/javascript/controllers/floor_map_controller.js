@@ -4,6 +4,16 @@ import { createTableImageNode } from "controllers/table_image";
 
 const Konva = window.Konva;
 
+// Status dot colours — must stay in sync with STATUS_META in
+// app/helpers/tables_helper.rb so the floor map matches the page legend.
+const STATUS_COLORS = {
+  available: "#22c55e", // green-500
+  occupied: "#ef4444", // red-500
+  reserved: "#f59e0b", // amber-500
+  out_of_service: "#9ca3af", // gray-400
+};
+const STATUS_RING = "#ffffff"; // white stroke so the dot reads on any table photo.
+
 export default class extends Controller {
   static values = { area: Object, tables: Array };
 
@@ -93,11 +103,30 @@ export default class extends Controller {
     shape.listening(true);
     group.add(shape);
 
-    // Center a table_number label on the shape (origin of the group = shape
-    // top-left for rects / center for circles).
+    // Center point of the table in group coordinates (origin = shape top-left
+    // for rects / center for circles).
+    const centerX = isRound ? 0 : width / 2;
+    const centerY = isRound ? 0 : height / 2;
+
+    // Status dot at the very centre of the table so the status is readable at a
+    // glance. Non-listening so pointer events still reach the table shape.
+    const statusDot = new Konva.Circle({
+      x: centerX,
+      y: centerY,
+      radius: 8,
+      fill: STATUS_COLORS[table.status] || STATUS_COLORS.out_of_service,
+      stroke: STATUS_RING,
+      strokeWidth: 2,
+      shadowColor: "rgba(0,0,0,0.25)",
+      shadowBlur: 3,
+      listening: false,
+    });
+    group.add(statusDot);
+
+    // Center a table_number label just below the status dot.
     const label = new Konva.Text({
-      x: isRound ? 0 : width / 2,
-      y: isRound ? 0 : height / 2,
+      x: centerX,
+      y: centerY + 20,
       fontSize: 13,
       fontFamily: "sans-serif",
       fontStyle: "bold",
