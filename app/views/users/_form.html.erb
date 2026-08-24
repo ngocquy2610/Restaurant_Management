@@ -1,0 +1,166 @@
+<%= form_with model: @user, class: "mx-auto w-full max-w-3xl space-y-6" do |form| %>
+  <% if @user.errors.any? %>
+    <div id="error_explanation" class="rounded-2xl bg-red-50 px-4 py-3 font-medium text-red-600">
+      <h2 class="font-semibold"><%= pluralize(@user.errors.count, "error") %> prohibited this user from being saved:</h2>
+      <ul class="ml-5 mt-1 list-disc">
+        <% @user.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <!-- Personal details card -->
+  <div class="rounded-[1.75rem] border border-[#8A1C2B]/10 bg-white/80 p-6 shadow-sm sm:p-8">
+    <div class="mb-8">
+      <h2 class="font-serif text-2xl font-semibold text-gray-900">Personal details</h2>
+      <p class="mt-1 text-sm text-gray-500">Basic contact and identity information for this user.</p>
+    </div>
+
+    <div class="grid gap-6 sm:grid-cols-2">
+      <!-- Full name -->
+      <div class="sm:col-span-2">
+        <%= form.label :full_name, class: "mb-1.5 flex items-center gap-2 text-sm font-semibold text-gray-700" do %>
+          <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#8A1C2B]/10 text-sm">👤</span>
+          Full name
+        <% end %>
+        <%= form.text_field :full_name,
+              class: "mt-1 block w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm outline-none transition placeholder:text-gray-400 focus:border-[#8A1C2B] focus:ring-2 focus:ring-[#8A1C2B]/20",
+              placeholder: "e.g. John Doe",
+              required: true %>
+      </div>
+
+      <!-- Email -->
+      <div>
+        <%= form.label :email, class: "mb-1.5 flex items-center gap-2 text-sm font-semibold text-gray-700" do %>
+          <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#8A1C2B]/10 text-sm">✉️</span>
+          Email address
+        <% end %>
+        <%= form.email_field :email, class: "mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm outline-none transition placeholder:text-gray-400 focus:border-[#8A1C2B] focus:ring-2 focus:ring-[#8A1C2B]/20",
+              placeholder: "e.g. john@example.com",
+              required: true %>
+      </div>
+
+      <!-- Phone -->
+      <div>
+        <%= form.label :phone, class: "mb-1.5 flex items-center gap-2 text-sm font-semibold text-gray-700" do %>
+          <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#8A1C2B]/10 text-sm">📞</span>
+          Phone number
+        <% end %>
+        <%= form.telephone_field :phone,
+              class: "mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm outline-none transition placeholder:text-gray-400 focus:border-[#8A1C2B] focus:ring-2 focus:ring-[#8A1C2B]/20",
+              placeholder: "e.g. 1234567890",
+              required: true %>
+      </div>
+
+      <!-- Location -->
+      <div>
+        <%= form.label :location, class: "mb-1.5 flex items-center gap-2 text-sm font-semibold text-gray-700" do %>
+          <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#8A1C2B]/10 text-sm">📍</span>
+          Location
+        <% end %>
+        <%= form.text_field :location,
+              class: "mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm outline-none transition placeholder:text-gray-400 focus:border-[#8A1C2B] focus:ring-2 focus:ring-[#8A1C2B]/20",
+              placeholder: "e.g. New York, NY" %>
+      </div>
+
+      <!-- Avatar upload -->
+      <div class="sm:col-span-2">
+        <%= form.label :avatar, class: "mb-1.5 flex items-center gap-2 text-sm font-semibold text-gray-700" do %>
+          <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#8A1C2B]/10 text-sm">🖼️</span>
+          Avatar
+        <% end %>
+
+        <% if @user.avatar.attached? %>
+          <%= image_tag @user.avatar,
+                class: "mb-3 h-28 w-28 rounded-2xl border border-gray-200 object-cover shadow-sm",
+                alt: "Current avatar for #{@user.full_name}" %>
+        <% end %>
+
+        <%= form.file_field :avatar,
+              class: "mt-1 block w-full cursor-pointer rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-700 shadow-sm outline-none transition file:mr-3 file:rounded-lg file:border-0 file:bg-[#8A1C2B]/10 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-[#8A1C2B] hover:file:bg-[#8A1C2B]/20 focus:border-[#8A1C2B] focus:ring-2 focus:ring-[#8A1C2B]/20",
+              accept: "image/png,image/jpeg,image/jpg,image/webp" %>
+        <p class="mt-1.5 text-xs text-gray-500">Optional. PNG, JPEG, or WEBP profile photo. Leave blank to keep the current avatar.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Password notice -->
+  <div class="rounded-[1.75rem] border border-gray-200 bg-white/60 p-6 shadow-sm sm:p-8">
+    <div class="flex items-center gap-3">
+      <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-[#8A1C2B]/10 text-xl">🔒</span>
+      <div>
+        <h2 class="font-serif text-lg font-semibold text-gray-900">Password</h2>
+        <p class="mt-1 text-sm text-gray-500">
+          The password is not editable here. Use the dedicated account flow to change it.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Administrative details card (admin only) -->
+  <% if current_user.admin? %>
+    <div class="rounded-[1.75rem] border border-[#8A1C2B]/10 bg-white/80 p-6 shadow-sm sm:p-8">
+      <div class="mb-8">
+        <h2 class="font-serif text-2xl font-semibold text-gray-900">Administrative details</h2>
+        <p class="mt-1 text-sm text-gray-500">Role, access status and membership tier controls for administrators.</p>
+      </div>
+
+      <div class="grid gap-6 sm:grid-cols-2">
+        <!-- Role -->
+        <div>
+          <%= form.label :role, class: "mb-1.5 flex items-center gap-2 text-sm font-semibold text-gray-700" do %>
+            <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#8A1C2B]/10 text-sm">🛡️</span>
+            Role
+          <% end %>
+          <%= form.select :role,
+                User.roles.keys.map { |key| [key.humanize, key] },
+                {},
+                class: "mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm outline-none transition focus:border-[#8A1C2B] focus:ring-2 focus:ring-[#8A1C2B]/20" %>
+        </div>
+
+        <!-- Status -->
+        <div>
+          <%= form.label :status, class: "mb-1.5 flex items-center gap-2 text-sm font-semibold text-gray-700" do %>
+            <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#8A1C2B]/10 text-sm">✅</span>
+            Status
+          <% end %>
+          <%= form.select :status,
+                { "Active" => true, "Inactive" => false },
+                {},
+                class: "mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm outline-none transition focus:border-[#8A1C2B] focus:ring-2 focus:ring-[#8A1C2B]/20" %>
+        </div>
+
+        <!-- Member tier -->
+        <div class="sm:col-span-2">
+          <%= form.label :member_tier_id, class: "mb-1.5 flex items-center gap-2 text-sm font-semibold text-gray-700" do %>
+            <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#8A1C2B]/10 text-sm">🥇</span>
+            Member tier
+          <% end %>
+          <%= form.collection_select :member_tier_id, @member_tiers, :id, :name,
+                { include_blank: "No tier assigned" },
+                class: "mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm outline-none transition focus:border-[#8A1C2B] focus:ring-2 focus:ring-[#8A1C2B]/20" %>
+        </div>
+
+        <!-- Year spend -->
+        <div class="sm:col-span-2">
+          <%= form.label :year_spend, class: "mb-1.5 flex items-center gap-2 text-sm font-semibold text-gray-700" do %>
+            <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-[#8A1C2B]/10 text-sm">💰</span>
+            Year-to-date spend
+          <% end %>
+          <%= form.number_field :year_spend, step: 0.01, min: 0,
+                class: "mt-1 block w-full rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 shadow-sm outline-none transition placeholder:text-gray-400 focus:border-[#8A1C2B] focus:ring-2 focus:ring-[#8A1C2B]/20",
+                placeholder: "0.00" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Actions -->
+  <div class="flex justify-end gap-3">
+    <%= link_to "Cancel", user_path(@user),
+        class: "inline-flex items-center rounded-full border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50" %>
+    <%= form.submit "Update user",
+          class: "inline-flex items-center gap-2 rounded-full bg-[#8A1C2B] px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#6d1420]" %>
+  </div>
+<% end %>

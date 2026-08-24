@@ -50,9 +50,15 @@
               <tr class="transition hover:bg-[#FAF5F1]">
                 <td class="px-6 py-5">
                   <div class="flex items-center gap-4">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#8A1C2B]/10 text-sm font-semibold text-[#8A1C2B]">
-                      <%= initials.presence || "?" %>
-                    </div>
+                    <% if employee.avatar.attached? %>
+                      <%= image_tag employee.avatar,
+                            class: "h-12 w-12 rounded-2xl border border-gray-200 object-cover text-sm font-semibold text-[#8A1C2B]",
+                            alt: "#{employee.full_name}'s avatar" %>
+                    <% else %>
+                      <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#8A1C2B]/10 text-sm font-semibold text-[#8A1C2B]">
+                        <%= initials.presence || "?" %>
+                      </div>
+                    <% end %>
                     <div>
                       <p class="text-sm font-semibold text-gray-900"><%= employee.full_name %></p>
                       <p class="mt-1 text-xs text-gray-500"><%= employee.email %></p>
@@ -79,7 +85,10 @@
                 </td>
 
                 <td class="px-6 py-5">
-                  <%= link_to "View", user_path(employee), class: "inline-flex rounded-full border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50" %>
+                  <div class="flex items-center gap-2">
+                    <%= link_to "View", user_path(employee), class: "inline-flex rounded-full border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50" %>
+                    <%= link_to "Edit", edit_user_path(employee), class: "inline-flex rounded-full bg-[#8A1C2B]/10 px-3 py-2 text-xs font-semibold text-[#8A1C2B] transition hover:bg-[#8A1C2B]/20" %>
+                  </div>
                 </td>
               </tr>
             <% end %>

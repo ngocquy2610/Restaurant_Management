@@ -1,11 +1,22 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+# Valid names come from the `name` enum (bronze / silver / gold / diamond).
 
-one:
-  name: MyString
-  discount: 1
-  active_price: 1
+bronze:
+  name: bronze
+  discount: 5
+  active_price: 0
 
-two:
-  name: MyString
-  discount: 1
-  active_price: 1
+silver:
+  name: silver
+  discount: 10
+  active_price: 500
+
+gold:
+  name: gold
+  discount: 15
+  active_price: 1200
+
+diamond:
+  name: diamond
+  discount: 20
+  active_price: 2500

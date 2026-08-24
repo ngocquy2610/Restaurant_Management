@@ -19,7 +19,7 @@ class ApplicationController < ActionController::Base
 
   def configure_permitted_parameters
     devise_parameter_sanitizer.permit(:sign_up, keys: [:full_name, :phone, :location])
-    devise_parameter_sanitizer.permit(:account_update, keys: [:full_name, :phone, :location, :avatar_url])
+    devise_parameter_sanitizer.permit(:account_update, keys: [:full_name, :phone, :location, :avatar])
   end
 
   def layout_by_resource

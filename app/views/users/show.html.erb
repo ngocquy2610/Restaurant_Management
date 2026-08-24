@@ -1,3 +1,7 @@
+<%
+  # Small helper to format monetary values consistently (e.g. "$1,250.00").
+  money = ->(value) { value.nil? ? "—" : number_to_currency(value) }
+%>
 <div class="relative"><%= render "layouts/header" %></div>
 <div class="min-h-screen bg-[#FBF0EC] py-10 px-4 pt-28">
   <div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
@@ -7,11 +11,17 @@
 
       <!-- Profile card - REAL DATA -->
       <div class="bg-white rounded-2xl shadow-sm p-6 text-center">
-        <div class="w-28 h-28 rounded-xl bg-[#8A1C2B]/10 flex items-center justify-center mx-auto mb-4">
-          <span class="text-3xl font-serif text-[#8A1C2B]">
-            <%= @user.full_name.to_s.first(1).upcase %>
-          </span>
-        </div>
+        <% if @user.avatar.attached? %>
+          <%= image_tag @user.avatar,
+                class: "w-28 h-28 rounded-xl object-cover mx-auto mb-4 border border-gray-200",
+                alt: "#{@user.full_name}'s avatar" %>
+        <% else %>
+          <div class="w-28 h-28 rounded-xl bg-[#8A1C2B]/10 flex items-center justify-center mx-auto mb-4">
+            <span class="text-3xl font-serif text-[#8A1C2B]">
+              <%= @user.full_name.to_s.first(1).upcase %>
+            </span>
+          </div>
+        <% end %>
 
         <h1 class="font-serif text-2xl text-gray-900 mb-3"><%= @user.full_name %></h1>
 
@@ -25,12 +35,64 @@
           <% end %>
         </div>
 
-        <%= link_to "Edit Profile", edit_user_registration_path,
+        <%= link_to "Edit Profile", edit_user_path,
               class: "block w-full text-center rounded-lg border border-gray-300 text-gray-700 font-semibold text-sm py-2.5 hover:bg-gray-50 transition-colors" %>
       </div>
 
-      <!-- Membership status card - PLACEHOLDER -->
-      <div class="bg-gray-200 rounded-2xl h-40"></div>
+      <!-- Membership status card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-[#8A1C2B]/10 p-6 border-3 <%= tier_color(@current_tier.id) %>">
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="font-serif text-xl text-gray-900">Membership Status</h2>
+          
+          <% if @current_tier&.discount.present? %>
+            <span class="inline-flex items-center rounded-full bg-[#8A1C2B]/10 px-3 py-1 text-xs font-semibold text-[#8A1C2B]">
+              <%= @current_tier.discount %>% off
+            </span>
+          <% end %>
+
+        </div>
+
+        <% if @current_tier %>
+          <!-- Current tier -->
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-full bg-[#8A1C2B]/10 flex items-center justify-center shrink-0 ">
+              <span class="font-serif text-2xl text-[#8A1C2B] capitalize"><%= @current_tier.name.to_s.capitalize.first %></span>
+            </div>
+            <div>
+              <p class="font-serif text-2xl text-gray-900 capitalize"><%= @current_tier.name.to_s.capitalize %></p>
+              <p class="text-sm text-gray-500">Current membership level</p>
+            </div>
+          </div>
+
+          <div class="mt-5 space-y-2 text-sm">
+            <div class="flex items-center justify-between text-gray-500">
+              <span>Year-to-date spend</span>
+              <span class="font-semibold text-gray-900"><%= number_to_currency(@user.year_spend, precision: 0) %></span>
+            </div>
+            <div class="flex items-center justify-between text-gray-500">
+              <span>Member discount</span>
+              <span class="font-semibold text-gray-900"><%= @current_tier.discount %>%</span>
+            </div>
+          </div>
+
+          <!-- Next tier -->
+          <div class="mt-5 border-t border-gray-100 pt-4">
+            <% if @next_tier %>
+              <p class="text-sm text-gray-600">
+                Spend <span class="font-semibold text-[#8A1C2B]"><%= number_to_currency(@amount_to_next_tier, precision: 0) %></span> more this year to reach
+              </p>
+              <div class="flex items-center justify-between mt-3">
+                <p class="font-serif text-xl text-gray-900 capitalize"><%= @next_tier.name.to_s.capitalize %></p>
+                <p class="text-sm text-[#8A1C2B] font-semibold">Up to <%= @next_tier.discount %>% off</p>
+              </div>
+            <% else %>
+              <p class="text-sm text-gray-600 font-medium">You have reached the highest membership level 🏆</p>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-sm text-gray-500">Membership tiers are not yet available.</p>
+        <% end %>
+      </div>
     </div>
 
     <!-- ==================== RIGHT COLUMN ==================== -->
