@@ -10,7 +10,7 @@
   status_label = @food.status&.to_s&.titleize || "Active"
 %>
 
-<div class="min-h-screen bg-[#f4e6e2] text-[#2f1f1d]">
+<div class="pt-28 min-h-screen bg-[#f4e6e2] text-[#2f1f1d]">
   <main class="mx-auto flex w-full max-w-[860px] flex-col px-6 py-12">
     <%= link_to foods_path, class: "mb-8 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-[#7b1f2a] hover:text-[#661a23]" do %>
       <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>

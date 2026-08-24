@@ -4,7 +4,7 @@ class RecipeItemsController < ApplicationController
   # GET /recipe_items or /recipe_items.json
   def index
     authorize RecipeItem, :index?
-    @recipe_items = RecipeItem.all
+    @recipe_items = RecipeItem.includes(:food, :food_variant, :ingredient).order(:id)
   end
 
   # GET /recipe_items/1 or /recipe_items/1.json
@@ -16,11 +16,13 @@ class RecipeItemsController < ApplicationController
   def new
     @recipe_item = RecipeItem.new
     authorize @recipe_item
+    load_form_options
   end
 
   # GET /recipe_items/1/edit
   def edit
     authorize @recipe_item
+    load_form_options
   end
 
   # POST /recipe_items or /recipe_items.json
@@ -29,8 +31,9 @@ class RecipeItemsController < ApplicationController
     authorize @recipe_item
 
     if @recipe_item.save
-      redirect_to recipe_items_path, notice: "Recipe item was successfully created."
+      redirect_to foods_path, notice: "Recipe item was successfully created."
     else
+      load_form_options
       render "recipe_items/new", status: :unprocessable_content
     end
   end
@@ -39,8 +42,9 @@ class RecipeItemsController < ApplicationController
   def update
     authorize @recipe_item
     if @recipe_item.update(recipe_item_params)
-      redirect_to recipe_items_path, notice: "Recipe item was successfully updated."
+      redirect_to foods_path, notice: "Recipe item was successfully updated."
     else
+      load_form_options
       render "recipe_items/edit", status: :unprocessable_content
     end
   end
@@ -54,6 +58,13 @@ class RecipeItemsController < ApplicationController
   end
 
   private
+
+    def load_form_options
+      @foods = Food.order(:name)
+      @ingredients = Ingredient.order(:name)
+      @food_variants = FoodVariant.includes(:food).order(:name)
+    end
+
     # Use callbacks to share common setup or constraints between actions.
     def set_recipe_item
       @recipe_item = RecipeItem.find(params.expect(:id))

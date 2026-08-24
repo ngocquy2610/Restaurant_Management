@@ -46,6 +46,7 @@ class FoodsController < ApplicationController
     if @food.update(food_params)
       redirect_to foods_path, notice: "Foods updated."
     else
+      @categories = Category.order(:name)
       render 'foods/edit', status: :unprocessable_entity
     end
   end
