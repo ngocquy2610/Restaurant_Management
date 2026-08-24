@@ -1,9 +1,12 @@
-<%= form_with(model: recipe_item, class: "contents") do |form| %>
-  <% if recipe_item.errors.any? %>
-    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
-      <h2><%= pluralize(recipe_item.errors.count, "error") %> prohibited this recipe_item from being saved:</h2>
+<% variants_json = @food_variants.group_by(&:food_id).transform_values { |vs| vs.map { |v| { id: v.id, name: v.name } } }.to_json %>
+<% current_variants = recipe_item.food_id.present? ? @food_variants.select { |v| v.food_id == recipe_item.food_id.to_i } : [] %>
 
-      <ul class="list-disc ml-6">
+<%= form_with(model: recipe_item, class: "space-y-6",
+      data: { controller: "recipe-item-form", recipe_item_form_variants_value: variants_json }) do |form| %>
+  <% if recipe_item.errors.any? %>
+    <div id="error_explanation" class="mb-6 rounded-md border border-[#e5b3ad] bg-[#fbe9e6] px-4 py-3 text-[#8f1f2a]">
+      <h2 class="font-semibold"><%= pluralize(recipe_item.errors.count, "error") %> prohibited this recipe item from being saved:</h2>
+      <ul class="mt-1 list-disc pl-5">
         <% recipe_item.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -11,7 +14,43 @@
     </div>
   <% end %>
 
-  <div class="inline">
-    <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <div>
+      <%= form.label :food_id, "Food", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.collection_select :food_id, @foods, :id, :name,
+            { prompt: "Select a food" },
+            data: { recipe_item_form_target: "food", action: "change->recipe-item-form#updateVariants" },
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+    </div>
+
+    <div>
+      <%= form.label :food_variant_id, "Food variant", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.select :food_variant_id,
+            current_variants.map { |v| [v.name, v.id] },
+            { include_blank: "No variant (base recipe)" },
+            data: { recipe_item_form_target: "variant" },
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+      <p class="mt-2 text-sm text-[#7a5d5a]">Filtered to the selected food. Leave empty to apply this ingredient to the base recipe.</p>
+    </div>
+
+    <div>
+      <%= form.label :ingredient_id, "Ingredient", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.collection_select :ingredient_id, @ingredients, :id, ->(ingredient) { "#{ingredient.name} (#{ingredient.unit})" },
+            { prompt: "Select an ingredient" },
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+    </div>
+
+    <div>
+      <%= form.label :quantity_required, "Quantity required", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.number_field :quantity_required,
+            step: 0.01, min: 0.01, placeholder: "0.00",
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] placeholder:text-[#7a5d5a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+      <p class="mt-2 text-sm text-[#7a5d5a]">Amount of the selected ingredient used per serving.</p>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3 border-t border-[#e4d2ce] pt-6">
+    <%= form.submit class: "cursor-pointer rounded-md bg-[#7b1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#661a23]" %>
+    <%= link_to "Cancel", recipe_items_path, class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
   </div>
 <% end %>

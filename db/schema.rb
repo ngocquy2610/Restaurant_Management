@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_14_033643) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_24_032639) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -94,10 +94,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_033643) do
     t.index ["jti"], name: "index_jwt_denylists_on_jti"
   end
 
+  create_table "member_tiers", force: :cascade do |t|
+    t.integer "active_price"
+    t.datetime "created_at", null: false
+    t.integer "discount"
+    t.string "name"
+    t.datetime "updated_at", null: false
+  end
+
   create_table "recipe_items", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "food_id", null: false
-    t.bigint "food_variant_id", null: false
+    t.bigint "food_variant_id"
     t.bigint "ingredient_id", null: false
     t.decimal "quantity_required", precision: 10, scale: 2
     t.datetime "updated_at", null: false
@@ -140,14 +148,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_033643) do
     t.string "full_name", null: false
     t.string "jti", null: false
     t.string "location"
+    t.bigint "member_tier_id"
     t.string "phone", null: false
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
     t.integer "role", default: 0, null: false
     t.boolean "status", default: true, null: false
     t.datetime "updated_at", null: false
+    t.decimal "year_spend", precision: 10, scale: 2
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["jti"], name: "index_users_on_jti", unique: true
+    t.index ["member_tier_id"], name: "index_users_on_member_tier_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
@@ -160,4 +171,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_033643) do
   add_foreign_key "recipe_items", "ingredients"
   add_foreign_key "tables", "areas"
   add_foreign_key "tables", "table_types"
+  add_foreign_key "users", "member_tiers"
 end
