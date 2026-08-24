@@ -32,13 +32,10 @@ class User < ApplicationRecord
 
   attribute :year_spend, default: 0
 
-  # The tier a member currently holds. New members with no assigned tier fall
-  # back to the lowest tier (e.g. bronze at a $0 threshold).
   def current_member_tier
     member_tier || MemberTier.order(:active_price, :id).first
   end
 
-  # The tier directly above the member's current one, or nil at the top tier.
   def next_member_tier
     current = current_member_tier
     return nil if current.nil?
@@ -48,8 +45,6 @@ class User < ApplicationRecord
               .first
   end
 
-  # How much more must be spent this year to unlock the next tier.
-  # Returns nil when the member is already at the highest tier.
   def amount_to_next_member_tier
     return nil if next_member_tier.nil?
 
