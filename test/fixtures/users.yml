@@ -9,6 +9,8 @@ one:
   status: false
   avatar_url: http://example.com/avatar.jpg
   jti: <%= SecureRandom.uuid %>
+  member_tier: silver
+  year_spend: 700.0
 
 two:
   full_name: Jane Smith
@@ -19,3 +21,5 @@ two:
   status: false
   avatar_url: http://example.com/avatar2.jpg
   jti: <%= SecureRandom.uuid %>
+  member_tier: diamond
+  year_spend: 3000.0

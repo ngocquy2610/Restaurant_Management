@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
   before_action :set_user, only: %i[ show edit update destroy ]
+  before_action :set_member_tiers, only: %i[ edit update ]
 
   # GET /users or /users.json
   def index
@@ -14,6 +15,10 @@ class UsersController < ApplicationController
   # GET /users/1 or /users/1.json
   def show
     authorize @user
+
+    @current_tier = @user.current_member_tier
+    @next_tier = @user.next_member_tier
+    @amount_to_next_tier = @user.amount_to_next_member_tier
   end
 
   # GET /users/new
@@ -74,8 +79,17 @@ class UsersController < ApplicationController
       @user = User.find(params[:id])
     end
 
-    # Only allow a list of trusted parameters through.
+    def set_member_tiers
+      @member_tiers = MemberTier.order(:active_price, :id)
+    end
+
+    # Only allow a list of trusted parameters through. Password is intentionally
+    # NOT permitted here - it is changed through the dedicated password/Devise flow.
+    # Avatar is uploaded as an attached image (Active Storage), not a URL.
     def user_params
-      params.require(:user).permit(:full_name, :email, :phone, :password, :password_confirmation)
+      permitted = %i[ full_name email phone location avatar ]
+      permitted += %i[ role status member_tier_id year_spend ] if current_user.admin?
+
+      params.require(:user).permit(permitted)
     end
 end

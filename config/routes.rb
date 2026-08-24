@@ -51,5 +51,5 @@ Rails.application.routes.draw do
   get 'admin/users', to: "users#index"
   get 'admin/dashboards', to: "dashboards#index"
 
-  resources :users, only: [:show]
+  resources :users, only: [:show, :edit, :update]
 end

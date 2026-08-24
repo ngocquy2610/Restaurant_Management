@@ -25,7 +25,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
   end
 
   def configure_account_update_params
-    devise_parameter_sanitizer.permit(:account_update, keys: [:full_name, :phone, :location, :avatar_url])
+    devise_parameter_sanitizer.permit(:account_update, keys: [:full_name, :phone, :location, :avatar])
   end
 
   def after_sign_up_path_for(resource)
