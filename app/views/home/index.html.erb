@@ -18,11 +18,11 @@
               <div class="absolute inset-0 bg-gradient-to-t from-[#2f1f1d]/85 via-[#2f1f1d]/25 to-transparent"></div>
 
               <div class="absolute inset-x-0 bottom-0 p-6 sm:p-10">
-                <div class="max-w-2xl">
+                <div class="w-fit border border-white/30 bg-black/40 p-6 sm:p-8 rounded-[12px]">
                   <% if promo.discount_type == "percentage" %>
                     <span class="mb-3 inline-flex items-center rounded-full bg-[#8f1f2a] px-4 py-1.5 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-sm"><%= promo.discount_value %>% OFF</span>
                   <% else %>
-                    <span class="mb-3 inline-flex items-center rounded-full bg-[#8f1f2a] px-4 py-1.5 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-sm">$<%= number_to_currency(promo.discount_value, precision: 2, unit: "") %> OFF</span>
+                    <span class="mb-3 inline-flex items-center rounded-full bg-[#8f1f2a] px-4 py-1.5 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-sm">$<%= number_to_currency(promo.discount_value, precision: 0, unit: "") %> OFF</span>
                   <% end %>
 
                   <h1 class="text-3xl font-semibold leading-tight text-white sm:text-5xl"><%= promo.name %></h1>
