@@ -1,0 +1,48 @@
+<% content_for :title, "Promotions" %>
+
+<div class="min-h-screen pt-[5.25rem] bg-[#f4e6e2] text-[#2f1f1d]">
+  <main class="mx-auto w-full max-w-[1260px] px-8 py-8">
+    <% if notice.present? %>
+      <p class="mb-5 inline-block rounded-md bg-green-50 px-3 py-2 text-sm font-medium text-green-700" id="notice"><%= notice %></p>
+    <% end %>
+
+    <div class="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-[#e4d2ce] pb-6">
+      <div>
+        <h2 class="font-serif text-[3.5rem] leading-none tracking-[-0.06em] text-[#2f1f1d]">Promotions</h2>
+        <p class="mt-3 text-[1.15rem] text-[#7a5a56]">Create and manage special offers for your customers.</p>
+      </div>
+
+      <%= link_to new_promotion_path, class: "inline-flex items-center gap-2 rounded-md bg-[#7b1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#661a23]" do %>
+        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        New promotion
+      <% end %>
+    </div>
+
+    <div id="promotions">
+      <% if @promotions.any? %>
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          <% @promotions.each do |promotion| %>
+            <div class="flex flex-col overflow-hidden rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+              <%= render promotion %>
+
+              <div class="mt-auto flex items-center gap-2 border-t border-[#e4d2ce] p-4">
+                <%= link_to "Show", promotion, class: "flex-1 rounded-md border border-[#d8c1bc] bg-[#f8efee] py-2 text-center text-sm font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+                <%= link_to "Edit", edit_promotion_path(promotion), class: "flex-1 rounded-md border border-[#d8c1bc] bg-[#f8efee] py-2 text-center text-sm font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+                <%= button_to "Delete", promotion, method: :delete, data: { turbo_confirm: "Are you sure?" }, class: "flex-1 cursor-pointer rounded-md bg-[#8f1f2a] p-2 text-center text-sm font-semibold text-white hover:bg-[#7a1a23]" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="flex min-h-[360px] items-center justify-center rounded-[20px] border-2 border-dashed border-[#d7b9b2] bg-[#f8f3f1]">
+          <div class="max-w-md text-center">
+            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#f1e3df] text-3xl">🏷️</div>
+            <h3 class="font-serif text-[2.2rem] font-semibold tracking-tight text-[#2f1f1d]">No promotions yet</h3>
+            <p class="mt-3 text-[1.05rem] text-[#7a5a56]">Create your first promotion to start offering discounts.</p>
+            <%= link_to "Add First Promotion", new_promotion_path, class: "mt-6 inline-flex items-center justify-center rounded-md bg-[#7b1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#661a23]" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </main>
+</div>

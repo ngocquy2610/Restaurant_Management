@@ -1,0 +1,73 @@
+<%= form_with(model: promotion, class: "space-y-6") do |form| %>
+  <% if promotion.errors.any? %>
+    <div id="error_explanation" class="mb-6 rounded-md border border-[#e5b3ad] bg-[#fbe9e6] px-4 py-3 text-[#8f1f2a]">
+      <h2 class="font-semibold"><%= pluralize(promotion.errors.count, "error") %> prohibited this promotion from being saved:</h2>
+      <ul class="mt-1 list-disc pl-5">
+        <% promotion.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <div class="sm:col-span-2">
+      <%= form.label :name, "Promotion name", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.text_field :name,
+            placeholder: "e.g. Summer Feast Discount",
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] placeholder:text-[#7a5d5a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+    </div>
+
+    <div>
+      <%= form.label :discount_type, "Discount type", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.select :discount_type,
+            Promotion.discount_types.map { |label, _value| [label.titleize, label] },
+            {},
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+    </div>
+
+    <div>
+      <%= form.label :discount_value, "Discount value", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.number_field :discount_value,
+            step: 0.01, min: 0, placeholder: "0.00",
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] placeholder:text-[#7a5d5a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+      <p class="mt-1 text-sm text-[#7a5d5a]">Percentage (e.g. 20) or fixed amount (e.g. 5.00) depending on type.</p>
+    </div>
+
+    <div>
+      <%= form.label :start_date, "Starts at", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.datetime_local_field :start_date,
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+    </div>
+
+    <div>
+      <%= form.label :end_date, "Ends at", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.datetime_local_field :end_date,
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+    </div>
+
+    <div>
+      <%= form.label :status, "Status", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.select :status,
+            Promotion.statuses.keys.map { |s| [s.titleize, s] },
+            {},
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+    </div>
+
+    <div class="sm:col-span-2">
+      <%= form.label :image, "Image", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.file_field :image,
+            accept: "image/png,image/jpeg,image/webp",
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[0.95rem] text-[#5c4543] file:mr-4 file:rounded-md file:border-0 file:bg-[#e9d7d2] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-[#5c4543] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+
+      <% if promotion.image.attached? %>
+        <p class="mt-2 text-sm text-[#7a5d5a]">Currently attached: <%= promotion.image.filename %></p>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3 border-t border-[#e4d2ce] pt-6">
+    <%= form.submit class: "cursor-pointer rounded-md bg-[#7b1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#661a23]" %>
+    <%= link_to "Cancel", promotions_path, class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+  </div>
+<% end %>

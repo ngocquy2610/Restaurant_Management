@@ -33,6 +33,6 @@
 
   <div class="mt-6 flex items-center gap-2 border-t border-[#e4d6d2] pt-5">
     <%= link_to "Edit", edit_ingredient_path(ingredient), class: "flex h-10 flex-1 items-center justify-center rounded-md border border-[#d8c1bc] bg-[#f8efee] text-sm font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
-    <%= button_to "Delete", ingredient, method: :delete, data: { turbo_confirm: "Delete this ingredient? This cannot be undone." }, class: "flex h-10 flex-1 cursor-pointer items-center justify-center rounded-md bg-[#8f1f2a] text-sm font-semibold text-white hover:bg-[#7a1a23]" %>
+    <%= button_to "Delete", ingredient, method: :delete, data: { turbo_confirm: "Delete this ingredient? This cannot be undone." }, class: "flex h-10 flex-1 cursor-pointer items-center justify-center rounded-md bg-[#8f1f2a] p-2 text-sm font-semibold text-white hover:bg-[#7a1a23]" %>
   </div>
 </article>

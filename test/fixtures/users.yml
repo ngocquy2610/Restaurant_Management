@@ -23,3 +23,13 @@ two:
   jti: <%= SecureRandom.uuid %>
   member_tier: diamond
   year_spend: 3000.0
+
+admin:
+  full_name: Admin User
+  phone: "5551234567"
+  email: admin@example.com
+  location: Office
+  role: 0
+  status: true
+  jti: <%= SecureRandom.uuid %>
+  year_spend: 0.0

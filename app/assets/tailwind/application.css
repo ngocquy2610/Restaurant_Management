@@ -21,3 +21,32 @@
     transition: none;
   }
 }
+
+/* ============================================================
+   Homepage promotional slideshow
+   Slides are stacked absolutely and cross-faded by Stimulus's
+   "promo-slider" controller (promo_slider_controller.js).
+   ============================================================ */
+.promo-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.7s ease;
+}
+
+.promo-slide.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.promo-slider-dot.is-active {
+  background-color: #8f1f2a;
+  width: 1.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .promo-slide {
+    transition: none;
+  }
+}

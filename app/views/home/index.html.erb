@@ -1,10 +1,64 @@
-<div class="relative"><%= render "layouts/header" %></div>
-<div class="pt-28">
-  <h1 class="font-bold text-4xl">Welcome to Lumière Dining</h1>
-  <p>A luxury restaurant from Vietnam</p>
-  <% @users&.each do |user| %>
-    <li>
-      <%= user.full_name %> - <%= user.email %>
-    </li>
-  <%end%>
+<div class="min-h-screen bg-[#f4e6e2] text-[#2f1f1d]">
+  <main class="mx-auto w-full max-w-[1400px] px-6 py-10 sm:px-10 pt-28">
+    <% if @promotions.empty? %>
+      <div class="flex min-h-[420px] items-center justify-center rounded-[24px] border-2 border-dashed border-[#d7b9b2] bg-[#f8f3f1]">
+        <div class="max-w-md text-center">
+          <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#f1e3df] text-3xl">🏷️</div>
+          <h1 class="font-serif text-[2.2rem] font-semibold tracking-tight text-[#2f1f1d]">Welcome to Lumière Dining</h1>
+          <p class="mt-3 text-[1.05rem] text-[#7a5a56]">A luxury restaurant from Vietnam. New promotions are coming soon.</p>
+        </div>
+      </div>
+    <% else %>
+      <div class="overflow-hidden rounded-[24px] border border-[#d7b9b2] bg-[#f8f3f1] shadow-sm" data-controller="promo-slider" data-promo-slider-interval-value="4500">
+        <div class="relative h-[420px] w-full sm:h-[520px]">
+          <% @promotions.each_with_index do |promo, index| %>
+            <div data-promo-slider-target="slide"
+                 class="promo-slide <%= index.zero? ? 'is-visible' : '' %>">
+              <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<%= url_for(promo.image) %>');"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-[#2f1f1d]/85 via-[#2f1f1d]/25 to-transparent"></div>
+
+              <div class="absolute inset-x-0 bottom-0 p-6 sm:p-10">
+                <div class="max-w-2xl">
+                  <% if promo.discount_type == "percentage" %>
+                    <span class="mb-3 inline-flex items-center rounded-full bg-[#8f1f2a] px-4 py-1.5 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-sm"><%= promo.discount_value %>% OFF</span>
+                  <% else %>
+                    <span class="mb-3 inline-flex items-center rounded-full bg-[#8f1f2a] px-4 py-1.5 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-sm">$<%= number_to_currency(promo.discount_value, precision: 2, unit: "") %> OFF</span>
+                  <% end %>
+
+                  <h1 class="text-3xl font-semibold leading-tight text-white sm:text-5xl"><%= promo.name %></h1>
+
+                  <p class="mt-3 text-[1.05rem] text-[#f1e3df]/90">
+                    <%= l(promo.start_date, format: :short) if promo.start_date %> &mdash; <%= l(promo.end_date, format: :short) if promo.end_date %>
+                  </p>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="relative z-10" data-promo-slider-target="controls">
+          <% if @promotions.length > 1 %>
+            <button type="button" data-action="promo-slider#prev"
+                    class="absolute left-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur transition hover:bg-white/35"
+                    aria-label="Previous promotion">
+              <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <button type="button" data-action="promo-slider#next"
+                    class="absolute right-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur transition hover:bg-white/35"
+                    aria-label="Next promotion">
+              <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          <% end %>
+        </div>
+
+        <div class="flex items-center justify-center gap-2 pb-3">
+          <% @promotions.each_with_index do |promo, index| %>
+            <button type="button" data-promo-slider-target="dot" data-index="<%= index %>" data-action="promo-slider#dot"
+                    class="promo-slider-dot h-2.5 w-2.5 rounded-full bg-[#d8c1bc] transition-all <%= index.zero? ? 'is-active' : '' %>"
+                    aria-label="Go to slide <%= index + 1 %>"></button>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </main>
 </div>
