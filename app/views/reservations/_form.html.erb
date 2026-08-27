@@ -1,0 +1,81 @@
+<%= form_with(model: reservation, class: "space-y-6") do |form| %>
+  <% if reservation.errors.any? %>
+    <div id="error_explanation" class="mb-6 rounded-md border border-[#e5b3ad] bg-[#fbe9e6] px-4 py-3 text-[#8f1f2a]">
+      <h2 class="font-semibold"><%= pluralize(reservation.errors.count, "error") %> prohibited this reservation from being saved:</h2>
+      <ul class="mt-1 list-disc pl-5">
+        <% reservation.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <div>
+      <%= form.label :guest_name, "Guest name", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.text_field :guest_name,
+            placeholder: "e.g. Jane Doe",
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] placeholder:text-[#7a5d5a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+    </div>
+
+    <div>
+      <%= form.label :guest_phone, "Guest phone", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.telephone_field :guest_phone,
+            placeholder: "e.g. 0812345678",
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] placeholder:text-[#7a5d5a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+      <p class="mt-2 text-sm text-[#7a5d5a]">A contact number so the restaurant can reach you about your booking.</p>
+    </div>
+
+    <div>
+      <%= form.label :reservation_date, "Reservation date", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.date_field :reservation_date,
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+    </div>
+
+    <div>
+      <%= form.label :reservation_time, "Reservation time", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.time_field :reservation_time,
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+    </div>
+
+    <div class="sm:col-span-2">
+      <%= form.label :table_id, "Table", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+
+      <% selected_table = reservation.table %>
+      <% if selected_table %>
+        <div class="flex items-center justify-between gap-4 rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3">
+          <div class="flex items-center gap-3">
+            <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#8A1C2B]/10 font-serif text-lg font-bold text-[#8A1C2B]"><%= selected_table.table_number %></span>
+            <div>
+              <p class="font-semibold text-[#2c1c1a]">Table <%= selected_table.table_number %></p>
+              <p class="text-sm text-[#7a5d5a]"><%= selected_table.area&.name %> · <%= selected_table.capacity %> seats · <%= selected_table.status.humanize %></p>
+            </div>
+          </div>
+          <%= form.hidden_field :table_id %>
+          <% if reservation.new_record? %>
+            <%= link_to "Change", reservations_path, class: "shrink-0 text-sm font-semibold text-[#8A1C2B] hover:underline" %>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="rounded-md border border-dashed border-[#d8c1bc] bg-[#f8efee] px-4 py-6 text-center">
+          <p class="text-sm text-[#7a5d5a]">No table selected yet.</p>
+          <%= link_to "Choose a table from the floor plan", reservations_path, class: "mt-2 inline-block text-sm font-semibold text-[#8A1C2B] hover:underline" %>
+        </div>
+      <% end %>
+      <p class="mt-2 text-sm text-[#7a5d5a]">Selected from the restaurant floor plan. Availability is confirmed by the restaurant.</p>
+    </div>
+
+    <div class="sm:col-span-2">
+      <%= form.label :note, "Note (optional)", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.text_area :note,
+            rows: 3,
+            placeholder: "Any special requests, dietary requirements, or celebration notes.",
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] placeholder:text-[#7a5d5a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3 border-t border-[#e4d2ce] pt-6">
+    <%= form.submit class: "cursor-pointer rounded-md bg-[#7b1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#661a23]" %>
+    <%= link_to "Cancel", reservations_path, class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+  </div>
+<% end %>

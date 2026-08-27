@@ -98,10 +98,30 @@
     <!-- ==================== RIGHT COLUMN ==================== -->
     <div class="space-y-8">
 
-      <!-- Recent reservations - PLACEHOLDER -->
+      <!-- Recent reservations -->
       <div>
-        <h2 class="font-serif text-xl text-gray-900 border-b border-gray-200 pb-3 mb-4">Recent Reservations</h2>
-        <div class="bg-gray-200 rounded-xl h-32"></div>
+        <div class="flex items-center justify-between border-b border-gray-200 pb-3 mb-4">
+          <h2 class="font-serif text-xl text-gray-900">Recent Reservations</h2>
+          <% if @reservations.any? %>
+            <span class="inline-flex rounded-full bg-[#E9CFC7] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#8A1C2B]">
+              <%= @reservations.size %> <%= "reservation".pluralize(@reservations.size) %>
+            </span>
+          <% end %>
+        </div>
+
+        <% if @reservations.any? %>
+          <div class="space-y-4">
+            <% @reservations.first(6).each do |reservation| %>
+              <%= render reservation %>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-12 text-center shadow-sm">
+            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#8A1C2B]/10 text-2xl">📅</div>
+            <p class="mt-4 font-serif text-lg font-semibold text-gray-900">No reservations yet</p>
+            <p class="mt-2 text-sm text-gray-500">Upcoming dining bookings will appear here once made.</p>
+          </div>
+        <% end %>
       </div>
 
       <!-- Culinary favorites - PLACEHOLDER -->

@@ -33,3 +33,13 @@ admin:
   status: true
   jti: <%= SecureRandom.uuid %>
   year_spend: 0.0
+
+receptionist:
+  full_name: Receptionist User
+  phone: "5559876543"
+  email: receptionist@example.com
+  location: Front Desk
+  role: 3
+  status: true
+  jti: <%= SecureRandom.uuid %>
+  year_spend: 0.0

@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  guest_name: MyString
+  guest_phone: MyString
+  table: one
+  status: 1
+  note: MyString
+
+two:
+  user: two
+  guest_name: MyString
+  guest_phone: MyString
+  table: two
+  status: 1
+  note: MyString

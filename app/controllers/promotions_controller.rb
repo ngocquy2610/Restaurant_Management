@@ -30,6 +30,7 @@ class PromotionsController < ApplicationController
 
     if @promotion.save
       redirect_to promotions_path, notice: "Promotion added."
+      
     else
       render "promotions/new", status: :unprocessable_content
     end
