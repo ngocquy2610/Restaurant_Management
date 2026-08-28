@@ -6,9 +6,7 @@ class UsersController < ApplicationController
   # GET /users or /users.json
   def index
     authorize User, :index?
-    users = policy_scope(User)
-    @customers = users.customer
-    @employees = users.where.not(role: [:admin, :customer])
+    @users = policy_scope(User).order(:role, :full_name)
     render 'admin/users/index'
   end
 
@@ -18,7 +16,9 @@ class UsersController < ApplicationController
 
     @current_tier = @user.current_member_tier
     @next_tier = @user.next_member_tier
+    @reservations = Reservation.where(user_id: @user).order(reservation_date: :desc)
     @amount_to_next_tier = @user.amount_to_next_member_tier
+    
   end
 
   # GET /users/new
@@ -53,7 +53,11 @@ class UsersController < ApplicationController
     authorize @user
     respond_to do |format|
       if @user.update(user_params)
-        format.html { redirect_to @user, notice: "User was successfully updated.", status: :see_other }
+        # When the role is changed directly from the admin Staff Directory
+        # dropdown, bounce straight back to the directory instead of the user's
+        # profile show page.
+        destination = params[:back_to_directory] ? admin_users_path : @user
+        format.html { redirect_to destination, notice: "User was successfully updated.", status: :see_other }
         format.json { render :show, status: :ok, location: @user }
       else
         format.html { render :edit, status: :unprocessable_content }
@@ -68,7 +72,7 @@ class UsersController < ApplicationController
     @user.destroy!
 
     respond_to do |format|
-      format.html { redirect_to users_path, notice: "User was successfully destroyed.", status: :see_other }
+      format.html { redirect_to admin_users_path, notice: "#{@user.full_name} was successfully removed.", status: :see_other }
       format.json { head :no_content }
     end
   end

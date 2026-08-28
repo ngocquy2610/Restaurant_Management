@@ -169,6 +169,7 @@ export default class extends Controller {
       action,
       id: table.id,
       table_number: table.table_number,
+      status: table.status,
       area_id: this.areaValue?.id ?? null,
       pos_x: Math.round(group.x() * 100) / 100,
       pos_y: Math.round(group.y() * 100) / 100,

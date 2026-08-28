@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_24_091059) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_26_030000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -102,6 +102,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_24_091059) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "notifications", force: :cascade do |t|
+    t.string "body"
+    t.datetime "created_at", null: false
+    t.bigint "recipient_id", null: false
+    t.integer "status", default: 0, null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["recipient_id", "status"], name: "index_notifications_on_recipient_id_and_status"
+    t.index ["recipient_id"], name: "index_notifications_on_recipient_id"
+  end
+
   create_table "promotions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.boolean "discount_type"
@@ -123,6 +134,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_24_091059) do
     t.index ["food_id"], name: "index_recipe_items_on_food_id"
     t.index ["food_variant_id"], name: "index_recipe_items_on_food_variant_id"
     t.index ["ingredient_id"], name: "index_recipe_items_on_ingredient_id"
+  end
+
+  create_table "reservations", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "guest_name"
+    t.string "guest_phone"
+    t.string "note"
+    t.date "reservation_date"
+    t.time "reservation_time"
+    t.integer "status"
+    t.bigint "table_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.index ["table_id"], name: "index_reservations_on_table_id"
+    t.index ["user_id"], name: "index_reservations_on_user_id"
   end
 
   create_table "table_types", force: :cascade do |t|
@@ -180,9 +206,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_24_091059) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "food_variants", "foods"
   add_foreign_key "foods", "categories"
+  add_foreign_key "notifications", "users", column: "recipient_id"
   add_foreign_key "recipe_items", "food_variants"
   add_foreign_key "recipe_items", "foods"
   add_foreign_key "recipe_items", "ingredients"
+  add_foreign_key "reservations", "tables"
+  add_foreign_key "reservations", "users"
   add_foreign_key "tables", "areas"
   add_foreign_key "tables", "table_types"
   add_foreign_key "users", "member_tiers"

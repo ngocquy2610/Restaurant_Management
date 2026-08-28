@@ -3,10 +3,10 @@ class ApplicationController < ActionController::Base
   layout :layout_by_resource
   include Pundit
 
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
 
-  # Changes to the importmap will invalidate the etag for HTML responses
+  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+
   stale_when_importmap_changes
   def after_sign_in_path_for(resource)
     case resource.role
@@ -16,6 +16,13 @@ class ApplicationController < ActionController::Base
   end
 
   protected
+
+  def user_not_authorized
+    respond_to do |format|
+      format.html { render file: Rails.root.join("public/403.html"), status: :forbidden, layout: false }
+      format.json { render json: { error: "You are not authorized to perform this action." }, status: :forbidden }
+    end
+  end
 
   def configure_permitted_parameters
     devise_parameter_sanitizer.permit(:sign_up, keys: [:full_name, :phone, :location])

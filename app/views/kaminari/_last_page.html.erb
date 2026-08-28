@@ -1,0 +1,12 @@
+<%# Link to the "Last" page.
+  - available local variables
+    url:           url to the last page
+    current_page:  a page object for the currently displayed page
+    total_pages:   total number of pages
+    per_page:      number of items to fetch per page
+    remote:        data-remote
+-%>
+<%= link_to_unless current_page.last?, "&raquo;".html_safe, url,
+    remote: remote,
+    class: "inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-base text-gray-500 shadow-sm transition hover:border-[#8A1C2B]/40 hover:bg-[#8A1C2B]/10 hover:text-[#8A1C2B]",
+    "aria-label": "Last page" %>

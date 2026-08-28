@@ -3,7 +3,7 @@
   <div class="flex gap-10 text-black">
     <%= link_to "Menu", menus_path %>
     <a href="#">Our Story</a>
-    <%= link_to "Reservation", tables_path %>
+    <%= link_to "Reservation", reservations_path %>
   </div>
 
   <div data-controller="dropdown" class="relative">
@@ -29,6 +29,9 @@
         <%= link_to "My Profile", user_path(current_user), class: "block px-4 py-2 text-sm text-gray-800 hover:bg-amber-50" %>
         <% if current_user.admin? %>
           <%= link_to "Dashboard", admin_dashboards_path, class: "block px-4 py-2 text-sm text-gray-800 hover:bg-amber-50" %>
+        <% end %>
+        <% if current_user.receptionist? %>
+          <%= link_to "Manage reservations", admin_reservations_path, class: "block px-4 py-2 text-sm text-gray-800 hover:bg-amber-50" %>
         <% end %>
         <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "block w-full px-4 py-2 text-left text-sm text-gray-800 hover:bg-amber-50" %>
       <% else %>

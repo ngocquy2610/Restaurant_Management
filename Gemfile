@@ -73,3 +73,4 @@ end
 gem 'devise'
 gem 'devise-jwt'
 gem 'pundit'
+gem 'kaminari'

@@ -1,43 +1,40 @@
-<!-- ============================================================
-       FOOTER
-       ============================================================ -->
-  <footer class="bg-[#2b1a17] text-[#e8d5d0]">
-    <div class="mx-auto grid w-full max-w-[1200px] gap-10 px-6 py-16 sm:px-10 md:grid-cols-4">
-      <div>
-        <h3 class="font-serif text-2xl font-bold text-white">Lumière Dining</h3>
-        <p class="mt-4 text-sm leading-relaxed text-[#c9a8a1]">Crafting culinary memories through timeless artistry of French dining.</p>
-      </div>
-
-      <div>
-        <h4 class="text-xs font-semibold uppercase tracking-[0.2em] text-[#e8c9c2]">Explore</h4>
-        <ul class="mt-4 space-y-2.5 text-sm">
-          <li><%= link_to "Menu", menus_path, class: "transition hover:text-white" %></li>
-          <li><%= link_to "Reservation", tables_path, class: "transition hover:text-white" %></li>
-          <li><a href="#" class="transition hover:text-white">Our Story</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <h4 class="text-xs font-semibold uppercase tracking-[0.2em] text-[#e8c9c2]">Legal &amp; Connect</h4>
-        <ul class="mt-4 space-y-2.5 text-sm">
-          <li><a href="#" class="transition hover:text-white">Contact Us</a></li>
-          <li><a href="#" class="transition hover:text-white">Careers</a></li>
-          <li><a href="#" class="transition hover:text-white">Privacy Policy</a></li>
-          <li><a href="#" class="transition hover:text-white">Terms of Service</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <h4 class="text-xs font-semibold uppercase tracking-[0.2em] text-[#e8c9c2]">Newsletter</h4>
-        <p class="mt-4 text-sm text-[#c9a8a1]">Join our list for seasonal menus and exclusive events.</p>
-        <%= form_with url: "#", local: true, class: "mt-4 flex" do %>
-          <%= email_field_tag :email, nil, placeholder: "Email address", class: "w-full rounded-l-sm border border-[#4a322d] bg-[#3a2320] px-4 py-2.5 text-sm text-white placeholder-[#8a6a63] focus:outline-none focus:ring-1 focus:ring-[#8f1f2a]" %>
-          <button type="submit" class="rounded-r-sm bg-[#8f1f2a] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#7a1a23]" aria-label="Subscribe">→</button>
-        <% end %>
-      </div>
+<footer class="bg-[#2b1a17] text-[#e8d5d0]">
+  <div class="mx-auto grid w-full max-w-[1200px] gap-10 px-6 py-16 sm:px-10 md:grid-cols-4">
+    <div>
+      <h3 class="font-serif text-2xl font-bold text-white">Lumière Dining</h3>
+      <p class="mt-4 text-sm leading-relaxed text-[#c9a8a1]">Crafting culinary memories through timeless artistry of French dining.</p>
     </div>
 
-    <div class="border-t border-[#4a322d] py-6 text-center text-sm text-[#8a6a63]">
-      © <%= Time.current.year %> Lumière Dining. Crafted with Passion.
+    <div>
+      <h4 class="text-xs font-semibold uppercase tracking-[0.2em] text-[#e8c9c2]">Explore</h4>
+      <ul class="mt-4 space-y-2.5 text-sm">
+        <li><%= link_to "Menu", menus_path, class: "transition hover:text-white" %></li>
+        <li><%= link_to "Reservation", reservations_path, class: "transition hover:text-white" %></li>
+        <li><a href="#" class="transition hover:text-white">Our Story</a></li>
+      </ul>
     </div>
-  </footer>
+
+    <div>
+      <h4 class="text-xs font-semibold uppercase tracking-[0.2em] text-[#e8c9c2]">Legal &amp; Connect</h4>
+      <ul class="mt-4 space-y-2.5 text-sm">
+        <li><a href="#" class="transition hover:text-white">Contact Us</a></li>
+        <li><a href="#" class="transition hover:text-white">Careers</a></li>
+        <li><a href="#" class="transition hover:text-white">Privacy Policy</a></li>
+        <li><a href="#" class="transition hover:text-white">Terms of Service</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h4 class="text-xs font-semibold uppercase tracking-[0.2em] text-[#e8c9c2]">Newsletter</h4>
+      <p class="mt-4 text-sm text-[#c9a8a1]">Join our list for seasonal menus and exclusive events.</p>
+      <%= form_with url: "#", local: true, class: "mt-4 flex" do %>
+        <%= email_field_tag :email, nil, placeholder: "Email address", class: "w-full rounded-l-sm border border-[#4a322d] bg-[#3a2320] px-4 py-2.5 text-sm text-white placeholder-[#8a6a63] focus:outline-none focus:ring-1 focus:ring-[#8f1f2a]" %>
+        <button type="submit" class="rounded-r-sm bg-[#8f1f2a] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#7a1a23]" aria-label="Subscribe">→</button>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="border-t border-[#4a322d] py-6 text-center text-sm text-[#8a6a63]">
+    © <%= Time.current.year %> Lumière Dining. Crafted with Passion.
+  </div>
+</footer>

@@ -10,6 +10,8 @@ class User < ApplicationRecord
   belongs_to :member_tier, optional: true
 
   has_one_attached :avatar
+  has_many :reservations, dependent: :destroy
+  has_many :notifications, foreign_key: :recipient_id, dependent: :destroy, inverse_of: :recipient
 
   validate :avatar_type_and_size
 

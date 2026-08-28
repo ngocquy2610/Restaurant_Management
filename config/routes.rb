@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :reservations
   resources :promotions
   resources :menus, only: [:index, :show]
   resources :categories
@@ -12,6 +13,12 @@ Rails.application.routes.draw do
   resources :recipe_items, only: [:new, :edit, :create, :update, :destroy]
 
   resources :ingredients, except: [:show]
+
+  resources :reservations do
+    member do
+      patch :update_status
+    end
+  end
 
   
   resources :tables
@@ -51,6 +58,15 @@ Rails.application.routes.draw do
   
   get 'admin/users', to: "users#index"
   get 'admin/dashboards', to: "dashboards#index"
+# Admin/receptionist reservation review and confirmation (separate from the
+  # public /reservations booking page).
+  namespace :admin do
+    resources :reservations, only: [:index] do
+      member do
+        patch :update_status
+      end
+    end
+  end
 
-  resources :users, only: [:show, :edit, :update]
+  resources :users, only: [:show, :edit, :update, :destroy]
 end

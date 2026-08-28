@@ -3,74 +3,79 @@
        HERO / COVER — promotion image slider
        ============================================================ -->
   <section class="relative">
-    <% if @promotions.empty? %>
-      <div class="relative flex min-h-[560px] items-center justify-center bg-gradient-to-br from-[#3a2320] via-[#5c3a33] to-[#2f1f1d]">
-        <div class="absolute inset-0 opacity-25" style="background-image: radial-gradient(circle at 25% 30%, rgba(255,255,255,0.12) 0, transparent 45%), radial-gradient(circle at 75% 70%, rgba(255,255,255,0.08) 0, transparent 40%);"></div>
-        <div class="relative z-10 max-w-2xl px-6 text-center">
-          <p class="text-sm font-semibold uppercase tracking-[0.3em] text-[#e8c9c2]">Welcome to Lumière Dining</p>
-          <h1 class="mt-5 font-serif text-4xl font-semibold leading-tight text-white sm:text-6xl">A Symphony of Flavors, A Legacy of Taste</h1>
-          <p class="mt-5 text-lg text-[#f1e3df]/85">Experience the timeless art of French fine dining in the heart of the city. New promotions are coming soon.</p>
-          <%= link_to tables_path, class: "mt-8 inline-flex items-center gap-2 rounded-sm bg-[#8f1f2a] px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-lg transition hover:bg-[#7a1a23]" do %>
-            Book a Table
-            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
-          <% end %>
+    <div class="relative h-[560px] w-full overflow-hidden sm:h-[640px]" data-controller="promo-slider" data-promo-slider-interval-value="4500">
+      <!-- Default cover slide (always shown first) -->
+      <div data-promo-slider-target="slide" class="promo-slide is-visible">
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('/default_cover.jpeg');"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#2f1f1d]/90 via-[#2f1f1d]/35 to-transparent"></div>
+
+        <div class="absolute inset-0 flex items-end justify-center pb-16 sm:items-center sm:pb-0">
+          <div class="mx-6 max-w-2xl rounded-[12px] bg-black/50 py-6 px-12 text-center">
+            <p class="text-sm font-semibold uppercase tracking-[0.3em] text-[#e8c9c2]">Welcome to Lumière Dining</p>
+            <h1 class="mt-5 font-serif text-4xl font-semibold leading-tight text-white sm:text-6xl">A Symphony of Flavors, A Legacy of Taste</h1>
+            <p class="mt-5 text-lg text-[#f1e3df]/85">Experience the timeless art of French fine dining in the heart of the city.</p>
+            <%= link_to reservations_path, class: "mt-8 inline-flex items-center gap-2 rounded-sm bg-[#8f1f2a] px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-lg transition hover:bg-[#7a1a23]" do %>
+              Book a Table
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+            <% end %>
+          </div>
         </div>
       </div>
-    <% else %>
-      <div class="relative h-[560px] w-full overflow-hidden sm:h-[640px]" data-controller="promo-slider" data-promo-slider-interval-value="4500">
-        <% @promotions.each_with_index do |promo, index| %>
-          <div data-promo-slider-target="slide"
-               class="promo-slide <%= index.zero? ? 'is-visible' : '' %>">
-            <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<%= url_for(promo.image) %>');"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-[#2f1f1d]/90 via-[#2f1f1d]/35 to-transparent"></div>
 
-            <div class="absolute inset-0 flex items-end justify-center pb-16 sm:items-center sm:pb-0">
-              <div class="mx-6 max-w-2xl rounded-[12px] bg-black/50 py-6 px-12 text-center">
-                <% if promo.discount_type == "percentage" %>
-                  <span class="mb-4 inline-flex items-center rounded-full bg-[#8f1f2a] px-4 py-1.5 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-sm"><%= number_to_currency(promo.discount_value, precision: 0, unit: "") %>% OFF</span>
-                <% else %>
-                  <span class="mb-4 inline-flex items-center rounded-full bg-[#8f1f2a] px-4 py-1.5 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-sm">$<%= number_to_currency(promo.discount_value, precision: 0, unit: "") %> OFF</span>
-                <% end %>
+      <% @promotions.each do |promo| %>
+        <div data-promo-slider-target="slide" class="promo-slide">
+          <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<%= url_for(promo.image) %>');"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-[#2f1f1d]/90 via-[#2f1f1d]/35 to-transparent"></div>
 
-                <h1 class="font-serif text-3xl font-semibold leading-tight text-white drop-shadow-lg sm:text-5xl"><%= promo.name %></h1>
+          <div class="absolute inset-0 flex items-end justify-center pb-16 sm:items-center sm:pb-0">
+            <div class="mx-6 max-w-2xl rounded-[12px] bg-black/50 py-6 px-12 text-center">
+              <% if promo.discount_type == "percentage" %>
+                <span class="mb-4 inline-flex items-center rounded-full bg-[#8f1f2a] px-4 py-1.5 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-sm"><%= number_to_currency(promo.discount_value, precision: 0, unit: "") %>% OFF</span>
+              <% else %>
+                <span class="mb-4 inline-flex items-center rounded-full bg-[#8f1f2a] px-4 py-1.5 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-sm">$<%= number_to_currency(promo.discount_value, precision: 0, unit: "") %> OFF</span>
+              <% end %>
 
-                <p class="mt-4 text-[1.05rem] text-[#f1e3df]/90">
-                  <%= l(promo.start_date, format: :short) if promo.start_date %> - <%= l(promo.end_date, format: :short) if promo.end_date %>
-                </p>
+              <h1 class="font-serif text-3xl font-semibold leading-tight text-white drop-shadow-lg sm:text-5xl"><%= promo.name %></h1>
 
-                <%= link_to tables_path(), class: "mt-7 inline-flex items-center gap-2 rounded-sm bg-[#8f1f2a] px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-lg transition hover:bg-[#7a1a23]" do %>
-                  Book a Table
-                  <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
-                <% end %>
-              </div>
+              <p class="mt-4 text-[1.05rem] text-[#f1e3df]/90">
+                <%= l(promo.start_date, format: :short) if promo.start_date %> - <%= l(promo.end_date, format: :short) if promo.end_date %>
+              </p>
+
+              <%= link_to tables_path(), class: "mt-7 inline-flex items-center gap-2 rounded-sm bg-[#8f1f2a] px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-lg transition hover:bg-[#7a1a23]" do %>
+                Book a Table
+                <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+              <% end %>
             </div>
           </div>
-        <% end %>
+        </div>
+      <% end %>
 
+      <% if @promotions.any? %>
         <div class="relative z-10" data-promo-slider-target="controls">
-          <% if @promotions.length > 1 %>
-            <button type="button" data-action="promo-slider#prev"
-                    class="absolute left-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur transition hover:bg-white/35"
-                    aria-label="Previous promotion">
-              <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-            </button>
-            <button type="button" data-action="promo-slider#next"
-                    class="absolute right-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur transition hover:bg-white/35"
-                    aria-label="Next promotion">
-              <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-            </button>
-          <% end %>
+          <button type="button" data-action="promo-slider#prev"
+                  class="absolute left-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur transition hover:bg-white/35"
+                  aria-label="Previous promotion">
+            <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <button type="button" data-action="promo-slider#next"
+                  class="absolute right-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur transition hover:bg-white/35"
+                  aria-label="Next promotion">
+            <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
         </div>
+      <% end %>
 
-        <div class="absolute inset-x-0 bottom-5 z-10 flex items-center justify-center gap-2">
-          <% @promotions.each_with_index do |promo, index| %>
-            <button type="button" data-promo-slider-target="dot" data-index="<%= index %>" data-action="promo-slider#dot"
-                    class="promo-slider-dot h-2.5 w-2.5 rounded-full bg-[#d8c1bc] transition-all <%= index.zero? ? 'is-active' : '' %>"
-                    aria-label="Go to slide <%= index + 1 %>"></button>
-          <% end %>
-        </div>
+      <div class="absolute inset-x-0 bottom-5 z-10 flex items-center justify-center gap-2">
+        <button type="button" data-promo-slider-target="dot" data-index="0" data-action="promo-slider#dot"
+                class="promo-slider-dot h-2.5 w-2.5 rounded-full bg-[#d8c1bc] transition-all is-active"
+                aria-label="Go to slide 1"></button>
+        <% @promotions.each_with_index do |promo, index| %>
+          <button type="button" data-promo-slider-target="dot" data-index="<%= index + 1 %>" data-action="promo-slider#dot"
+                  class="promo-slider-dot h-2.5 w-2.5 rounded-full bg-[#d8c1bc] transition-all"
+                  aria-label="Go to slide <%= index + 2 %>"></button>
+        <% end %>
       </div>
-    <% end %>
+    </div>
   </section>
 
   <!-- ============================================================
@@ -157,7 +162,7 @@
         <p class="mt-7 leading-relaxed text-[#5c443f]">
           Designed to reflect the warmth of a traditional French manor, our dining room features plush seating, soft candle lighting, and intimate corners perfect for quiet conversations and celebratory toasts.
         </p>
-        <%= link_to "Reserve Your Table", tables_path, class: "mt-8 inline-block rounded-sm border border-[#8f1f2a] px-6 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-[#8f1f2a] transition hover:bg-[#8f1f2a] hover:text-white" %>
+        <%= link_to "Reserve Your Table", reservations_path, class: "mt-8 inline-block rounded-sm border border-[#8f1f2a] px-6 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-[#8f1f2a] transition hover:bg-[#8f1f2a] hover:text-white" %>
       </div>
 
       <div class="order-1 grid h-72 grid-cols-3 grid-rows-2 gap-3 sm:h-80 md:order-2 md:h-[420px]">
@@ -175,32 +180,5 @@
         <% end %>
       </div>
     </div>
-  </section>
-
-  <!-- ============================================================
-       RESERVE YOUR TABLE
-       ============================================================ -->
-  <section class="bg-[#f4e6e2]">
-    <div class="mx-auto w-full max-w-[1000px] px-6 py-20 sm:px-10">
-      <div class="rounded-[20px] border border-[#d7b9b2] bg-[#fdfaf9] p-8 shadow-lg sm:p-12" style="background-image: radial-gradient(rgba(143,31,42,0.06) 1px, transparent 1px); background-size: 18px 18px;">
-        <div class="rounded-[14px] border border-[#e3cdc8] bg-white p-8 text-center shadow-sm sm:p-10">
-          <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#f4e6e2] text-2xl">🍽️</div>
-          <h2 class="mt-5 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">Reserve Your Table</h2>
-          <p class="mx-auto mt-4 max-w-xl text-[#7a5a56]">
-            We invite you to join us for an unforgettable evening. Early reservations are recommended for weekend dining and special occasions.
-          </p>
-
-          <%= form_with url: tables_path, method: :get, local: true, class: "mx-auto mt-8 flex max-w-2xl flex-col items-stretch justify-center gap-3 sm:flex-row" do %>
-            <%= date_field_tag :date, nil, class: "w-full rounded-sm border border-[#d7b9b2] bg-white px-4 py-3 text-[#2f1f1d] focus:border-[#8f1f2a] focus:outline-none sm:w-auto sm:flex-1" %>
-            <%= select_tag :time, options_for_select(["18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00"], "19:00"), class: "w-full rounded-sm border border-[#d7b9b2] bg-white px-4 py-3 text-[#2f1f1d] focus:border-[#8f1f2a] focus:outline-none sm:w-auto sm:flex-1" %>
-            <button type="submit" class="w-full rounded-sm bg-[#8f1f2a] px-8 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-white transition hover:bg-[#7a1a23] sm:w-auto">
-              Find Table
-            </button>
-          <% end %>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  
+  </section>  
 </div>

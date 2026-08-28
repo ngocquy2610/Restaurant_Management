@@ -110,4 +110,72 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert @user.status, "status should be updated to active"
     assert_equal 250.0, @user.year_spend
   end
+
+  # Staff directory (admin/users) -------------------------------------------
+
+  test "index lists all users including admins and customers" do
+    get admin_users_url
+    assert_response :success
+
+    # Every user in the directory should be displayed: admins, staff and customers.
+    assert_select "tbody tr", count: User.count
+    assert_select "tbody tr", text: /Admin User/
+    assert_select "tbody tr", text: /John Doe/
+    assert_select "tbody tr", text: /Jane Smith/
+  end
+
+  test "index does not let a non-admin see the staff directory" do
+    sign_out @admin
+    sign_in users(:one) # inventory_manager (non-admin)
+    get admin_users_url
+    assert_response :forbidden
+  end
+
+  test "admin can change a user's role from the directory dropdown" do
+    # Simulate the inline role dropdown form in the staff directory.
+    patch user_url(@user), params: {
+      back_to_directory: "true",
+      user: { role: "kitchen_staff" }
+    }
+
+    assert_redirected_to admin_users_url
+    @user.reload
+    assert_predicate @user, :kitchen_staff?
+  end
+
+  test "admin can destroy a user and is redirected back to the directory" do
+    victim = User.create!(
+      full_name: "To Be Deleted",
+      email: "doomed@example.com",
+      phone: "5550009999",
+      password: "password123",
+      role: :waiter
+    )
+
+    assert_difference("User.count", -1) do
+      delete user_url(victim)
+    end
+
+    assert_redirected_to admin_users_url
+    assert_equal "To Be Deleted was successfully removed.", flash[:notice]
+    assert_not User.exists?(victim.id)
+  end
+
+  test "admin cannot destroy their own account" do
+    assert_no_difference("User.count") do
+      delete user_url(@admin)
+    end
+
+    assert_response :forbidden
+  end
+
+  test "directory delete button includes a confirmation notice" do
+    get admin_users_url
+    assert_response :success
+
+    assert_select "form[action='#{user_path(@user)}'][method='post'] button[type='submit']",
+                  text: "Delete", count: 1
+    assert_includes response.body,
+                    "data-turbo-confirm=\"Are you sure you want to permanently delete #{@user.full_name}? This action cannot be undone.\""
+  end
 end
