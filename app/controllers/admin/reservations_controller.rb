@@ -4,7 +4,10 @@ class Admin::ReservationsController < ApplicationController
 
   def index
     authorize Reservation, :manage?
-    @reservations = policy_scope(Reservation).order(created_at: :desc)
+    @reservations = policy_scope(Reservation)
+                    .order(created_at: :desc)
+                    .page(params[:page])
+                    .per(5)
   end
 
   def update_status

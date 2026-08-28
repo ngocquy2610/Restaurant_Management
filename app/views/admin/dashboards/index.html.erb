@@ -80,13 +80,13 @@
           <p class="mt-4 text-xs text-gray-600">Manage staff across departments.</p>
         <% end %>
 
-        <a href="#" class="group rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm transition hover:border-[#8A1C2B]/30 hover:bg-[#FAF5F1]">
+        <%= link_to admin_reservations_path, class: "group rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm transition hover:border-[#8A1C2B]/30 hover:bg-[#FAF5F1]" do %>
           <div class="flex items-center justify-between">
             <p class="text-sm font-semibold text-gray-900">Reservations</p>
             <span class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#8A1C2B]/10 text-lg">📅</span>
           </div>
           <p class="mt-4 text-xs text-gray-600">View and manage bookings.</p>
-        </a>
+        <% end %>
 
         <%= link_to categories_path, class: "group rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm transition hover:border-[#8A1C2B]/30 hover:bg-[#FAF5F1]" do %>
           <div class="flex items-center justify-between">
@@ -119,52 +119,56 @@
     <div class="overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-sm">
       <div class="flex items-center justify-between border-b border-gray-200 px-6 py-5">
         <h2 class="font-serif text-2xl font-semibold text-gray-900">Recent Reservations</h2>
-        <button type="button" class="inline-flex items-center justify-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50">
-          View all
-        </button>
+        <%= link_to "View all",
+            admin_reservations_path,
+            class: "inline-flex items-center justify-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50" %>
       </div>
-      <div class="overflow-x-auto">
-        <table class="min-w-full text-left text-sm text-gray-700">
-          <thead class="bg-[#FEF3E8] text-xs uppercase tracking-[0.16em] text-gray-500">
-            <tr>
-              <th scope="col" class="px-6 py-4">Guest</th>
-              <th scope="col" class="px-6 py-4">Party</th>
-              <th scope="col" class="px-6 py-4">Time</th>
-              <th scope="col" class="px-6 py-4">Table</th>
-              <th scope="col" class="px-6 py-4">Status</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200 bg-white">
-            <% [
-              { name: "Ava Thompson", initials: "AT", party: "4", time: "6:30 PM", table: "Table 12", status: "confirmed" },
-              { name: "Liam Carter",  initials: "LC", party: "2", time: "7:00 PM", table: "Table 05", status: "seated" },
-              { name: "Noah Bennett", initials: "NB", party: "6", time: "7:15 PM", table: "Table 18", status: "confirmed" },
-              { name: "Mia Rodriguez",initials: "MR", party: "3", time: "8:00 PM", table: "Table 09", status: "pending" }
-            ].each do |res| %>
-              <tr class="transition hover:bg-[#FAF5F1]">
-                <td class="px-6 py-5">
-                  <div class="flex items-center gap-4">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#8A1C2B]/10 text-sm font-semibold text-[#8A1C2B]">
-                      <%= res[:initials] %>
-                    </div>
-                    <p class="text-sm font-semibold text-gray-900"><%= res[:name] %></p>
-                  </div>
-                </td>
-                <td class="px-6 py-5 text-sm text-gray-600"><%= res[:party] %> guests</td>
-                <td class="px-6 py-5 text-sm text-gray-600"><%= res[:time] %></td>
-                <td class="px-6 py-5 text-sm text-gray-600"><%= res[:table] %></td>
-                <td class="px-6 py-5">
-                  <% label = { confirmed: ["Confirmed", "bg-[#E9CFC7] text-[#8A1C2B]"], seated: ["Seated", "bg-green-100 text-green-700"], pending: ["Pending", "bg-amber-100 text-amber-700"] }[res[:status].to_sym] %>
-                  <span class="inline-flex rounded-full bg-[#E9CFC7] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#8A1C2B] <%= label[1] %>">
-                    <%= label[0] %>
-                  </span>
-                </td>
+      <% if @reservations.any? %>
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-left text-sm text-gray-700">
+            <thead class="bg-[#FEF3E8] text-xs uppercase tracking-[0.16em] text-gray-500">
+              <tr>
+                <th scope="col" class="px-6 py-4">Guest</th>
+                <th scope="col" class="px-6 py-4">Party</th>
+                <th scope="col" class="px-6 py-4">Time</th>
+                <th scope="col" class="px-6 py-4">Table</th>
+                <th scope="col" class="px-6 py-4">Status</th>
               </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody class="divide-y divide-gray-200 bg-white">
+              <% @reservations.each do |reservation| %>
+                <tr class="transition hover:bg-[#FAF5F1]">
+                  <td class="px-6 py-5">
+                    <div class="flex items-center gap-4">
+                      <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#8A1C2B]/10 text-sm font-semibold text-[#8A1C2B]">
+                        <%= reservation.guest_name.to_s[0, 2].upcase %>
+                      </div>
+                      <div>
+                        <p class="text-sm font-semibold text-gray-900"><%= reservation.guest_name %></p>
+                        <% if reservation.user.present? %>
+                          <p class="mt-1 text-xs text-gray-500"><%= reservation.user.full_name %></p>
+                        <% end %>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-5 text-sm text-gray-600"><%= reservation.table&.capacity %> guests</td>
+                  <td class="px-6 py-5 text-sm text-gray-600"><%= reservation.reservation_time&.strftime("%I:%M %p") %></td>
+                  <td class="px-6 py-5 text-sm text-gray-600">Table <%= reservation.table&.table_number %></td>
+                  <td class="px-6 py-5">
+                    <span class="inline-flex items-center gap-2 rounded-full <%= reservation_status_chip_class(reservation.status) %> px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] <%= reservation_status_meta(reservation.status)[:text] %>">
+                      <span class="h-2 w-2 rounded-full <%= reservation_status_dot_class(reservation.status) %>"></span>
+                      <%= reservation_status_label(reservation.status) %>
+                    </span>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+          <%= paginate @reservations %>
+        </div>
+      <% else %>
+        <p class="px-6 py-10 text-center text-sm text-gray-500">No active reservations right now.</p>
+      <% end %>
     </div>
   </div>
 </div>
-

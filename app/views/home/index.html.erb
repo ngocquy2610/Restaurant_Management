@@ -162,7 +162,7 @@
         <p class="mt-7 leading-relaxed text-[#5c443f]">
           Designed to reflect the warmth of a traditional French manor, our dining room features plush seating, soft candle lighting, and intimate corners perfect for quiet conversations and celebratory toasts.
         </p>
-        <%= link_to "Reserve Your Table", tables_path, class: "mt-8 inline-block rounded-sm border border-[#8f1f2a] px-6 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-[#8f1f2a] transition hover:bg-[#8f1f2a] hover:text-white" %>
+        <%= link_to "Reserve Your Table", reservations_path, class: "mt-8 inline-block rounded-sm border border-[#8f1f2a] px-6 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-[#8f1f2a] transition hover:bg-[#8f1f2a] hover:text-white" %>
       </div>
 
       <div class="order-1 grid h-72 grid-cols-3 grid-rows-2 gap-3 sm:h-80 md:order-2 md:h-[420px]">
@@ -180,32 +180,5 @@
         <% end %>
       </div>
     </div>
-  </section>
-
-  <!-- ============================================================
-       RESERVE YOUR TABLE
-       ============================================================ -->
-  <section class="bg-[#f4e6e2]">
-    <div class="mx-auto w-full max-w-[1000px] px-6 py-20 sm:px-10">
-      <div class="rounded-[20px] border border-[#d7b9b2] bg-[#fdfaf9] p-8 shadow-lg sm:p-12" style="background-image: radial-gradient(rgba(143,31,42,0.06) 1px, transparent 1px); background-size: 18px 18px;">
-        <div class="rounded-[14px] border border-[#e3cdc8] bg-white p-8 text-center shadow-sm sm:p-10">
-          <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#f4e6e2] text-2xl">🍽️</div>
-          <h2 class="mt-5 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">Reserve Your Table</h2>
-          <p class="mx-auto mt-4 max-w-xl text-[#7a5a56]">
-            We invite you to join us for an unforgettable evening. Early reservations are recommended for weekend dining and special occasions.
-          </p>
-
-          <%= form_with url: tables_path, method: :get, local: true, class: "mx-auto mt-8 flex max-w-2xl flex-col items-stretch justify-center gap-3 sm:flex-row" do %>
-            <%= date_field_tag :date, nil, class: "w-full rounded-sm border border-[#d7b9b2] bg-white px-4 py-3 text-[#2f1f1d] focus:border-[#8f1f2a] focus:outline-none sm:w-auto sm:flex-1" %>
-            <%= select_tag :time, options_for_select(["18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00"], "19:00"), class: "w-full rounded-sm border border-[#d7b9b2] bg-white px-4 py-3 text-[#2f1f1d] focus:border-[#8f1f2a] focus:outline-none sm:w-auto sm:flex-1" %>
-            <button type="submit" class="w-full rounded-sm bg-[#8f1f2a] px-8 py-3 text-sm font-semibold uppercase tracking-[0.1em] text-white transition hover:bg-[#7a1a23] sm:w-auto">
-              Find Table
-            </button>
-          <% end %>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  
+  </section>  
 </div>
