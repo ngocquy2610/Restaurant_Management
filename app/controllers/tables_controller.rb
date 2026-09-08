@@ -52,6 +52,11 @@ class TablesController < ApplicationController
     authorize @table
 
     if @table.save
+      notify_user(
+        recipient: current_user,
+        title: "Table created",
+        body: "The table #{@recipe_item.name} has been created."
+      )
       redirect_to tables_path, notice: "Table added."
     else
       @areas = Area.order(:name)
@@ -65,6 +70,11 @@ class TablesController < ApplicationController
   def update
     authorize @table
     if @table.update(table_params)
+      notify_user(
+        recipient: current_user,
+        title: "Table updated",
+        body: "The table #{@recipe_item.name} has been updated."
+      )
       redirect_to tables_path, notice: "Table updated."
     else
       @areas = Area.order(:name)
@@ -78,7 +88,11 @@ class TablesController < ApplicationController
   def destroy
     authorize @table
     @table.destroy!
-
+    notify_user(
+      recipient: current_user,
+      title: "Table destroyed",
+      body: "The table #{@recipe_item.name} has been destroyed."
+    )
     @areas = Area.order(:floor_level, :id)
     @area = if params[:area_id].present?
               @areas.find { |a| a.id == params[:area_id].to_i }

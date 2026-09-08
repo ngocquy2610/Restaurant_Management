@@ -31,6 +31,11 @@ class RecipeItemsController < ApplicationController
     authorize @recipe_item
 
     if @recipe_item.save
+      notify_user(
+        recipient: current_user,
+        title: "Recipe item created",
+        body: "The recipe item #{@recipe_item.name} has been created."
+      )
       redirect_to foods_path, notice: "Recipe item was successfully created."
     else
       load_form_options
@@ -42,6 +47,11 @@ class RecipeItemsController < ApplicationController
   def update
     authorize @recipe_item
     if @recipe_item.update(recipe_item_params)
+      notify_user(
+        recipient: current_user,
+        title: "Recipe item updated",
+        body: "The recipe item #{@recipe_item.name} has been updated."
+      )
       redirect_to foods_path, notice: "Recipe item was successfully updated."
     else
       load_form_options
@@ -53,7 +63,11 @@ class RecipeItemsController < ApplicationController
   def destroy
     authorize @recipe_item
     @recipe_item.destroy!
-
+    notify_user(
+      recipient: current_user,
+      title: "Recipe item destroyed",
+      body: "The recipe item #{@recipe_item.name} has been destroyed."
+    )
     redirect_to recipe_items_path, notice: "Recipe item was successfully destroyed."
   end
 

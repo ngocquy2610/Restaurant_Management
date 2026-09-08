@@ -29,8 +29,12 @@ class PromotionsController < ApplicationController
     authorize @promotion
 
     if @promotion.save
+      notify_user(
+        recipient: current_user,
+        title: "Promotion created",
+        body: "The promotion #{@promotion.name} has been created."
+      )
       redirect_to promotions_path, notice: "Promotion added."
-      
     else
       render "promotions/new", status: :unprocessable_content
     end
@@ -40,6 +44,11 @@ class PromotionsController < ApplicationController
   def update
     authorize @promotion
     if @promotion.update(promotion_params)
+      notify_user(
+        recipient: current_user,
+        title: "Promotion updated",
+        body: "The promotion #{@promotion.name} has been updated."
+      )
       redirect_to promotions_path, notice: "Promotion updated."
     else
       render "promotions/edit", status: :unprocessable_content
@@ -50,7 +59,11 @@ class PromotionsController < ApplicationController
   def destroy
     authorize @promotion
     @promotion.destroy!
-
+    notify_user(
+      recipient: current_user,
+      title: "Promotion destroyed",
+      body: "The promotion #{@promotion.name} has been destroyed."
+    )
     redirect_to promotions_path, notice: "Promotion removed."
   end
 

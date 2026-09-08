@@ -33,6 +33,11 @@ class FoodsController < ApplicationController
     authorize @food
 
     if @food.save
+      notify_user(
+        recipient: current_user,
+        title: "Food created",
+        body: "The food #{@food.name} has been created."
+      )
       redirect_to foods_path, notice: "Foods created"
     else
       @categories = Category.all
@@ -44,6 +49,11 @@ class FoodsController < ApplicationController
   def update
     authorize @food
     if @food.update(food_params)
+      notify_user(
+        recipient: current_user,
+        title: "Food updated",
+        body: "The food #{@food.name} has been updated."
+      )
       redirect_to foods_path, notice: "Foods updated."
     else
       @categories = Category.order(:name)
@@ -55,7 +65,11 @@ class FoodsController < ApplicationController
   def destroy
     authorize @food
     @food.destroy!
-
+    notify_user(
+      recipient: current_user,
+      title: "Food destroyed",
+      body: "The food #{@food.name} has been destroyed."
+    )
     redirect_to foods_path, notice: "Food removed."
   end
 

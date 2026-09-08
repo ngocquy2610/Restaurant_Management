@@ -1,0 +1,30 @@
+<% if notification.unread? %>
+  <!-- Unread: white background -->
+  <article id="<%= dom_id(notification) %>" class="rounded-lg bg-[#ffc7c7] p-5 shadow-lg ring-1 ring-[#3ea12b]/10 transition hover:shadow-xl">
+    <div class="flex items-start justify-between gap-4">
+      <div class="min-w-0">
+        <div class="flex items-center gap-2">
+          <span class="h-2.5 w-2.5 shrink-0 rounded-full bg-[#8f1f2a]"></span>
+          <h2 class="truncate font-serif text-lg font-semibold text-[#2f1f1d]"><%= notification.title %></h2>
+        </div>
+        <p class="mt-1.5 text-sm leading-relaxed text-[#3a2a27]"><%= notification.body %></p>
+      </div>
+      <span class="shrink-0 rounded-full bg-[#8f1f2a] px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-white">New</span>
+    </div>
+    <p class="mt-3 text-xs text-[#a08b86]"><%= time_ago_in_words(notification.created_at) %> ago</p>
+  </article>
+<% else %>
+  <article id="<%= dom_id(notification) %>" class="rounded-lg bg-[#e8fee4] p-5 shadow-lg ring-1 ring-[#3ea12b]/10 transition hover:shadow-xl">
+    <div class="flex items-start justify-between gap-4">
+      <div class="min-w-0">
+        <div class="flex items-center gap-2">
+          <span class="h-2.5 w-2.5 shrink-0 rounded-full bg-[#3ea12b]"></span>
+          <h2 class="truncate font-serif text-lg font-semibold text-[#2f1f1d]"><%= notification.title %></h2>
+        </div>
+        <p class="mt-1.5 text-sm leading-relaxed text-[#3a2a27]"><%= notification.body %></p>
+      </div>
+      <span class="shrink-0 rounded-full bg-[#3ea12b] px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-white">Read</span>
+    </div>
+    <p class="mt-3 text-xs text-[#a08b86]"><%= time_ago_in_words(notification.created_at) %> ago</p>
+  </article>
+<% end %>

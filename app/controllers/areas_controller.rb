@@ -13,6 +13,11 @@ class AreasController < ApplicationController
     authorize @area
 
     if @area.save
+      notify_user(
+        recipient: current_user,
+        title: "Area created",
+        body: "The area #{@area.name} has been created."
+      )
       redirect_to tables_path, notice: "Area added."
     else
       render 'admin/areas/new', status: :unprocessable_entity
@@ -27,6 +32,11 @@ class AreasController < ApplicationController
   def update
     authorize @area
     if @area.update(area_params)
+      notify_user(
+        recipient: current_user,
+        title: "Area updated",
+        body: "The area #{@area.name} has been updated."
+      )
       redirect_to tables_path, notice: "Area updated."
     else
       render 'admin/areas/edit', status: :unprocessable_entity
@@ -36,7 +46,11 @@ class AreasController < ApplicationController
   def destroy
     authorize @area
     @area.destroy!
-
+    notify_user(
+      recipient: current_user,
+      title: "Area destroyed",
+      body: "The area #{@area.name} has been destroyed."
+    )
     redirect_to tables_path, notice: "Area removed."
   end
 
