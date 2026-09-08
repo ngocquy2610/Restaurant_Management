@@ -36,6 +36,11 @@ class CategoriesController < ApplicationController
     authorize @category
 
     if @category.save
+      notify_user(
+        recipient: current_user,
+        title: "Category created",
+        body: "The category #{@category.name} has been created."
+      )
       redirect_to categories_path, notice: "Category added."
     else
       render 'categories/new', status: :unprocessable_entity
@@ -46,6 +51,11 @@ class CategoriesController < ApplicationController
   def update
     authorize @category
     if @category.update(category_params)
+      notify_user(
+        recipient: current_user,
+        title: "Category updated",
+        body: "The category #{@category.name} has been updated."
+      )
       redirect_to categories_path, notice: "Category updated."
     else
       render 'categories/edit', status: :unprocessable_entity
@@ -56,7 +66,11 @@ class CategoriesController < ApplicationController
   def destroy
     authorize @category
     @category.destroy!
-
+      notify_user(
+        recipient: current_user,
+        title: "Category destroyed",
+        body: "The category #{@category.name} has been destroyed."
+      )
     redirect_to categories_path, notice: "Category removed."
   end
 

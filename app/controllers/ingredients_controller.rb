@@ -29,6 +29,11 @@ class IngredientsController < ApplicationController
     authorize @ingredient
 
     if @ingredient.save
+      notify_user(
+        recipient: current_user,
+        title: "Ingredient created",
+        body: "The ingredient #{@ingredient.name} has been created."
+      )
       redirect_to ingredients_path, notice: "Ingredient was successfully created."
     else
       render "ingredients/new", status: :unprocessable_content
@@ -39,6 +44,11 @@ class IngredientsController < ApplicationController
   def update
     authorize @ingredient
     if @ingredient.update(ingredient_params)
+      notify_user(
+        recipient: current_user,
+        title: "Ingredient updated",
+        body: "The ingredient #{@ingredient.name} has been updated."
+      )
       redirect_to ingredients_path, notice: "Ingredient was successfully updated."
     else
       render "ingredients/edit", status: :unprocessable_content
@@ -49,7 +59,11 @@ class IngredientsController < ApplicationController
   def destroy
     authorize @ingredient
     @ingredient.destroy!
-
+    notify_user(
+      recipient: current_user,
+      title: "Ingredient destroyed",
+      body: "The ingredient #{@ingredient.name} has been destroyed."
+    )
     redirect_to ingredients_path, notice: "Ingredient was successfully destroyed."
   end
 

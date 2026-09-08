@@ -13,6 +13,13 @@ class Admin::ReservationsController < ApplicationController
   def update_status
     authorize @reservation, :update_status?
     if @reservation.update(status_params)
+      if @reservation.user_id.present?
+        notify_user(
+          recipient: @reservation.user,
+          title: "Reservation confirmed",
+          body: "Your reservation for #{@reservation.reservation_date.strftime('%d/%m')} at #{@reservation.reservation_time.strftime('%H:%M')} is confirmed — Table #{@reservation.table.table_number}."
+        )
+      end
       redirect_to admin_reservations_path,
                   notice: "Reservation for #{@reservation.guest_name} was updated to #{@reservation.status.humanize}."
     else

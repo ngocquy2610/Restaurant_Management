@@ -17,7 +17,6 @@ class ReservationsController < ApplicationController
     @next_area = current_index && current_index < @areas.size - 1 ? @areas[current_index + 1] : nil
 
     @tables_payload = @area ? @area.tables.map { |t| table_json(t) } : []
-
   end
 
   # GET /reservations/1 or /reservations/1.json
@@ -39,11 +38,18 @@ class ReservationsController < ApplicationController
     @reservation.user ||= current_user
 
     if @reservation.save
+      notify_role(:receptionist,
+        title: "New reservation request",
+        body: "#{@reservation.guest_name} requested a table at #{@reservation.reservation_date.strftime('%d/%m')} at #{@reservation.reservation_time.strftime('%H:%M')}. Table #{@reservation.table.table_number}."
+      )
+      notify_role(:admin,
+        title: "New reservation request",
+        body: "#{@reservation.guest_name} requested a table at #{@reservation.reservation_date.strftime('%d/%m')} at #{@reservation.reservation_time.strftime('%H:%M')}. Table #{@reservation.table.table_number}."
+      )
       redirect_to reservations_path, notice: "Reservation was successfully created."
     else
       render "reservations/new", status: :unprocessable_content
     end
-    
   end
 
   # PATCH/PUT /reservations/1 or /reservations/1.json
@@ -62,6 +68,11 @@ class ReservationsController < ApplicationController
   def update_status
     authorize @reservation, :update_status?
     if @reservation.update(status_params)
+      notify_user(
+        recipient: @reservation.user,
+        title: "Reservation notice",
+        body: "Your reservation for #{@reservation.reservation_date.strftime('%d/%m')} at #{@reservation.reservation_time.strftime('%H:%M')} has sent successfully - Table #{@reservation.table.table_number}"
+      )
       redirect_to @reservation, notice: "Reservation status updated."
     else
       render :show, status: :unprocessable_entity

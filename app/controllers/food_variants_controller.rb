@@ -31,6 +31,11 @@ class FoodVariantsController < ApplicationController
     authorize @food_variant
 
     if @food_variant.save
+      notify_user(
+        recipient: current_user,
+        title: "Food variant created",
+        body: "The food variant #{@food_variant.name} of #{@food_variant.food} has been created."
+      )
       redirect_to food_variants_path, notice: "Food variant was successfully created."
     else
       @foods = Food.order(:name)
@@ -43,6 +48,11 @@ class FoodVariantsController < ApplicationController
     authorize @food_variant
 
     if @food_variant.update(food_variant_params)
+      notify_user(
+        recipient: current_user,
+        title: "Food variant updated",
+        body: "The food variant #{@food_variant.name} of #{@food_variant.food} has been updated."
+      )
       redirect_to food_variant_path, notice: "Food variant was successfully updated."
     else
       @foods = Food.order(:name)
@@ -54,7 +64,11 @@ class FoodVariantsController < ApplicationController
   def destroy
     authorize @food_variant
     @food_variant.destroy!
-
+    notify_user(
+      recipient: current_user,
+      title: "Food variant destroyed",
+      body: "The food variant #{@food_variant.name} of #{@food_variant.food} has been destroyed."
+    )
     redirect_to food_variants_path, notice: "Food variant was successfully destroyed."
   end
 

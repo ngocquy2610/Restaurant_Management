@@ -1,4 +1,9 @@
 Rails.application.routes.draw do
+  resources :notifications do
+    collection do
+      patch :mark_all_read
+    end
+  end
   resources :reservations
   resources :promotions
   resources :menus, only: [:index, :show]
