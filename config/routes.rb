@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :preorders
   resources :notifications do
     collection do
       patch :mark_all_read

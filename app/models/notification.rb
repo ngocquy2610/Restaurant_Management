@@ -5,14 +5,11 @@ class Notification < ApplicationRecord
 
   scope :recent, -> { order(created_at: :desc) }
 
-  # Push every new notification to its recipient in real time via Action Cable.
-  # Each notification bubbles up on the recipient's notification page
-  # (#notifications-list) and lights up the bell badge (#notification-badge).
   after_create_commit :broadcast_new_notification
 
   private
     def broadcast_new_notification
-      broadcast_prepend_to recipient, target: "notifications-list"
+      broadcast_prepend_to recipient, target: "notifications-list" # helper của Turbo Streams
       broadcast_replace_to recipient,
         target: "notification-badge",
         partial: "notifications/bell_badge",
