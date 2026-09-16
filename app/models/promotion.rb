@@ -1,5 +1,6 @@
 class Promotion < ApplicationRecord
   has_one_attached :image
+  has_many :orders
 
   validates :name, presence: true
   enum :discount_type, {percentage: true, fix_amount: false}, default: true

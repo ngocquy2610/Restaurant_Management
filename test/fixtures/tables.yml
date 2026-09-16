@@ -24,3 +24,32 @@ two:
   width: 120
   height: 60
   rotation: 30
+
+# Tables used by the order fixtures. They intentionally belong to
+# table_types(:two) (and are not tables(:one)/tables(:two)) so that the
+# scaffold table/table-type destroy tests — which delete those fixtures — never
+# trip the orders->tables foreign key.
+booked_a:
+  table_type: two
+  area: one
+  capacity: 4
+  status: 0
+  table_number: B1
+  shape: 1
+  pos_x: 100
+  pos_y: 100
+  radius: 40
+  rotation: 0
+
+booked_b:
+  table_type: two
+  area: two
+  capacity: 6
+  status: 0
+  table_number: B2
+  shape: 2
+  pos_x: 200
+  pos_y: 200
+  width: 120
+  height: 60
+  rotation: 30

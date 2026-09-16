@@ -1,0 +1,53 @@
+<% content_for :title, "Pre-order received" %>
+<div class="relative"><%= render "layouts/header" %></div>
+<div class="min-h-screen bg-[#FBF0EC] px-4 py-10 pt-28">
+  <div class="mx-auto max-w-3xl space-y-8">
+    <div class="text-center">
+      <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl">✅</div>
+      <h1 class="mt-4 font-serif text-4xl font-semibold tracking-tight text-gray-900">Pre-order confirmed</h1>
+      <p class="mt-3 text-sm text-gray-600">
+        Table <span class="font-semibold text-gray-900"><%= @order.table&.table_number %></span> —
+        we'll have these ready for you.
+      </p>
+    </div>
+
+    <% if notice.present? %>
+      <p class="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700" id="notice"><%= notice %></p>
+    <% end %>
+
+    <div class="overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-sm">
+      <div class="flex items-center justify-between border-b border-gray-200 px-6 py-5">
+        <h2 class="font-serif text-2xl font-semibold text-gray-900">Your dishes</h2>
+        <span class="inline-flex rounded-full bg-[#E9CFC7] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#8A1C2B]"><%= @order.order_items.size %> items</span>
+      </div>
+
+      <% if @order.order_items.any? %>
+        <ul class="divide-y divide-gray-200">
+          <% @order.order_items.includes(:food, :food_variant).each do |item| %>
+            <li class="flex items-center justify-between gap-4 px-6 py-4">
+              <div>
+                <p class="font-semibold text-gray-900"><%= item.food&.name %></p>
+                <p class="mt-1 text-xs text-gray-500">
+                  <% if item.food_variant.present? %><%= item.food_variant.name %> · <% end %>Qty <%= item.quantity %>
+                </p>
+              </div>
+              <span class="font-semibold text-gray-900"><%= number_to_currency(item.unit_price.to_f * item.quantity.to_i, precision: 2) %></span>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="px-6 py-12 text-center text-sm text-gray-500">No dishes were chosen this time.</p>
+      <% end %>
+
+      <div class="flex justify-between border-t border-gray-200 bg-[#FEF3E8] px-6 py-5 font-serif text-2xl font-semibold text-gray-900">
+        <span>Estimated total</span>
+        <span><%= number_to_currency(@order.total_price, precision: 2) %></span>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-center gap-3">
+      <%= link_to "Back to reservations", reservations_path, class: "inline-flex items-center rounded-full border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50" %>
+      <%= link_to "Menu", menus_path, class: "inline-flex items-center rounded-full bg-[#8A1C2B] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#6d1420]" %>
+    </div>
+  </div>
+</div>

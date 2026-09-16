@@ -1,0 +1,16 @@
+<%# Grouped "choose a dish" dropdown used by the order form rows.
+  locals: name (string), selected (id or blank) %>
+<select name="<%= name %>" data-order-form-food data-order-form-index="true"
+        class="order-food-select w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#8A1C2B]">
+  <option value="">Choose a dish…</option>
+  <% @categories.each do |category| %>
+    <optgroup label="<%= category.name %>">
+      <% @foods.select { |food| food.category_id == category.id }.each do |food| %>
+        <option value="<%= food.id %>" data-food-id="<%= food.id %>"
+                <%= "selected" if food.id == selected.to_i %>>
+          <%= food.name %> — <%= number_to_currency(food.base_price, precision: 2) %>
+        </option>
+      <% end %>
+    </optgroup>
+  <% end %>
+</select>

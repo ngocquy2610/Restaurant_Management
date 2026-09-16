@@ -2,6 +2,8 @@ class Reservation < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :table
 
+  has_many :orders, dependent: :destroy
+
   validates :guest_name, presence: true
   validates :guest_phone, format: { with: /\A\d{9,11}\z/ }, presence: true
 
@@ -14,19 +16,13 @@ class Reservation < ApplicationRecord
     completed: 5
   }, default: 0
 
-  # Reservation statuses that keep a table held/reserved. Any other (terminal)
-  # status frees the table back to available.
   ACTIVE_STATUSES = %i[pending approved checked_in].freeze
 
-  # Keep the table's own status in sync: pending/approved/checked_in hold the
-  # table as reserved, while rejected/cancelled/completed release it.
   after_create  :sync_table_status
   after_update  :sync_table_status, if: -> { saved_change_to_status? || saved_change_to_table_id? }
   after_destroy :sync_table_status
 
-  # A table can only be held by one active reservation at a time.
   validate :table_must_not_be_double_booked
-  # Out of service / occupied tables cannot be booked.
   validate :table_must_be_bookable
 
   private
@@ -45,10 +41,6 @@ class Reservation < ApplicationRecord
 
   def table_must_be_bookable
     return if table.blank?
-
-    # Only enforced when the table is being (re)assigned. An existing reservation
-    # must not be blocked just because its own check-in put the table into the
-    # occupied state (e.g. completing/cancelling it frees the table again).
     return unless new_record? || table_id_changed?
 
     if table.occupied? || table.out_of_service?

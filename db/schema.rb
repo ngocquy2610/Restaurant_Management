@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_26_030000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_16_040001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -113,6 +113,69 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_26_030000) do
     t.index ["recipient_id"], name: "index_notifications_on_recipient_id"
   end
 
+  create_table "order_items", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "food_id", null: false
+    t.bigint "food_variant_id"
+    t.bigint "order_id", null: false
+    t.integer "quantity"
+    t.text "special_note"
+    t.integer "status"
+    t.decimal "unit_price"
+    t.datetime "updated_at", null: false
+    t.index ["food_id"], name: "index_order_items_on_food_id"
+    t.index ["food_variant_id"], name: "index_order_items_on_food_variant_id"
+    t.index ["order_id"], name: "index_order_items_on_order_id"
+  end
+
+  create_table "orders", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.decimal "discount_amount"
+    t.bigint "promotion_id"
+    t.bigint "reservation_id"
+    t.integer "status"
+    t.decimal "subtotal"
+    t.bigint "table_id", null: false
+    t.decimal "table_price", precision: 10, scale: 2
+    t.decimal "total_price", precision: 10, scale: 2
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.index ["reservation_id"], name: "index_orders_on_reservation_id"
+    t.index ["table_id"], name: "index_orders_on_table_id"
+    t.index ["user_id"], name: "index_orders_on_user_id"
+  end
+
+  create_table "payment_methods", force: :cascade do |t|
+    t.boolean "active"
+    t.integer "code"
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_payment_methods_on_code", unique: true
+  end
+
+  create_table "payments", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "currency"
+    t.decimal "discount_amount"
+    t.text "failure_reason"
+    t.string "idempotency_key"
+    t.bigint "order_id", null: false
+    t.datetime "paid_at"
+    t.bigint "payment_method_id", null: false
+    t.bigint "processed_by_id"
+    t.text "qr_code_data"
+    t.datetime "refunded_at"
+    t.integer "status"
+    t.decimal "subtotal"
+    t.decimal "total_amount"
+    t.datetime "updated_at", null: false
+    t.index ["idempotency_key"], name: "index_payments_on_idempotency_key", unique: true
+    t.index ["order_id"], name: "index_payments_on_order_id"
+    t.index ["payment_method_id"], name: "index_payments_on_payment_method_id"
+    t.index ["processed_by_id"], name: "index_payments_on_processed_by_id"
+  end
+
   create_table "promotions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.boolean "discount_type"
@@ -207,6 +270,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_26_030000) do
   add_foreign_key "food_variants", "foods"
   add_foreign_key "foods", "categories"
   add_foreign_key "notifications", "users", column: "recipient_id"
+  add_foreign_key "order_items", "food_variants"
+  add_foreign_key "order_items", "foods"
+  add_foreign_key "order_items", "orders"
+  add_foreign_key "orders", "promotions"
+  add_foreign_key "orders", "reservations"
+  add_foreign_key "orders", "tables"
+  add_foreign_key "orders", "users"
+  add_foreign_key "payments", "orders"
+  add_foreign_key "payments", "payment_methods"
+  add_foreign_key "payments", "users", column: "processed_by_id"
   add_foreign_key "recipe_items", "food_variants"
   add_foreign_key "recipe_items", "foods"
   add_foreign_key "recipe_items", "ingredients"

@@ -1,0 +1,35 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  order: one
+  payment_method: one
+  processed_by: one
+  subtotal: 9.99
+  discount_amount: 9.99
+  total_amount: 9.99
+  status: 1
+  stripe_payment_intent_id: MyString
+  qr_code_data: MyText
+  provider_transaction_id: MyString
+  failure_reason: MyText
+  currency: MyString
+  idempotency_key: MyString
+  paid_at: 2026-09-16 10:29:28
+  refunded_at: 2026-09-16 10:29:28
+
+two:
+  order: two
+  payment_method: two
+  processed_by: two
+  subtotal: 9.99
+  discount_amount: 9.99
+  total_amount: 9.99
+  status: 1
+  stripe_payment_intent_id: MyString
+  qr_code_data: MyText
+  provider_transaction_id: MyString
+  failure_reason: MyText
+  currency: MyString
+  idempotency_key: MyString
+  paid_at: 2026-09-16 10:29:28
+  refunded_at: 2026-09-16 10:29:28
