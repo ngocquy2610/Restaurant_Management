@@ -1,0 +1,45 @@
+<% content_for :title, "Orders" %>
+<div class="relative"><%= render "layouts/header" %></div>
+<div class="min-h-screen bg-[#FBF0EC] px-4 py-10 pt-28">
+  <div class="mx-auto max-w-7xl space-y-8">
+    <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-[0.32em] text-[#8A1C2B]/80">Waiter Console</p>
+        <h1 class="mt-3 font-serif text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">Orders</h1>
+        <p class="mt-4 text-sm text-gray-600">Track every table's order from placement to completion.</p>
+      </div>
+      <div class="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+        <% if current_user&.admin? %>
+          <%= link_to admin_dashboards_path,
+                class: "inline-flex items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10" />
+            </svg>
+            Dashboard
+          <% end %>
+        <% end %>
+        <% if policy(Order).new? %>
+          <%= link_to "New order", new_order_path,
+                class: "inline-flex items-center justify-center rounded-full bg-[#8A1C2B] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#6d1420]" %>
+        <% end %>
+      </div>
+    </div>
+
+    <% if notice.present? %>
+      <p class="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700" id="notice"><%= notice %></p>
+    <% end %>
+
+    <div class="space-y-5">
+      <% if @orders.any? %>
+        <% @orders.each do |order| %>
+          <%= render order %>
+        <% end %>
+      <% else %>
+        <div class="rounded-[2rem] border-2 border-dashed border-[#d7b9b2] bg-white px-6 py-16 text-center">
+          <p class="font-serif text-2xl font-semibold text-gray-700">No orders yet</p>
+          <p class="mt-2 text-sm text-gray-500">Place your first order to get started.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

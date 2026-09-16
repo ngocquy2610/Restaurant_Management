@@ -104,7 +104,8 @@ class ReservationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "pending", reservation.status
     # Booking a table sets its status to reserved so it can't be booked again.
     assert @bookable.reload.reserved?
-    assert_redirected_to reservations_url
+    # After booking, the customer is sent straight to the pre-order screen.
+    assert_redirected_to new_reservation_preorder_path(reservation)
   end
 
   test "should allow creating a reservation without a signed-in user (user_id null)" do
@@ -114,7 +115,7 @@ class ReservationsControllerTest < ActionDispatch::IntegrationTest
       post reservations_url, params: valid_reservation_params(table: @bookable2, guest_name: "Walk-in Guest", phone: "0892776511")
     end
 
-    assert_redirected_to reservations_url
+    assert_redirected_to new_reservation_preorder_path(Reservation.last)
     assert_nil Reservation.last.user_id
   end
 

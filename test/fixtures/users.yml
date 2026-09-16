@@ -43,3 +43,23 @@ receptionist:
   status: true
   jti: <%= SecureRandom.uuid %>
   year_spend: 0.0
+
+waiter:
+  full_name: Waiter User
+  phone: "5555554444"
+  email: waiter@example.com
+  location: Floor
+  role: 4
+  status: true
+  jti: <%= SecureRandom.uuid %>
+  year_spend: 0.0
+
+customer:
+  full_name: Customer User
+  phone: "5551112222"
+  email: customer@example.com
+  location: Home
+  role: 5
+  status: true
+  jti: <%= SecureRandom.uuid %>
+  year_spend: 0.0

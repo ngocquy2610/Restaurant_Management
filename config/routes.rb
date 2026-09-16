@@ -1,5 +1,22 @@
 Rails.application.routes.draw do
-  resources :preorders
+  resources :order_items, only: [:create, :destroy] do
+    member do
+      patch :update_status
+    end
+  end
+
+  resources :orders do
+    member do
+      patch :update_status
+    end
+  end
+  # Customer pre-order flow: after booking a table, they order through
+  # reservations/:id/preorders/new and create; show/list happen on /preorders.
+  resources :reservations do
+    resources :preorders, only: %i[ new create ]
+  end
+  resources :preorders, only: %i[ show index destroy ]
+
   resources :notifications do
     collection do
       patch :mark_all_read

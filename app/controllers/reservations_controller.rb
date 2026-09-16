@@ -46,7 +46,8 @@ class ReservationsController < ApplicationController
         title: "New reservation request",
         body: "#{@reservation.guest_name} requested a table at #{@reservation.reservation_date.strftime('%d/%m')} at #{@reservation.reservation_time.strftime('%H:%M')}. Table #{@reservation.table.table_number}."
       )
-      redirect_to reservations_path, notice: "Reservation was successfully created."
+      # Let the customer pre-order dishes for the table they just booked.
+      redirect_to new_reservation_preorder_path(@reservation), notice: "Table booked! Add a pre-order below."
     else
       render "reservations/new", status: :unprocessable_content
     end

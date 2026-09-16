@@ -4,6 +4,7 @@ class Food < ApplicationRecord
   has_many :food_variants, dependent: :destroy
   has_many :recipe_items, dependent: :destroy
   has_many :ingredients, through: :recipe_items
+  has_many :order_items, dependent: :destroy
 
   has_one_attached :image
 

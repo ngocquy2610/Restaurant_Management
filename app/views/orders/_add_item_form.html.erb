@@ -1,0 +1,9 @@
+<%# Adds a single dish to an existing order. posts to OrderItemsController#create. %>
+<%= form_with url: order_items_path, method: :post, class: "contents",
+      data: { controller: "order-form", order_form_variants: h(@variants_by_food.to_json) } do |form| %>
+  <%= hidden_field_tag :order_id, order.id %>
+  <div data-order-form-target="items" class="space-y-3">
+    <%= render "orders/item_row", prefix: "order_item", item: @order_item %>
+  </div>
+  <%= form.submit "Add to order", class: "mt-4 rounded-md bg-[#8A1C2B] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#6d1420]" %>
+<% end %>

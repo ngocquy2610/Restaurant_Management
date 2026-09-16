@@ -1,70 +1,78 @@
 class PreordersController < ApplicationController
-  before_action :set_preorder, only: %i[ show edit update destroy ]
+  before_action :set_order, only: %i[ show destroy ]
 
-  # GET /preorders or /preorders.json
+  # GET /preorders — staff overview of every customer pre-order.
+  # Pre-orders now live on the orders table (status = :preorder).
   def index
-    @preorders = Preorder.all
+    authorize Order, :index?
+    @orders = Order.includes(:reservation, :table).where(status: :preorder).order(created_at: :desc)
   end
 
-  # GET /preorders/1 or /preorders/1.json
-  def show
-  end
-
-  # GET /preorders/new
+  # GET /preorders/new?reservation_id=1 — the customer-facing ordering screen
+  # shown right after they finish booking a table.
   def new
-    @preorder = Preorder.new
+    @order = Order.new(status: :preorder, reservation_id: params[:reservation_id])
+    authorize @order, :new?
+    load_food_data
   end
 
-  # GET /preorders/1/edit
-  def edit
-  end
-
-  # POST /preorders or /preorders.json
+  # POST /preorders — creates a new Order record directly (status = :preorder)
+  # for the table that was just booked.
   def create
-    @preorder = Preorder.new(preorder_params)
+    @order = Order.new(preorder_params)
+    @order.status = :preorder
+    @order.table = @order.reservation&.table
+    @order.waiter = current_user
+    authorize @order, :create?
 
-    respond_to do |format|
-      if @preorder.save
-        format.html { redirect_to @preorder, notice: "Preorder was successfully created." }
-        format.json { render :show, status: :created, location: @preorder }
-      else
-        format.html { render :new, status: :unprocessable_content }
-        format.json { render json: @preorder.errors, status: :unprocessable_content }
-      end
+    if @order.save
+      notify_role(:kitchen_staff,
+        title: "Pre-order received",
+        body: "#{@order.reservation&.guest_name} pre-ordered dishes for table #{@order.table&.table_number}."
+      )
+      redirect_to preorder_path(@order), notice: "Your pre-order was received. See you soon!"
+    else
+      load_food_data
+      render :new, status: :unprocessable_entity
     end
   end
 
-  # PATCH/PUT /preorders/1 or /preorders/1.json
-  def update
-    respond_to do |format|
-      if @preorder.update(preorder_params)
-        format.html { redirect_to @preorder, notice: "Preorder was successfully updated.", status: :see_other }
-        format.json { render :show, status: :ok, location: @preorder }
-      else
-        format.html { render :edit, status: :unprocessable_content }
-        format.json { render json: @preorder.errors, status: :unprocessable_content }
-      end
-    end
+  # GET /preorders/1 — confirmation with the chosen dishes + total.
+  def show
+    authorize @order, :show?
   end
 
-  # DELETE /preorders/1 or /preorders/1.json
+  # DELETE /preorders/1
   def destroy
-    @preorder.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to preorders_path, notice: "Preorder was successfully destroyed.", status: :see_other }
-      format.json { head :no_content }
-    end
+    authorize @order, :destroy?
+    @order.destroy!
+    redirect_to preorders_path, notice: "Pre-order was cancelled.", status: :see_other
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_preorder
-      @preorder = Preorder.find(params.expect(:id))
+
+    def set_order
+      @order = Order.find(params.expect(:id))
     end
 
-    # Only allow a list of trusted parameters through.
+    # Foods grouped by category + a variant map for the order-form picker.
+    def load_food_data
+      @categories = Category.order(:name)
+      @foods = Food.includes(:category).order(:name)
+      @tables = Table.order(:id)
+
+      @variants_by_food = FoodVariant.includes(:food)
+                                      .order(:name)
+                                      .group_by(&:food_id)
+                                      .transform_values do |variants|
+        variants.map { |v| { id: v.id, name: v.name } }
+      end
+    end
+
     def preorder_params
-      params.fetch(:preorder, {})
+      params.require(:order).permit(
+        :reservation_id,
+        order_items_attributes: [:id, :food_id, :food_variant_id, :quantity, :special_note, :_destroy]
+      )
     end
 end

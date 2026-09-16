@@ -2,6 +2,7 @@ class FoodVariant < ApplicationRecord
   belongs_to :food
 
   has_many :recipe_items, dependent: :destroy
+  has_many :order_items, dependent: :destroy
   
   validates :name, presence: true, uniqueness: { scope: :food_id, case_sensitive: false }
   validates :price_adjustment, presence: true, numericality: true

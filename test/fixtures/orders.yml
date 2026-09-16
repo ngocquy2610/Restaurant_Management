@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  table: booked_a
+  status: 1
+
+two:
+  table: booked_b
+  status: 1

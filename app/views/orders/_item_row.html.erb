@@ -1,0 +1,35 @@
+<%# One configurable line-item row. locals: prefix (string), item (OrderItem, may be nil).
+  Inside the order form this is `order[order_items_attributes][INDEX]`;
+  inside the single "add item" form it is `order_item`. %>
+<div data-order-form-row class="grid gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-12">
+  <div class="sm:col-span-4">
+    <%= render "orders/food_select", name: "#{prefix}[food_id]", selected: item&.food_id %>
+  </div>
+
+  <div class="sm:col-span-3">
+    <select name="<%= prefix %>[food_variant_id]" data-order-form-variant
+            data-order-form-index="true" data-selected-variant="<%= item&.food_variant_id %>"
+            class="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#8A1C2B]">
+      <option value="">No variant</option>
+    </select>
+  </div>
+
+  <div class="sm:col-span-1">
+    <input name="<%= prefix %>[quantity]" data-order-form-index="true"
+           type="number" min="1" value="<%= item&.quantity || 1 %>"
+           class="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#8A1C2B]" />
+  </div>
+
+  <div class="sm:col-span-3">
+    <input name="<%= prefix %>[special_note]" data-order-form-index="true"
+           type="text" value="<%= item&.special_note %>" placeholder="Note (optional)"
+           class="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#8A1C2B]" />
+  </div>
+
+  <div class="sm:col-span-1">
+    <button type="button" data-action="click->order-form#removeItem"
+            class="flex h-full w-full items-center justify-center rounded-md border border-red-200 bg-red-50 px-2 py-2 text-sm font-semibold text-red-700 hover:bg-red-100">
+      ×
+    </button>
+  </div>
+</div>
