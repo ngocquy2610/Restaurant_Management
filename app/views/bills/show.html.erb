@@ -1,0 +1,84 @@
+<div class="min-h-screen bg-[#FBF0EC] px-4 py-10 pt-28">
+  <div class="mx-auto max-w-2xl rounded-2xl bg-white p-8 shadow-sm">
+    <h1 class="font-serif text-3xl font-semibold text-gray-900">
+      Payment Bill
+    </h1>
+
+    <p class="mt-2 text-sm text-gray-500">
+      Order #<%= @order.id %>
+      · Payment #<%= @payment.id %>
+    </p>
+
+    <div class="mt-8 space-y-3 border-b border-gray-200 pb-6">
+      <div class="flex justify-between">
+        <span>Subtotal</span>
+        <span>
+          <%= number_to_currency(@payment.subtotal, unit: "$", precision: 2) %>
+        </span>
+      </div>
+
+      <div class="flex justify-between">
+        <span>Discount</span>
+        <span>
+          <%= number_to_currency(@payment.discount_amount, unit: "$", precision: 2) %>
+        </span>
+      </div>
+
+      <div class="flex justify-between text-xl font-semibold">
+        <span>Total (USD)</span>
+        <span>
+          <%= number_to_currency(@payment.total_amount, unit: "$", precision: 2) %>
+        </span>
+      </div>
+
+      <div class="flex justify-between text-xl font-semibold text-[#8A1C2B]">
+        <span>Total (VND)</span>
+        <span>
+          <%= number_to_currency(@payment.total_amount_vnd, unit: "₫", precision: 0) %>
+        </span>
+      </div>
+    </div>
+
+    <div class="mt-6">
+      <p>
+        Payment method:
+        <strong><%= @payment.payment_method.name %></strong>
+      </p>
+
+      <p class="mt-2">
+        Status:
+        <strong><%= @payment.status.humanize %></strong>
+      </p>
+    </div>
+
+    <% if @payment.payment_method.qr? && @payment.pending? %>
+      <div class="mt-8 border-t border-gray-200 pt-6">
+        <h2 class="text-center text-lg font-semibold">Scan to pay</h2>
+        <p class="mt-2 text-center text-sm text-gray-600">
+          QR amount:
+          <%= number_to_currency(@payment.total_amount_vnd, unit: "₫", precision: 0) %>
+        </p>
+
+        <% if @payment.vietqr_url.present? %>
+          <div class="mt-4 flex justify-center">
+            <%= image_tag @payment.vietqr_url,
+                  alt: "VietQR payment code",
+                  class: "h-80 w-80 max-w-full object-contain" %>
+          </div>
+        <% else %>
+          <p class="mt-4 rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+            VietQR is not configured.
+          </p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if @payment.pending? && policy(@order).update? %>
+      <%= button_to "Confirm payment",
+            confirm_order_payment_path(@order, @payment),
+            method: :patch,
+            data: { turbo_confirm: "Confirm that payment has been received?" },
+            class: "mt-8 rounded-md bg-green-600 px-4 py-2 font-semibold text-white" %>
+    <% end %>
+  </div>
+</div>

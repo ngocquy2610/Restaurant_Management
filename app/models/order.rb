@@ -28,12 +28,16 @@ class Order < ApplicationRecord
   end
 
   def recalculate_total_price!
-    total = table_price.to_f + order_items.sum { |oi| oi.unit_price.to_f * oi.quantity.to_i }
-    total = total.round(2)
+    calculated_subtotal = table_price.to_d + order_items.sum do |order_item|
+      order_item.unit_price.to_d * order_item.quantity.to_i
+    end
+    calculated_subtotal = calculated_subtotal.round(2)
+    total = [calculated_subtotal - discount_amount.to_d, 0].max.round(2)
 
     if persisted?
-      update_columns(total_price: total) unless total_price == total
+      update_columns(subtotal: calculated_subtotal, total_price: total) unless subtotal == calculated_subtotal && total_price == total
     else
+      self.subtotal = calculated_subtotal
       self.total_price = total
     end
   end

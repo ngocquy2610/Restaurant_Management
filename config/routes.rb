@@ -9,9 +9,15 @@ Rails.application.routes.draw do
     member do
       patch :update_status
     end
+
+    resources :payments, only: [:create] do
+      member do
+        get :bill, to: "bills#show"
+        patch :confirm
+      end
+    end
   end
-  # Customer pre-order flow: after booking a table, they order through
-  # reservations/:id/preorders/new and create; show/list happen on /preorders.
+
   resources :reservations do
     resources :preorders, only: %i[ new create ]
   end
