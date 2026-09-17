@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_16_040001) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_16_075046) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -167,6 +167,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_16_040001) do
     t.text "qr_code_data"
     t.datetime "refunded_at"
     t.integer "status"
+    t.string "stripe_checkout_session_id"
+    t.string "stripe_payment_intent_id"
     t.decimal "subtotal"
     t.decimal "total_amount"
     t.datetime "updated_at", null: false
@@ -174,6 +176,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_16_040001) do
     t.index ["order_id"], name: "index_payments_on_order_id"
     t.index ["payment_method_id"], name: "index_payments_on_payment_method_id"
     t.index ["processed_by_id"], name: "index_payments_on_processed_by_id"
+    t.index ["stripe_checkout_session_id"], name: "index_payments_on_stripe_checkout_session_id", unique: true
+    t.index ["stripe_payment_intent_id"], name: "index_payments_on_stripe_payment_intent_id", unique: true
   end
 
   create_table "promotions", force: :cascade do |t|

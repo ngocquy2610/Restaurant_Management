@@ -103,6 +103,15 @@
         <span>Table charge (<%= @order.table&.table_type&.type&.presence || "table" %>)</span>
         <span><%= number_to_currency(@order.table_price, precision: 2) %></span>
       </div>
+      <div class="mt-2 flex justify-between text-sm text-gray-600">
+        <span>
+          Membership discount
+          <% pct = @order.membership_discount_percent %>
+          <% if pct.positive? %>(<%= pct %>% off)<% end %>
+        </span>
+        <span>-<%= number_to_currency(@order.discount_amount, precision: 2) %></span>
+      </div>
+
       <div class="mt-2 flex justify-between border-t border-gray-100 pt-4 font-serif text-2xl font-semibold text-gray-900">
         <span>Total</span>
         <span><%= number_to_currency(@order.total_price, precision: 2) %></span>
@@ -112,9 +121,29 @@
     <% if policy(@order).update? && !@order.completed? && @payment_methods.present? %>
       <div class="rounded-4xl border border-gray-200 bg-white p-6 shadow-sm">
         <h2 class="font-serif text-2xl font-semibold text-gray-900">Payment</h2>
-        <p class="mt-2 text-sm text-gray-600">Amount to collect: <%= number_to_currency(@order.total_price, unit: "₫", precision: 0) %></p>
 
-        <%= form_with url: order_payments_path(@order), method: :post, class: "mt-4 flex flex-wrap items-end gap-3" do %>
+        <div class="mt-3 space-y-1 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-600">
+          <div class="flex justify-between">
+            <span>Subtotal</span>
+            <span><%= number_to_currency(@order.subtotal, precision: 2) %></span>
+          </div>
+          <div class="flex justify-between">
+            <span>
+              Membership discount
+              <% pct = @order.membership_discount_percent %>
+              <% if pct.positive? %>(<%= pct %>% off)<% end %>
+            </span>
+            <span>-<%= number_to_currency(@order.discount_amount, precision: 2) %></span>
+          </div>
+        </div>
+        <p class="mt-2 text-sm text-gray-600">
+          Amount to collect:
+          <strong><%= number_to_currency(@order.total_price, unit: "₫", precision: 0) %></strong>
+        </p>
+
+          <%= form_with url: order_payments_path(@order), method: :post,
+            data: { turbo: false },
+            class: "mt-4 flex flex-wrap items-end gap-3" do %>
           <div>
             <%= label_tag :payment_method_id, "Payment method", class: "mb-1 block text-sm font-semibold text-gray-700" %>
             <%= select_tag :payment_method_id,

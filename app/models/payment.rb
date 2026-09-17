@@ -5,6 +5,9 @@ class Payment < ApplicationRecord
              class_name: "User",
              optional: true
 
+  after_update :credit_customer_year_spend,
+    if: -> { saved_change_to_status? && completed? }
+
   enum :status, {
     pending: 0,
     completed: 1,
@@ -25,5 +28,12 @@ class Payment < ApplicationRecord
 
   def total_amount_vnd
     ::VietqrUrlBuilder.amount_in_vnd(self)
+  end
+
+  private
+
+  def credit_customer_year_spend
+    customer = order.customer
+    customer&.increment!(:year_spend, total_amount.to_d)
   end
 end

@@ -18,7 +18,11 @@
       </div>
 
       <div class="flex justify-between">
-        <span>Discount</span>
+        <span>
+          Membership discount
+          <% pct = @order.membership_discount_percent %>
+          <% if pct.positive? %>(<%= pct %>% off)<% end %>
+        </span>
         <span>
           <%= number_to_currency(@payment.discount_amount, unit: "$", precision: 2) %>
         </span>
@@ -34,7 +38,7 @@
       <div class="flex justify-between text-xl font-semibold text-[#8A1C2B]">
         <span>Total (VND)</span>
         <span>
-          <%= number_to_currency(@payment.total_amount_vnd, unit: "₫", precision: 0) %>
+          <%= number_to_currency(@payment.total_amount_vnd, unit: "đ", precision: 0) %>
         </span>
       </div>
     </div>
@@ -73,7 +77,7 @@
       </div>
     <% end %>
 
-    <% if @payment.pending? && policy(@order).update? %>
+    <% if @payment.pending? && !@payment.payment_method.card? && policy(@order).update? %>
       <%= button_to "Confirm payment",
             confirm_order_payment_path(@order, @payment),
             method: :patch,

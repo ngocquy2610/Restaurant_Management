@@ -3,7 +3,10 @@ class User < ApplicationRecord
     :recoverable, :rememberable, :validatable, :jwt_authenticatable,
     jwt_revocation_strategy: JwtDenylist
 
-  after_update :calculate_member_tier!, if: :saved_change_to_year_spend?
+  # Recompute the member tier whenever `year_spend` changes. Uses `after_save`
+  # (not `after_update`) so the tier is also assigned when a user is first created
+  # with a `year_spend` value (a plain `after_update` never fires on INSERT).
+  after_save :calculate_member_tier!, if: :saved_change_to_year_spend?
 
   before_validation :set_jti, on: :create
 

@@ -13,6 +13,7 @@ Rails.application.routes.draw do
     resources :payments, only: [:create] do
       member do
         get :bill, to: "bills#show"
+        get :success
         patch :confirm
       end
     end

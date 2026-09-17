@@ -20,7 +20,7 @@ class OrdersController < ApplicationController
     @order = Order.new
     authorize @order
     @order_items = @order.order_items
-    load_food_data
+    load_food_data(occupied_tables: true)
   end
 
   # GET /orders/1/edit
@@ -50,7 +50,7 @@ class OrdersController < ApplicationController
       redirect_to @order, notice: "Order was successfully created."
     else
       @order_items = @order.order_items
-      load_food_data
+      load_food_data(occupied_tables: true)
       render :new, status: :unprocessable_entity
     end
   end
@@ -97,10 +97,10 @@ class OrdersController < ApplicationController
       @order = Order.find(params.expect(:id))
     end
 
-    def load_food_data
+    def load_food_data(occupied_tables: false)
       @categories = Category.order(:name)
       @foods = Food.includes(:category).order(:name)
-      @tables = Table.order(:id)
+      @tables = occupied_tables ? Table.occupied.order(:id) : Table.order(:id)
 
       @variants_by_food = FoodVariant.includes(:food)
                                       .order(:name)
