@@ -10,6 +10,35 @@
     </div>
   <% end %>
 
+  <% if current_user.present? %>
+    <% membership_tier = current_user.current_member_tier %>
+    <% discount_pct = membership_tier&.discount.to_i %>
+    <div class="mt-6 rounded-md border border-[#8A1C2B]/30 bg-[#fbe9e6] px-4 py-4">
+      <div class="flex items-center gap-3">
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#8A1C2B]/10 text-lg font-bold text-[#8A1C2B]">★</span>
+        <div>
+          <p class="font-semibold text-[#2c1c1a]">
+            <% if membership_tier.present? %>
+              <%= membership_tier.name %>
+            <% else %>
+              Restaurant member
+            <% end %>
+            <% if discount_pct.positive? %>
+              · <span class="text-[#8A1C2B]"><%= discount_pct %>% off</span>
+            <% end %>
+          </p>
+          <p class="text-sm text-[#7a5d5a]">
+            <% if discount_pct.positive? %>
+              Your <%= discount_pct %>% membership discount is applied automatically when you book and pay.
+            <% else %>
+              You don't have a loyalty discount yet — it will show here once you earn a member tier.
+            <% end %>
+          </p>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
   <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
     <div>
       <%= form.label :guest_name, "Guest name", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>

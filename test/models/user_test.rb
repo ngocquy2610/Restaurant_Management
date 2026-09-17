@@ -62,4 +62,17 @@ class UserTest < ActiveSupport::TestCase
 
     assert_equal member_tiers(:gold), user.reload.member_tier
   end
+
+  test "creating a user with a high year_spend assigns the matching member tier" do
+    user = User.new(
+      email: "new-spender@example.com",
+      password: "password123",
+      full_name: "New Spender",
+      phone: "7778889990",
+      year_spend: 1500
+    )
+    user.save!
+
+    assert_equal member_tiers(:gold), user.reload.member_tier
+  end
 end

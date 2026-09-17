@@ -28,12 +28,20 @@ class Order < ApplicationRecord
   end
 
   def recalculate_total_price!
-    total = table_price.to_f + order_items.sum { |oi| oi.unit_price.to_f * oi.quantity.to_i }
-    total = total.round(2)
+    calculated_subtotal = table_price.to_d + order_items.sum do |order_item|
+      order_item.unit_price.to_d * order_item.quantity.to_i
+    end
+    calculated_subtotal = calculated_subtotal.round(2)
+    discount = membership_discount_amount(calculated_subtotal)
+    total = [calculated_subtotal - discount, 0].max.round(2)
 
     if persisted?
-      update_columns(total_price: total) unless total_price == total
+      unless subtotal == calculated_subtotal && discount_amount == discount && total_price == total
+        update_columns(subtotal: calculated_subtotal, discount_amount: discount, total_price: total)
+      end
     else
+      self.subtotal = calculated_subtotal
+      self.discount_amount = discount
       self.total_price = total
     end
   end
@@ -47,6 +55,20 @@ class Order < ApplicationRecord
       else :available
       end
     table.update!(status: target) if table.present? && table.status.to_sym != target
+  end
+
+  def customer
+    reservation&.user || (waiter if waiter&.customer?)
+  end
+
+  # Discount percentage granted by the customer's current membership tier.
+  def membership_discount_percent
+    customer&.current_member_tier&.discount.to_i
+  end
+
+  # Dollar value of the membership discount for a given base amount.
+  def membership_discount_amount(base = subtotal)
+    (base.to_d * membership_discount_percent / 100.0).round(2)
   end
 
   private

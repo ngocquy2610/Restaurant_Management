@@ -262,3 +262,14 @@ unless uncovered.empty?
 end
 
 puts "Seeding complete."
+
+[
+  ["Cash", :cash],
+  ["Card", :card],
+  ["QR Code", :qr]
+].each do |name, code|
+  PaymentMethod.find_or_create_by!(code: code) do |payment_method|
+    payment_method.name = name
+    payment_method.active = true
+  end
+end

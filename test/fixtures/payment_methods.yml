@@ -1,11 +1,11 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  name: MyString
-  code: 1
-  active: false
+  name: Cash
+  code: 0
+  active: true
 
 two:
-  name: MyString
+  name: Card
   code: 1
-  active: false
+  active: true

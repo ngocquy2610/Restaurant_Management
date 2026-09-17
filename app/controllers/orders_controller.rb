@@ -11,6 +11,7 @@ class OrdersController < ApplicationController
   def show
     authorize @order
     @order_item = @order.order_items.build
+    @payment_methods = PaymentMethod.where(active: true).order(:code)
     load_food_data
   end
 
@@ -19,7 +20,7 @@ class OrdersController < ApplicationController
     @order = Order.new
     authorize @order
     @order_items = @order.order_items
-    load_food_data
+    load_food_data(occupied_tables: true)
   end
 
   # GET /orders/1/edit
@@ -49,7 +50,7 @@ class OrdersController < ApplicationController
       redirect_to @order, notice: "Order was successfully created."
     else
       @order_items = @order.order_items
-      load_food_data
+      load_food_data(occupied_tables: true)
       render :new, status: :unprocessable_entity
     end
   end
@@ -70,6 +71,11 @@ class OrdersController < ApplicationController
   # PATCH /orders/1/update_status
   def update_status
     authorize @order, :update_status?
+    if order_status_params[:status] == "completed" && !@order.payments.completed.exists?
+      redirect_to order_path(@order), alert: "Create and confirm a payment before completing this order."
+      return
+    end
+
     if @order.update(order_status_params)
       @order.recalculate_total_price!
       redirect_to @order, notice: "Order status updated."
@@ -91,12 +97,10 @@ class OrdersController < ApplicationController
       @order = Order.find(params.expect(:id))
     end
 
-    # Foods grouped by category plus a variant map used by the order-form
-    # Stimulus controller so the variant dropdown only shows the selected dish.
-    def load_food_data
+    def load_food_data(occupied_tables: false)
       @categories = Category.order(:name)
       @foods = Food.includes(:category).order(:name)
-      @tables = Table.order(:id)
+      @tables = occupied_tables ? Table.occupied.order(:id) : Table.order(:id)
 
       @variants_by_food = FoodVariant.includes(:food)
                                       .order(:name)
@@ -106,8 +110,6 @@ class OrdersController < ApplicationController
       end
     end
 
-    # In-service when staff take the order on-site; preorder when a customer
-    # (or unauthenticated user) books it ahead of arrival.
     def order_status_for(user)
       user.present? && user.customer? ? :preorder : :inserve
     end
