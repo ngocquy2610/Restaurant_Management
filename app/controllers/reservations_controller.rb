@@ -26,10 +26,14 @@ class ReservationsController < ApplicationController
   # GET /reservations/new
   def new
     @reservation = Reservation.new(table_id: params[:table_id])
+    @slot_date = params[:date].present? ? Date.parse(params[:date]) : Date.current
+    set_schedule
   end
 
   # GET /reservations/1/edit
   def edit
+    @slot_date = @reservation.reservation_date || Date.current
+    set_schedule
   end
 
   # POST /reservations or /reservations.json
@@ -49,6 +53,8 @@ class ReservationsController < ApplicationController
       # Let the customer pre-order dishes for the table they just booked.
       redirect_to new_reservation_preorder_path(@reservation), notice: "Table booked! Add a pre-order below."
     else
+      @slot_date = @reservation.reservation_date || Date.current
+      set_schedule
       render "reservations/new", status: :unprocessable_content
     end
   end
@@ -94,6 +100,18 @@ class ReservationsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_reservation
       @reservation = Reservation.find(params.expect(:id))
+    end
+
+    # Computes the slot data the (shared) reservation form needs to render the
+    # date/2-hour-slot picker: every meal slot for the selected date plus the
+    # subset that is still free for the currently selected table.
+    def set_schedule
+      @all_slots = Reservation.meal_slots_for(@slot_date)
+      @available_slots = if @reservation.table
+                           Reservation.available_slots(@reservation.table, @slot_date, exclude_id: @reservation.id)
+                         else
+                           []
+                         end
     end
 
     # Only allow a list of trusted parameters through.

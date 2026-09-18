@@ -7,26 +7,25 @@ class Table < ApplicationRecord
   enum :shape, { square: 0, round: 1, rectangle: 2 }
   enum :status, { available: 0, occupied: 1, reserved: 2, out_of_service: 3 }
 
-  # Recompute this table's status from its reservations. Used by Reservation
-  # callbacks so the floor plan always reflects who holds the table:
-  #   - a checked-in reservation marks the table occupied
-  #   - a pending/approved reservation holds the table as reserved
-  #   - rejected/cancelled/completed (or no) reservations free it to available
   def refresh_status_from_reservations!
-    active = reservations.where(status: Reservation::ACTIVE_STATUSES).to_a
+    now = Time.zone.now
+    active_now = reservations
+      .where(status: Reservation::ACTIVE_STATUSES)
+      .select { |r| r.holds_table_now?(now) }
+
     new_status =
-      if active.any?(&:checked_in?)
+      if active_now.any?(&:checked_in?)
         :occupied
-      elsif active.any?
+      elsif active_now.any?
         :reserved
       else
         :available
       end
+
     update!(status: new_status) unless status.to_sym == new_status
   end
 
-  # Seating capacities admins are allowed to pick, and which table shapes
-  # support each of them.
+
   ALLOWED_CAPACITIES = [2, 4, 6, 8, 10].freeze
   SHAPE_CAPACITIES = {
     "square" => [2, 4],
