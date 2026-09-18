@@ -62,6 +62,30 @@ class OrderTest < ActiveSupport::TestCase
     assert @table.reload.available?
   end
 
+  test "completing a paid order marks its linked reservation completed" do
+    reservation = Reservation.create!(
+      user: users(:one),
+      table: tables(:booked_a),
+      guest_name: "Jane Smith",
+      guest_phone: "5551234567",
+      reservation_date: Date.current + 1,
+      reservation_time: "19:00",
+      status: :approved
+    )
+    order = Order.create!(table: reservation.table, reservation: reservation, status: :preorder)
+
+    assert reservation.reload.approved?
+
+    order.update!(status: :completed)
+    assert reservation.reload.completed?
+  end
+
+  test "completing an order without a reservation raises no error" do
+    order = Order.create!(table: @table, status: :inserve)
+    order.update!(status: :completed)
+    assert @table.reload.available?
+  end
+
   test "applies the customer's membership discount to the total" do
     table = tables(:booked_a) # available in fixtures
     # users(:one) is silver (10% off).

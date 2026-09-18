@@ -50,3 +50,47 @@
     transition: none;
   }
 }
+
+/* ============================================================
+   Reservation time-slot picker (reservations/_form)
+   Custom classes toggled by the "reservation-schedule" Stimulus
+   controller, so they are defined here explicitly rather than as
+   Tailwind utilities (their presence is data-driven).
+   ============================================================ */
+.slot-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 1px solid #d8c1bc;
+  background: #fffdfc;
+  color: #2c1c1a;
+  border-radius: 0.625rem;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.slot-option:hover:not(:disabled):not(.slot-booked) {
+  border-color: #8a1c2b;
+  background: #fbe9e6;
+}
+
+.slot-option.slot-active {
+  border-color: #7b1f2a;
+  background: #f3d7d0;
+  box-shadow: 0 0 0 2px rgba(138, 28, 43, 0.25);
+}
+
+.slot-option.slot-booked,
+.slot-option:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  border-color: #e0cdc8;
+  color: #a58b83;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slot-option {
+    transition: none;
+  }
+}

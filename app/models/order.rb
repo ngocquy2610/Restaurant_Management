@@ -21,6 +21,7 @@ class Order < ApplicationRecord
   before_validation :set_table_price, if: -> { table.present? && table_price.blank? }
   after_create  :sync_table!
   after_update  :sync_table!, if: -> { saved_change_to_status? }
+  after_update  :sync_reservation, if: -> { saved_change_to_status? && completed? }
   after_save    :recalculate_total_price!, if: -> { table_price_changed? || order_items.any? }
 
   def set_table_price
@@ -49,12 +50,18 @@ class Order < ApplicationRecord
   def sync_table!
     target =
       case status.to_sym
-      when :preorder  then :reserved
-      when :inserve   then :occupied
-      when :completed then :available
-      else :available
+        when :preorder  then :reserved
+        when :inserve   then :occupied
+        when :completed then :available
+        else :available
       end
     table.update!(status: target) if table.present? && table.status.to_sym != target
+  end
+
+  # When the order is paid (marked completed), close out its linked reservation
+  # so the booking is finished and its table is freed.
+  def sync_reservation
+    reservation&.update!(status: :completed)
   end
 
   def customer

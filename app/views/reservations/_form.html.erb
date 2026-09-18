@@ -1,6 +1,6 @@
-<%= form_with(model: reservation, class: "space-y-6") do |form| %>
+<%= form_with(model: reservation, class: "space-y-8") do |form| %>
   <% if reservation.errors.any? %>
-    <div id="error_explanation" class="mb-6 rounded-md border border-[#e5b3ad] bg-[#fbe9e6] px-4 py-3 text-[#8f1f2a]">
+    <div id="error_explanation" class="rounded-md border border-[#e5b3ad] bg-[#fbe9e6] px-4 py-3 text-[#8f1f2a]">
       <h2 class="font-semibold"><%= pluralize(reservation.errors.count, "error") %> prohibited this reservation from being saved:</h2>
       <ul class="mt-1 list-disc pl-5">
         <% reservation.errors.each do |error| %>
@@ -13,9 +13,9 @@
   <% if current_user.present? %>
     <% membership_tier = current_user.current_member_tier %>
     <% discount_pct = membership_tier&.discount.to_i %>
-    <div class="mt-6 rounded-md border border-[#8A1C2B]/30 bg-[#fbe9e6] px-4 py-4">
+    <div class="rounded-md border border-[#8A1C2B]/30 bg-[#fbe9e6] px-4 py-4">
       <div class="flex items-center gap-3">
-        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#8A1C2B]/10 text-lg font-bold text-[#8A1C2B]">★</span>
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#8A1C2B]/10 text-lg font-bold text-[#8A1C2B]">&#9733;</span>
         <div>
           <p class="font-semibold text-[#2c1c1a]">
             <% if membership_tier.present? %>
@@ -24,14 +24,14 @@
               Restaurant member
             <% end %>
             <% if discount_pct.positive? %>
-              · <span class="text-[#8A1C2B]"><%= discount_pct %>% off</span>
+              &middot; <span class="text-[#8A1C2B]"><%= discount_pct %>% off</span>
             <% end %>
           </p>
           <p class="text-sm text-[#7a5d5a]">
             <% if discount_pct.positive? %>
               Your <%= discount_pct %>% membership discount is applied automatically when you book and pay.
             <% else %>
-              You don't have a loyalty discount yet — it will show here once you earn a member tier.
+              You don't have a loyalty discount yet &mdash; it will show here once you earn a member tier.
             <% end %>
           </p>
         </div>
@@ -54,19 +54,54 @@
             class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] placeholder:text-[#7a5d5a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
       <p class="mt-2 text-sm text-[#7a5d5a]">A contact number so the restaurant can reach you about your booking.</p>
     </div>
+  </div>
 
-    <div>
-      <%= form.label :reservation_date, "Reservation date", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
-      <%= form.date_field :reservation_date,
-            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+  <%# Schedule picker: date + 2-hour meal slots (rendered once a table is chosen). %>
+  <% if reservation.table && @all_slots&.any? %>
+    <div data-controller="reservation-schedule"
+         data-reservation-schedule-path-value="<%= new_reservation_path(table_id: reservation.table.id, date: "__DATE__") %>"
+         data-reservation-schedule-date-value="<%= @slot_date %>"
+         class="rounded-md border border-[#d8c1bc] bg-[#f8efee] p-5">
+      <%= form.hidden_field :reservation_time, data: { reservation_schedule_target: "time" } %>
+
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div>
+          <%= form.label :reservation_date, "Reservation date", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+          <%= form.date_field :reservation_date,
+                value: @slot_date,
+                min: Date.current,
+                class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]",
+                data: { reservation_schedule_target: "date", action: "reservation-schedule#changeDate" } %>
+        </div>
+
+        <div>
+          <%= form.label :reservation_time, "Pick a time slot (2 hours per meal)", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+          <div class="grid grid-cols-2 gap-2">
+            <% @all_slots.each do |slot| %>
+              <% label = "#{slot.strftime("%H:%M")} - #{(slot + 2.hours).strftime("%H:%M")}" %>
+              <% booked = !@available_slots.include?(slot) %>
+              <button type="button"
+                      data-reservation-schedule-target="slot"
+                      data-action="click->reservation-schedule#selectSlot"
+                      data-time="<%= slot.strftime("%H:%M:%S") %>"
+                      class="slot-option <%= "slot-booked" if booked %> <%= reservation.reservation_time&.strftime("%H:%M:%S") == slot.strftime("%H:%M:%S") ? "slot-active" : "" %>"
+                      <%= 'disabled' if booked %>>
+                <span class="block font-semibold"><%= label %></span>
+                <span class="block text-xs opacity-80"><%= booked ? "Already booked" : "Available" %></span>
+              </button>
+            <% end %>
+          </div>
+          <p class="mt-2 text-xs text-[#7a5d5a]">Each meal lasts <strong>2 hours</strong>. Booked slots are disabled.</p>
+        </div>
+      </div>
     </div>
-
-    <div>
-      <%= form.label :reservation_time, "Reservation time", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
-      <%= form.time_field :reservation_time,
-            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+  <% else %>
+    <div class="rounded-md border border-dashed border-[#d8c1bc] bg-[#f8efee] px-4 py-5 text-sm text-[#7a5d5a]">
+      Choose a table from the floor plan first, then pick a date and an available time slot here.
     </div>
+  <% end %>
 
+  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
     <div class="sm:col-span-2">
       <%= form.label :table_id, "Table", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
 
@@ -77,7 +112,7 @@
             <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#8A1C2B]/10 font-serif text-lg font-bold text-[#8A1C2B]"><%= selected_table.table_number %></span>
             <div>
               <p class="font-semibold text-[#2c1c1a]">Table <%= selected_table.table_number %></p>
-              <p class="text-sm text-[#7a5d5a]"><%= selected_table.area&.name %> · <%= selected_table.capacity %> seats · <%= selected_table.status.humanize %></p>
+              <p class="text-sm text-[#7a5d5a]"><%= selected_table.area&.name %> &middot; <%= selected_table.capacity %> seats</p>
             </div>
           </div>
           <%= form.hidden_field :table_id %>
@@ -91,7 +126,6 @@
           <%= link_to "Choose a table from the floor plan", reservations_path, class: "mt-2 inline-block text-sm font-semibold text-[#8A1C2B] hover:underline" %>
         </div>
       <% end %>
-      <p class="mt-2 text-sm text-[#7a5d5a]">Selected from the restaurant floor plan. Availability is confirmed by the restaurant.</p>
     </div>
 
     <div class="sm:col-span-2">
