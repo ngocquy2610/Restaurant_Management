@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_16_075046) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_18_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -55,6 +55,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_16_075046) do
     t.string "name"
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_categories_on_name"
+  end
+
+  create_table "customer_queues", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "guest_name"
+    t.string "guest_phone"
+    t.string "note"
+    t.integer "status"
+    t.bigint "table_id"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["table_id"], name: "index_customer_queues_on_table_id"
+    t.index ["user_id"], name: "index_customer_queues_on_user_id"
   end
 
   create_table "food_variants", force: :cascade do |t|
@@ -271,6 +284,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_16_075046) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "customer_queues", "tables"
+  add_foreign_key "customer_queues", "users"
   add_foreign_key "food_variants", "foods"
   add_foreign_key "foods", "categories"
   add_foreign_key "notifications", "users", column: "recipient_id"

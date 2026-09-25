@@ -2,6 +2,8 @@ class Table < ApplicationRecord
   belongs_to :area
   belongs_to :table_type
 
+  after_update :seat_waiting_guests, if: -> { saved_change_to_status? && available? }
+
   has_many :reservations, dependent: :destroy
 
   enum :shape, { square: 0, round: 1, rectangle: 2 }
@@ -66,5 +68,9 @@ class Table < ApplicationRecord
 
     allowed = SHAPE_CAPACITIES[shape]
     errors.add(:capacity, "cannot be #{capacity} guests for a #{shape} table (allowed: #{allowed.join(', ')} guests)") if allowed && !allowed.include?(capacity)
+  end
+
+  def seat_waiting_guests
+    CustomerQueueManager.assign_next_available!(self)
   end
 end
