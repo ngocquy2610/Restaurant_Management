@@ -94,6 +94,15 @@ Rails.application.routes.draw do
     resources :reservations, only: [:index] do
       member do
         patch :update_status
+        patch :assign_table
+        patch :change_table
+      end
+    end
+
+    resources :customer_queues, only: [:index, :create, :destroy] do
+      member do
+        patch :cancel
+        patch :seat
       end
     end
   end

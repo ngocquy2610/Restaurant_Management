@@ -58,8 +58,6 @@ class Order < ApplicationRecord
     table.update!(status: target) if table.present? && table.status.to_sym != target
   end
 
-  # When the order is paid (marked completed), close out its linked reservation
-  # so the booking is finished and its table is freed.
   def sync_reservation
     reservation&.update!(status: :completed)
   end
