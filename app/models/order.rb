@@ -27,6 +27,21 @@ class Order < ApplicationRecord
   scope :unreleased_preorders, -> { preorder.where(released_to_kitchen_at: nil) }
   scope :released_preorders,   -> { preorder.where.not(released_to_kitchen_at: nil) }
 
+  # Past paid visits belonging to a customer, whether the order was placed
+  # directly (orders.user_id) or via a reservation (reservations.user_id).
+  # LEFT JOIN keeps walk-in/preorder rows whose reservation_id is NULL.
+  scope :dining_history_for, ->(user) {
+    left_joins(:reservation)
+      .where("reservations.user_id = :id OR orders.user_id = :id", id: user.id)
+      .where(status: :completed)
+      .order(updated_at: :desc)
+  }
+
+  # Most recent completed payment snapshot for invoice display.
+  # payments must already be loaded/eager-scoped by the caller.
+  def completed_payment(loaded_payments = payments)
+    loaded_payments.select(&:completed?).max_by(&:paid_at_or_created)
+  end
 
   def set_table_price
     self.table_price = table.table_type.price_add_on

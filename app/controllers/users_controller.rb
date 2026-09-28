@@ -16,9 +16,15 @@ class UsersController < ApplicationController
 
     @current_tier = @user.current_member_tier
     @next_tier = @user.next_member_tier
-    @reservations = Reservation.where(user_id: @user).order(reservation_date: :desc)
     @amount_to_next_tier = @user.amount_to_next_member_tier
-    
+
+    # Independent pagination per section (3 per page each).
+    @reservations = Reservation.where(user_id: @user)
+      .order(reservation_date: :desc)
+      .page(params[:reservations_page]).per(3)
+    @dining_histories = Order.dining_history_for(@user)
+      .includes(:table, :waiter, reservation: :user, order_items: [:food, :food_variant], payments: :payment_method)
+      .page(params[:history_page]).per(3)
   end
 
   # GET /users/new

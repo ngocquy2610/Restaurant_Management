@@ -4,7 +4,7 @@ class OrderPolicy < ApplicationPolicy
   end
 
   def show?
-    staff? || record.waiter == user
+    staff? || record.waiter == user || record.customer == user
   end
 
   def create?
