@@ -24,6 +24,10 @@ class Order < ApplicationRecord
   after_update  :sync_reservation, if: -> { saved_change_to_status? && completed? }
   after_save    :recalculate_total_price!, if: -> { table_price_changed? || order_items.any? }
 
+  scope :unreleased_preorders, -> { preorder.where(released_to_kitchen_at: nil) }
+  scope :released_preorders,   -> { preorder.where.not(released_to_kitchen_at: nil) }
+
+
   def set_table_price
     self.table_price = table.table_type.price_add_on
   end
@@ -74,6 +78,42 @@ class Order < ApplicationRecord
   # Dollar value of the membership discount for a given base amount.
   def membership_discount_amount(base = subtotal)
     (base.to_d * membership_discount_percent / 100.0).round(2)
+  end
+
+  # Giờ phải đẩy bếp = giờ bắt đầu bữa - 10 phút (nil-safe)
+  def release_time
+    slot = reservation&.slot_start
+    slot && slot - 10.minutes
+  end
+
+  # Đã tới giờ đẩy chưa?
+  def due_for_release?(now = Time.zone.now)
+    preorder? && released_to_kitchen_at.nil? && release_time.present? && release_time <= now
+  end
+
+  def released_to_kitchen?
+    released_to_kitchen_at.present?
+  end
+
+  # Release 1 lần duy nhất, an toàn khi gọi trùng
+  def release_to_kitchen!
+    return false if released_to_kitchen_at.present?
+    return false unless preorder?
+    return false unless reservation && Reservation::ACTIVE_STATUSES.include?(reservation.status.to_sym)
+    update!(released_to_kitchen_at: Time.zone.now)
+    true
+  end
+
+  # Đặt lịch: quá giờ rồi → release ngay; chưa tới → hẹn Sidekiq
+  def schedule_kitchen_release
+    return false unless preorder? && released_to_kitchen_at.nil?
+    rt = release_time
+    return false if rt.nil?
+    if rt <= Time.zone.now
+      release_to_kitchen!
+    else
+      PreorderReleaseJob.set(wait_until: rt).perform_later(id)
+    end
   end
 
   private

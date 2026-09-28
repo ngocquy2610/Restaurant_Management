@@ -31,6 +31,10 @@ class OrderPolicy < ApplicationPolicy
     user.admin?
   end
 
+  def release?
+    staff?
+  end
+
   class Scope < Scope
     def resolve
       if user.admin? || user.waiter? || user.kitchen_staff?

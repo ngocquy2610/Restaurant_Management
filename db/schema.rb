@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_18_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_25_120001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -133,7 +133,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_18_160000) do
     t.bigint "order_id", null: false
     t.integer "quantity"
     t.text "special_note"
-    t.integer "status"
+    t.integer "status", default: 0
     t.decimal "unit_price"
     t.datetime "updated_at", null: false
     t.index ["food_id"], name: "index_order_items_on_food_id"
@@ -145,6 +145,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_18_160000) do
     t.datetime "created_at", null: false
     t.decimal "discount_amount"
     t.bigint "promotion_id"
+    t.datetime "released_to_kitchen_at"
     t.bigint "reservation_id"
     t.integer "status"
     t.decimal "subtotal"
@@ -154,6 +155,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_18_160000) do
     t.datetime "updated_at", null: false
     t.bigint "user_id"
     t.index ["reservation_id"], name: "index_orders_on_reservation_id"
+    t.index ["status", "released_to_kitchen_at"], name: "index_orders_on_status_and_released_to_kitchen_at"
     t.index ["table_id"], name: "index_orders_on_table_id"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end

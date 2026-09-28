@@ -54,6 +54,16 @@ waiter:
   jti: <%= SecureRandom.uuid %>
   year_spend: 0.0
 
+kitchen_staff:
+  full_name: Kitchen User
+  phone: "5554443333"
+  email: kitchen@example.com
+  location: Kitchen
+  role: 2
+  status: true
+  jti: <%= SecureRandom.uuid %>
+  year_spend: 0.0
+
 customer:
   full_name: Customer User
   phone: "5551112222"

@@ -1,5 +1,17 @@
 module OrdersHelper
   # Presentation metadata for Order#status and OrderItem#status.
+
+  WAITER_ALLOWED_TRANSITIONS = {
+    "pending" => %i[cancelled].freeze,
+    "ready" => %i[served].freeze
+  }.freeze
+
+  KITCHEN_ALLOWED_TRANSITIONS = {
+    "pending" => %i[accepted cancelled].freeze,
+    "accepted" => %i[preparing cancelled].freeze,
+    "preparing" => %i[ready cancelled].freeze
+  }.freeze
+
   ORDER_STATUS_META = {
     "preorder"  => { label: "Pre-order", chip: "bg-amber-100", text: "text-amber-700",  dot: "bg-amber-500" },
     "inserve"   => { label: "In service", chip: "bg-blue-100", text: "text-blue-700",   dot: "bg-blue-500" },
@@ -37,6 +49,18 @@ module OrdersHelper
   def order_item_next_statuses(status)
     ORDER_ITEM_TRANSITIONS.fetch(status.to_s, [])
   end
+
+  def order_item_next_statuses_for(user, status)
+    general = ORDER_ITEM_TRANSITIONS.fetch(status.to_s, [])
+    return general if user&.admin?
+    return general if user&.kitchen_staff?
+    if user&.waiter?
+      allowed = WAITER_ALLOWED_TRANSITIONS.fetch(status.to_s, [])
+      return general & allowed
+    end
+    []
+  end
+
 
   private
 

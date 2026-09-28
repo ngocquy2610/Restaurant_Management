@@ -13,6 +13,7 @@ class Admin::ReservationsController < ApplicationController
   def update_status
     authorize @reservation, :update_status?
     if @reservation.update(status_params)
+      @reservation.orders.preorder.each(&:schedule_kitchen_release)
       if @reservation.user_id.present?
         notify_user(
           recipient: @reservation.user,
@@ -31,6 +32,7 @@ class Admin::ReservationsController < ApplicationController
     authorize @reservation, :update_status?
     old_table = @reservation.table
     if @reservation.update(table: set_table, status: :approved)
+      @reservation.orders.preorder.each(&:schedule_kitchen_release)
       old_table&.refresh_status_from_reservations! if old_table != @reservation.table
       redirect_to admin_reservations_path,
                   notice: "Assigned Table #{@reservation.table.table_number} to #{@reservation.guest_name}."
@@ -43,6 +45,7 @@ class Admin::ReservationsController < ApplicationController
     authorize @reservation, :update_status?
     old_table = @reservation.table
     if @reservation.update(table: set_table)
+      @reservation.orders.preorder.each(&:schedule_kitchen_release)
       old_table&.refresh_status_from_reservations! if old_table != @reservation.table
       redirect_to admin_reservations_path,
                   notice: "Moved #{@reservation.guest_name} to Table #{@reservation.table.table_number}."
