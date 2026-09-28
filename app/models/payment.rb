@@ -30,6 +30,10 @@ class Payment < ApplicationRecord
     ::VietqrUrlBuilder.amount_in_vnd(self)
   end
 
+  def paid_at_or_created
+    paid_at || created_at
+  end
+
   private
 
   def credit_customer_year_spend

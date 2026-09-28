@@ -1,88 +1,112 @@
+<% customer = @order.customer %>
+<% content_for :title, "Invoice ##{@payment.id} - Order ##{@order.id}" %>
+<div class="relative"><%= render "layouts/header" %></div>
 <div class="min-h-screen bg-[#FBF0EC] px-4 py-10 pt-28">
-  <div class="mx-auto max-w-2xl rounded-2xl bg-white p-8 shadow-sm">
-    <h1 class="font-serif text-3xl font-semibold text-gray-900">
-      Payment Bill
-    </h1>
-
-    <p class="mt-2 text-sm text-gray-500">
-      Order #<%= @order.id %>
-      · Payment #<%= @payment.id %>
-    </p>
-
-    <div class="mt-8 space-y-3 border-b border-gray-200 pb-6">
-      <div class="flex justify-between">
-        <span>Subtotal</span>
-        <span>
-          <%= number_to_currency(@payment.subtotal, unit: "$", precision: 2) %>
-        </span>
-      </div>
-
-      <div class="flex justify-between">
-        <span>
-          Membership discount
-          <% pct = @order.membership_discount_percent %>
-          <% if pct.positive? %>(<%= pct %>% off)<% end %>
-        </span>
-        <span>
-          <%= number_to_currency(@payment.discount_amount, unit: "$", precision: 2) %>
-        </span>
-      </div>
-
-      <div class="flex justify-between text-xl font-semibold">
-        <span>Total (USD)</span>
-        <span>
-          <%= number_to_currency(@payment.total_amount, unit: "$", precision: 2) %>
-        </span>
-      </div>
-
-      <div class="flex justify-between text-xl font-semibold text-[#8A1C2B]">
-        <span>Total (VND)</span>
-        <span>
-          <%= number_to_currency(@payment.total_amount_vnd, unit: "đ", precision: 0) %>
-        </span>
-      </div>
-    </div>
-
-    <div class="mt-6">
-      <p>
-        Payment method:
-        <strong><%= @payment.payment_method.name %></strong>
-      </p>
-
-      <p class="mt-2">
-        Status:
-        <strong><%= @payment.status.humanize %></strong>
-      </p>
-    </div>
-
-    <% if @payment.payment_method.qr? && @payment.pending? %>
-      <div class="mt-8 border-t border-gray-200 pt-6">
-        <h2 class="text-center text-lg font-semibold">Scan to pay</h2>
-        <p class="mt-2 text-center text-sm text-gray-600">
-          QR amount:
-          <%= number_to_currency(@payment.total_amount_vnd, unit: "₫", precision: 0) %>
-        </p>
-
-        <% if @payment.vietqr_url.present? %>
-          <div class="mt-4 flex justify-center">
-            <%= image_tag @payment.vietqr_url,
-                  alt: "VietQR payment code",
-                  class: "h-80 w-80 max-w-full object-contain" %>
-          </div>
-        <% else %>
-          <p class="mt-4 rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-            VietQR is not configured.
-          </p>
+  <div class="mx-auto max-w-3xl space-y-4">
+    <div class="flex flex-wrap items-center justify-between gap-3 print:hidden">
+      <div class="flex items-center gap-2 text-sm">
+        <%= link_to "Back to order", order_path(@order), class: "rounded-full border border-gray-200 bg-white px-4 py-2 font-semibold text-gray-700 hover:bg-gray-50" %>
+        <% if customer.present? %>
+          <%= link_to "Dining history", user_path(customer), class: "rounded-full border border-gray-200 bg-white px-4 py-2 font-semibold text-gray-700 hover:bg-gray-50" %>
         <% end %>
       </div>
-    <% end %>
-
-    <% if @payment.pending? && !@payment.payment_method.card? && policy(@order).update? %>
-      <%= button_to "Confirm payment",
-            confirm_order_payment_path(@order, @payment),
-            method: :patch,
-            data: { turbo_confirm: "Confirm that payment has been received?" },
-            class: "mt-8 rounded-md bg-green-600 px-4 py-2 font-semibold text-white" %>
-    <% end %>
+      <div class="flex items-center gap-2">
+        <%= link_to "Export PDF", bill_order_payment_path(@order, @payment, format: :pdf), class: "rounded-full bg-[#8A1C2B] px-4 py-2 text-sm font-semibold text-white hover:bg-[#6d1422]" %>
+        <button type="button" onclick="window.print()" class="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">Print</button>
+      </div>
+    </div>
+    <div class="rounded-2xl bg-white p-8 shadow-sm">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p class="font-serif text-xl font-bold text-[#8A1C2B]">Lumiere Dining</p>
+          <h1 class="mt-1 font-serif text-3xl font-semibold text-gray-900">Invoice</h1>
+          <p class="mt-2 text-sm text-gray-500">Invoice <strong class="text-gray-900">#<%= @payment.id %></strong> · Order #<%= @order.id %></p>
+        </div>
+        <div class="text-right text-sm">
+          <span class="inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-gray-600"><%= @payment.status.humanize %></span>
+          <p class="mt-2 text-gray-500">Issued: <%= @payment.created_at&.strftime("%d %b %Y - %I:%M %p") %></p>
+          <% if @payment.paid_at.present? %>
+            <p class="text-gray-500">Paid: <%= @payment.paid_at.strftime("%d %b %Y - %I:%M %p") %></p>
+          <% end %>
+        </div>
+      </div>
+      <div class="mt-6 grid grid-cols-1 gap-4 rounded-xl bg-[#FEF3E8] p-4 text-sm sm:grid-cols-3">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-widest text-gray-400">Customer</p>
+          <p class="mt-1 font-semibold text-gray-900"><%= customer&.full_name || "Guest" %></p>
+          <% if @order.reservation.present? %>
+            <p class="mt-1 text-gray-500">Reservation <%= @order.reservation.reservation_date %></p>
+          <% end %>
+        </div>
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-widest text-gray-400">Table / Waiter</p>
+          <p class="mt-1 font-semibold text-gray-900">Table <%= @order.table&.table_number || "-" %></p>
+          <p class="mt-1 text-gray-500"><%= @order.waiter&.full_name || "-" %></p>
+        </div>
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-widest text-gray-400">Payment</p>
+          <p class="mt-1 font-semibold text-gray-900"><%= @payment.payment_method.name %></p>
+          <p class="mt-1 text-gray-500">By <%= @payment.processed_by&.full_name || "-" %></p>
+        </div>
+      </div>
+      <div class="mt-8">
+        <h2 class="font-serif text-xl font-semibold text-gray-900">Items</h2>
+        <% if @order_items.any? %>
+          <table class="mt-4 min-w-full text-left text-sm text-gray-700">
+            <thead class="bg-[#FEF3E8] text-xs uppercase tracking-widest text-gray-500">
+              <tr><th scope="col" class="px-4 py-3">Dish</th><th scope="col" class="px-4 py-3">Variant</th><th scope="col" class="px-4 py-3 text-center">Qty</th><th scope="col" class="px-4 py-3 text-right">Unit</th><th scope="col" class="px-4 py-3 text-right">Amount</th></tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 bg-white">
+              <% @order_items.each do |item| %>
+                <tr>
+                  <td class="px-4 py-3 font-medium text-gray-900"><%= item.food&.name || "Dish" %></td>
+                  <td class="px-4 py-3 text-gray-500"><%= item.food_variant&.name || "-" %></td>
+                  <td class="px-4 py-3 text-center"><%= item.quantity %></td>
+                  <td class="px-4 py-3 text-right"><%= number_to_currency(item.unit_price, unit: "₫", precision: 0) %></td>
+                  <td class="px-4 py-3 text-right font-semibold"><%= number_to_currency(item.unit_price.to_d * item.quantity.to_i, unit: "₫", precision: 0) %></td>
+                </tr>
+              <% end %>
+              <% if @order.table_price.to_d.positive? %>
+                <tr>
+                  <td class="px-4 py-3 font-medium text-gray-900">Table fee</td>
+                  <td class="px-4 py-3 text-gray-500">-</td>
+                  <td class="px-4 py-3 text-center">1</td>
+                  <td class="px-4 py-3 text-right"><%= number_to_currency(@order.table_price, unit: "₫", precision: 0) %></td>
+                  <td class="px-4 py-3 text-right font-semibold"><%= number_to_currency(@order.table_price, unit: "₫", precision: 0) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        <% else %>
+          <p class="mt-4 text-sm text-gray-500">No line items on this order.</p>
+        <% end %>
+      </div>
+      <div class="mt-8 space-y-2 border-t border-gray-200 pt-6 text-sm">
+        <div class="flex justify-between text-gray-600"><span>Subtotal (snapshot at payment time)</span><span><%= number_to_currency(@payment.subtotal, unit: "$", precision: 2) %></span></div>
+        <div class="flex justify-between text-gray-600"><span>Membership discount <% pct = @order.membership_discount_percent %><% if pct.positive? %>(<%= pct %>% off)<% end %></span><span>-<%= number_to_currency(@payment.discount_amount, unit: "$", precision: 2) %></span></div>
+        <div class="flex justify-between text-lg font-semibold text-gray-900"><span>Total (USD)</span><span><%= number_to_currency(@payment.total_amount, unit: "$", precision: 2) %></span></div>
+        <div class="flex justify-between text-xl font-semibold text-[#8A1C2B]"><span>Total (VND)</span><span><%= number_to_currency(@payment.total_amount_vnd, unit: "₫", precision: 0) %></span></div>
+        <% if @payment.total_amount != @order.total_price %>
+          <p class="rounded-md border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">Note: the order total has changed since this payment was created. Create a new payment for the updated total.</p>
+        <% end %>
+      </div>
+      <% if @payment.payment_method.qr? && @payment.pending? %>
+        <div class="mt-8 border-t border-gray-200 pt-6">
+          <h2 class="text-center text-lg font-semibold">Scan to pay</h2>
+          <p class="mt-2 text-center text-sm text-gray-600">QR amount: <%= number_to_currency(@payment.total_amount_vnd, unit: "₫", precision: 0) %></p>
+          <% if @payment.vietqr_url.present? %>
+            <div class="mt-4 flex justify-center"><%= image_tag @payment.vietqr_url, alt: "VietQR payment code", class: "h-80 w-80 max-w-full object-contain" %></div>
+          <% else %>
+            <p class="mt-4 rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">VietQR is not configured.</p>
+          <% end %>
+        </div>
+      <% end %>
+      <div class="mt-8 flex flex-wrap items-center gap-3 border-t border-gray-100 pt-6 print:hidden">
+        <% if @payment.pending? && !@payment.payment_method.card? && policy(@order).update? %>
+          <%= button_to "Confirm payment", confirm_order_payment_path(@order, @payment), method: :patch, data: { turbo_confirm: "Confirm that payment has been received?" }, class: "rounded-md bg-green-600 px-4 py-2 font-semibold text-white" %>
+        <% end %>
+        <p class="text-sm text-gray-400">Thank you for dining with us.</p>
+      </div>
+    </div>
   </div>
 </div>

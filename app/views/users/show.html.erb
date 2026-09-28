@@ -99,27 +99,59 @@
     <div class="space-y-8">
 
       <!-- Recent reservations -->
-      <div>
+      <div id="reservations-section">
         <div class="flex items-center justify-between border-b border-gray-200 pb-3 mb-4">
           <h2 class="font-serif text-xl text-gray-900">Recent Reservations</h2>
-          <% if @reservations.any? %>
+          <% if @reservations.total_count.positive? %>
             <span class="inline-flex rounded-full bg-[#E9CFC7] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#8A1C2B]">
-              <%= @reservations.size %> <%= "reservation".pluralize(@reservations.size) %>
+              <%= @reservations.total_count %> <%= "reservation".pluralize(@reservations.total_count) %>
             </span>
           <% end %>
         </div>
 
         <% if @reservations.any? %>
           <div class="space-y-4">
-            <% @reservations.first(6).each do |reservation| %>
+            <% @reservations.each do |reservation| %>
               <%= render reservation %>
             <% end %>
+          </div>
+          <div class="mt-4">
+            <%= paginate @reservations, param_name: :reservations_page, params: { anchor: "reservations-section" } %>
           </div>
         <% else %>
           <div class="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-12 text-center shadow-sm">
             <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#8A1C2B]/10 text-2xl">📅</div>
             <p class="mt-4 font-serif text-lg font-semibold text-gray-900">No reservations yet</p>
             <p class="mt-2 text-sm text-gray-500">Upcoming dining bookings will appear here once made.</p>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Dining history -->
+      <div id="dining-history-section">
+        <div class="flex items-center justify-between border-b border-gray-200 pb-3 mb-4">
+          <h2 class="font-serif text-xl text-gray-900">Dining History</h2>
+          <% if @dining_histories.total_count.positive? %>
+            <span class="inline-flex rounded-full bg-[#E9CFC7] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#8A1C2B]">
+              <%= @dining_histories.total_count %> <%= "visit".pluralize(@dining_histories.total_count) %>
+            </span>
+          <% end %>
+        </div>
+
+        <% if @dining_histories.any? %>
+          <div class="space-y-4">
+            <% @dining_histories.each do |dining_order| %>
+              <%= render "users/dining_history_item", dining_order: dining_order %>
+            <% end %>
+          </div>
+          <div class="mt-4">
+            <%= paginate @dining_histories, param_name: :history_page, params: { anchor: "dining-history-section" } %>
+          </div>
+        <% else %>
+          <div class="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-12 text-center shadow-sm">
+            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#8A1C2B]/10 text-2xl">🧾</div>
+            <p class="mt-4 font-serif text-lg font-semibold text-gray-900">No dining history yet</p>
+            <p class="mt-2 text-sm text-gray-500">Completed paid orders will appear here with invoice links.</p>
           </div>
         <% end %>
       </div>

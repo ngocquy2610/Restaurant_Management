@@ -80,3 +80,6 @@ gem 'stripe'
 gem 'sidekiq', '~> 8.1'
 gem 'sidekiq-cron', '~> 2.0'
 gem 'redis', '~> 5.0'
+
+gem "prawn"
+gem "prawn-table"
