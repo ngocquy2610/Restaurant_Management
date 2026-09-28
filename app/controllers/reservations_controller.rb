@@ -63,6 +63,8 @@ class ReservationsController < ApplicationController
   def update
     respond_to do |format|
       if @reservation.update(reservation_params)
+        # Reschedule kitchen release for linked preorders (T-10 follows new slot_start).
+        @reservation.orders.preorder.each(&:schedule_kitchen_release)
         format.html { redirect_to @reservation, notice: "Reservation was successfully updated.", status: :see_other }
         format.json { render :show, status: :ok, location: @reservation }
       else

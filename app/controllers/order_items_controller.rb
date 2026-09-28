@@ -22,8 +22,31 @@ class OrderItemsController < ApplicationController
   # PATCH /order_items/1/update_status
   def update_status
     authorize @order_item, :update_status?
-    if @order_item.update(status_params)
-      redirect_to @order_item.order, notice: "Item updated."
+    target = params.require(:order_item).require(:status)
+
+    # 1. Validate against the general state machine.
+    allowed = OrdersHelper::ORDER_ITEM_TRANSITIONS.fetch(@order_item.status.to_s, [])
+    unless allowed.include?(target.to_sym)
+      return redirect_to @order_item.order,
+        alert: "Cannot move #{@order_item.food&.name} from '#{@order_item.status}' to '#{target}'."
+    end
+
+    # 2. Waiters may only do pending -> cancelled and ready -> served.
+    if current_user.waiter?
+      waiter_allowed = OrdersHelper::WAITER_ALLOWED_TRANSITIONS.fetch(@order_item.status.to_s, [])
+      unless waiter_allowed.include?(target.to_sym)
+        return redirect_to @order_item.order,
+          alert: "Waiter can only mark Ready as Served (or cancel a new pending item)."
+      end
+    end
+
+    if @order_item.update(status: target)
+      if @order_item.served?
+        notify_role(:kitchen_staff,
+          title: "Dish served",
+          body: "#{@order_item.quantity}x #{@order_item.food&.name} for table #{@order_item.order&.table&.table_number} has been served.")
+      end
+      redirect_to @order_item.order, notice: "Table #{@order_item.order&.table&.table_number}: #{@order_item.food&.name} → #{target.humanize}."
     else
       redirect_to @order_item.order, alert: @order_item.errors.full_messages.to_sentence
     end

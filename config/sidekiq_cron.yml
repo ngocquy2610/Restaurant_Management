@@ -1,0 +1,6 @@
+# Sidekiq-cron schedules. Loaded by config/initializers/sidekiq.rb on boot.
+preorder_release_sweep:
+  cron: "* * * * *"
+  class: "PreorderReleaseSweepJob"
+  queue: low
+  description: "Safety net: release preorder dishes to kitchen at T-10"

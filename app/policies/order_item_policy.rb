@@ -20,16 +20,21 @@ class OrderItemPolicy < ApplicationPolicy
   end
 
   def update_status?
-    order_taker?
+    staff?
   end
 
   def destroy?
     order_taker?
   end
 
+  # The kitchen console is only reachable by admins and kitchen staff.
+  def kitchen_queue?
+    user.admin? || user.kitchen_staff?
+  end
+
   class Scope < Scope
     def resolve
-      staff? ? scope.all : scope.none
+      user.admin? || user.waiter? || user.kitchen_staff? ? scope.all : scope.none
     end
   end
 

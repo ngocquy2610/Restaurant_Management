@@ -42,4 +42,17 @@ class OrderItemTest < ActiveSupport::TestCase
     order.reload
     assert_in_delta order.table_price.to_f, order.total_price.to_f, 0.001
   end
+
+  test "in_kitchen scope only returns kitchen-stage items ordered by creation time" do
+    order = Order.create!(table: tables(:one))
+    old = order.order_items.create!(food: @food, quantity: 1, status: :pending)
+    accepted = order.order_items.create!(food: @food, quantity: 1, status: :accepted)
+    ready = order.order_items.create!(food: @food, quantity: 1, status: :ready)
+
+    queued = OrderItem.in_kitchen
+    assert queued.include?(old)
+    assert queued.include?(accepted)
+    assert_not queued.include?(ready)
+    assert queued.to_a.index(old) < queued.to_a.index(accepted)
+  end
 end

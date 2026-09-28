@@ -1,0 +1,122 @@
+<% content_for :title, "Order ##{@order.id} - Table #{@order.table&.table_number}" %>
+<div class="relative"><%= render "layouts/header" %></div>
+<div class="min-h-screen bg-[#FBF0EC] px-4 py-10 pt-28">
+  <div class="mx-auto max-w-7xl space-y-8">
+    <div>
+      <%= link_to admin_kitchen_queues_path, class: "inline-flex items-center gap-2 text-sm font-semibold text-[#8A1C2B] hover:text-[#6d1420]" do %>
+        <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        Back to Queue
+      <% end %>
+      <p class="mt-4 text-sm font-semibold uppercase tracking-[0.32em] text-[#8A1C2B]/80">Kitchen Console</p>
+      <div class="mt-3 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 class="font-serif text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
+            Table <%= @order.table&.table_number || "?" %>
+            <span class="text-2xl text-gray-400">Order #<%= @order.id %></span>
+          </h1>
+          <p class="mt-3 text-sm text-gray-600">
+            <%= @order.created_at&.strftime("%d %b %Y - %I:%M %p") %>
+            <% if @order.waiter.present? %> by <%= @order.waiter.full_name %><% end %>
+            - <%= pluralize(@order.order_items.size, "dish") %>
+          </p>
+        </div>
+        <div class="flex items-center gap-3">
+          <%= order_status_badge(@order.status) %>
+          <% if policy(@order).show? %>
+            <%= link_to "Full order", order_path(@order), class: "inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <% if notice.present? %>
+      <p class="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700" id="notice"><%= notice %></p>
+    <% end %>
+    <% if alert.present? %>
+      <p class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700" id="alert"><%= alert %></p>
+    <% end %>
+    <div class="flex flex-wrap gap-3">
+      <% %w[pending accepted preparing ready served cancelled].each do |status_name| %>
+        <% count = @order.order_items.count { |i| i.status.to_s == status_name } %>
+        <% next if count.zero? %>
+        <% meta = OrdersHelper::ORDER_ITEM_STATUS_META.fetch(status_name) %>
+        <span class="inline-flex items-center gap-2 rounded-full <%= meta[:chip] %> px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] <%= meta[:text] %>">
+          <span class="h-2 w-2 rounded-full <%= meta[:dot] %>"></span>
+          <%= meta[:label] %> - <%= count %>
+        </span>
+      <% end %>
+    </div>
+    <div class="overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-sm">
+      <div class="flex items-center justify-between border-b border-gray-200 px-6 py-5">
+        <h2 class="font-serif text-2xl font-semibold text-gray-900">Dishes and recipes</h2>
+        <span class="inline-flex rounded-full bg-[#E9CFC7] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#8A1C2B]"><%= @order.order_items.size %> items</span>
+      </div>
+      <% if @order.order_items.any? %>
+        <div class="divide-y divide-gray-100">
+          <% @order.order_items.each do |item| %>
+            <% recipes = @grouped_recipes[item.id] || [] %>
+            <div id="<%= dom_id(item) %>" class="px-6 py-5">
+              <div class="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <p class="font-serif text-lg font-semibold text-gray-900"><%= item.quantity %>x <%= item.food&.name %></p>
+                  <p class="mt-1 text-sm text-gray-500"><%= item.food_variant&.name || "Base recipe" %></p>
+                  <% if item.special_note.present? %><p class="mt-1 text-xs italic text-amber-700"><%= item.special_note %></p><% end %>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                  <%= order_item_status_badge(item.status) %>
+                  <div class="flex flex-wrap justify-end gap-2">
+                    <% order_item_next_statuses(item.status).each do |ns| %>
+                      <%= button_to ns.to_s.humanize, admin_kitchen_queue_update_item_status_path(@order, item), method: :patch, params: { order_item: { status: ns } }, class: "cursor-pointer inline-flex rounded-full px-3 py-1.5 text-xs font-semibold bg-[#8A1C2B] text-white hover:bg-[#6d1420]" %>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-3 rounded-2xl border border-gray-100 bg-[#FAF5F1] px-4 py-3">
+                <p class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-400">Recipe - <%= recipes.size %> ingredients</p>
+                <% if recipes.any? %>
+                  <ul class="mt-2 divide-y divide-gray-100">
+                    <% recipes.each do |ri| %>
+                      <li class="flex items-center justify-between gap-3 py-1.5 text-sm">
+                        <span class="font-medium text-gray-800"><%= ri.ingredient&.name %></span>
+                        <span class="text-gray-500"><%= ri.quantity_required %> <%= ri.ingredient&.unit %> x <%= item.quantity %></span>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% else %>
+                  <p class="mt-2 text-sm text-gray-500">No recipe recorded for this dish yet.</p>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="px-6 py-12 text-center text-sm text-gray-500">Nothing ordered yet.</p>
+      <% end %>
+    </div>
+    <div class="overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-sm">
+      <div class="flex items-center justify-between border-b border-gray-200 px-6 py-5">
+        <h2 class="font-serif text-2xl font-semibold text-gray-900">Prep list</h2>
+        <span class="inline-flex rounded-full bg-[#E9CFC7] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#8A1C2B]"><%= @aggregated_ingredients.size %> lines</span>
+      </div>
+      <% if @aggregated_ingredients.any? %>
+        <table class="min-w-full text-left text-sm text-gray-700">
+          <thead class="bg-[#FEF3E8] text-xs uppercase tracking-[0.16em] text-gray-500">
+            <tr><th class="px-6 py-4">Ingredient</th><th class="px-6 py-4 text-right">Needed</th><th class="px-6 py-4 text-right">Stock</th><th class="px-6 py-4 text-right">Status</th></tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 bg-white">
+            <% @aggregated_ingredients.each do |entry| %>
+              <tr>
+                <td class="px-6 py-4 font-semibold text-gray-900"><%= entry[:ingredient]&.name %></td>
+                <td class="px-6 py-4 text-right"><%= entry[:total_qty].to_s("F") %> <%= entry[:unit] %></td>
+                <td class="px-6 py-4 text-right text-gray-600"><%= entry[:ingredient]&.current_stock %> <%= entry[:unit] %></td>
+                <td class="px-6 py-4 text-right"><% if entry[:low_stock] %><span class="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">Low stock</span><% else %><span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">OK</span><% end %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <p class="px-6 py-12 text-center text-sm text-gray-500">No recipes for this order.</p>
+      <% end %>
+    </div>
+  </div>
+</div>
+

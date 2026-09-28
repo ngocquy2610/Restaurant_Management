@@ -75,12 +75,15 @@
                 <td class="px-6 py-5"><%= order_item_status_badge(item.status) %></td>
                 <td class="px-6 py-5">
                   <div class="flex flex-wrap justify-end gap-2">
-                    <% order_item_next_statuses(item.status).each do |next_status| %>
+                    <% order_item_next_statuses_for(current_user, item.status).each do |next_status| %>
                       <%= button_to next_status.to_s.humanize,
                             update_status_order_item_path(item),
                             method: :patch,
                             params: { order_item: { status: next_status } },
-                            class: "cursor-pointer inline-flex rounded-full px-3 py-2 text-xs font-semibold #{next_status == :cancelled ? 'border border-red-200 bg-red-50 text-red-700 hover:bg-red-100' : 'bg-[#8A1C2B] text-white hover:bg-[#6d1420]'}" %>
+                            class: "cursor-pointer inline-flex rounded-full px-3 py-2 text-xs font-semibold #{next_status == :cancelled ? 'border border-red-200 bg-red-50 text-red-700 hover:bg-red-100' : 'bg-green-600 text-white hover:bg-green-700'}" %>
+                    <% end %>
+                    <% if current_user&.waiter? && %w[accepted preparing].include?(item.status.to_s) %>
+                      <span class="text-xs italic text-gray-400">Waiting for kitchen</span>
                     <% end %>
                     <% if policy(item).destroy? %>
                       <%= button_to "×", item, method: :delete, data: { turbo_confirm: "Remove this item?" },

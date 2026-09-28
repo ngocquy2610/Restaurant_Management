@@ -1,4 +1,10 @@
 Rails.application.routes.draw do
+  require "sidekiq/web"
+  require "sidekiq/cron/web"
+  authenticate :user, ->(user) { user.admin? } do
+    mount Sidekiq::Web => "/sidekiq"
+  end
+
   resources :order_items, only: [:create, :destroy] do
     member do
       patch :update_status
@@ -22,7 +28,11 @@ Rails.application.routes.draw do
   resources :reservations do
     resources :preorders, only: %i[ new create ]
   end
-  resources :preorders, only: %i[ show index destroy ]
+  resources :preorders, only: %i[ show index destroy ] do
+    member do
+      patch :release
+    end
+  end
 
   resources :notifications do
     collection do
@@ -104,6 +114,12 @@ Rails.application.routes.draw do
         patch :cancel
         patch :seat
       end
+    end
+
+    resources :kitchen_queues, only: [:index, :show] do
+      patch "items/:id/update_status",
+            to: "kitchen_queues#update_status",
+            as: :update_item_status
     end
   end
 

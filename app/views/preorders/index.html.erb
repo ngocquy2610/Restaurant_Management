@@ -24,8 +24,10 @@
               <th scope="col" class="px-6 py-4">Guest</th>
               <th scope="col" class="px-6 py-4">Table</th>
               <th scope="col" class="px-6 py-4">Dishes</th>
+              <th scope="col" class="px-6 py-4">Kitchen</th>
               <th scope="col" class="px-6 py-4 text-right">Estimated total</th>
               <th scope="col" class="px-6 py-4 text-right">Placed</th>
+              <th scope="col" class="px-6 py-4 text-right">Action</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200 bg-white">
@@ -39,8 +41,23 @@
                 </td>
                 <td class="px-6 py-5 text-gray-600">Table <%= order.table&.table_number %></td>
                 <td class="px-6 py-5 text-gray-600"><%= pluralize(order.order_items.size, "dish") %></td>
+                <td class="px-6 py-5">
+                  <% if order.released_to_kitchen? %>
+                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-700">Đã đẩy <%= order.released_to_kitchen_at&.strftime("%H:%M") %> · Ưu tiên</span>
+                  <% elsif order.release_time.present? %>
+                    <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600">Chờ T-10 (<%= order.release_time.strftime("%H:%M") %>)</span>
+                  <% else %>
+                    <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-600">No slot</span>
+                  <% end %>
+                </td>
                 <td class="px-6 py-5 text-right font-medium text-gray-900"><%= number_to_currency(order.total_price, precision: 2) %></td>
                 <td class="px-6 py-5 text-right text-gray-500"><%= order.created_at&.strftime("%d %b · %I:%M %p") %></td>
+                <td class="px-6 py-5 text-right">
+                  <% unless order.released_to_kitchen? %>
+                    <%= button_to "Release ngay", release_preorder_path(order), method: :patch,
+                          class: "inline-flex rounded-full bg-[#8A1C2B] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#6d1420]" %>
+                  <% end %>
+                </td>
               </tr>
             <% end %>
           </tbody>

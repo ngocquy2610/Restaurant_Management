@@ -1,11 +1,11 @@
 class PreordersController < ApplicationController
-  before_action :set_order, only: %i[ show destroy ]
+  before_action :set_order, only: %i[ show destroy release ]
 
   # GET /preorders — staff overview of every customer pre-order.
   # Pre-orders now live on the orders table (status = :preorder).
   def index
     authorize Order, :index?
-    @orders = Order.includes(:reservation, :table).where(status: :preorder).order(created_at: :desc)
+    @orders = Order.includes(:reservation, :table, :order_items).where(status: :preorder).order(created_at: :desc)
   end
 
   # GET /preorders/new?reservation_id=1 — the customer-facing ordering screen
@@ -14,6 +14,19 @@ class PreordersController < ApplicationController
     @order = Order.new(status: :preorder, reservation_id: params[:reservation_id])
     authorize @order, :new?
     load_food_data
+  end
+
+  def release
+    authorize @order, :release?
+    if @order.release_to_kitchen!
+      notify_role(:kitchen_staff,
+        title: "Pre-order released early",
+        body: "#{@order.reservation&.guest_name} (Table #{@order.table&.table_number}) — #{@order.order_items.count} dish(es) moved to top of queue."
+      )
+      redirect_to preorders_path, notice: "Preorder have been put on top of queue"
+    else
+      redirect_to preorders_path, alert: "Pre-orders that were previously released or reservations that are no longer valid."
+    end
   end
 
   # POST /preorders — creates a new Order record directly (status = :preorder)
@@ -26,6 +39,7 @@ class PreordersController < ApplicationController
     authorize @order, :create?
 
     if @order.save
+      @order.schedule_kitchen_release
       notify_role(:kitchen_staff,
         title: "Pre-order received",
         body: "#{@order.reservation&.guest_name} pre-ordered dishes for table #{@order.table&.table_number}."

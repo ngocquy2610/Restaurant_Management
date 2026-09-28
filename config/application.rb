@@ -19,6 +19,10 @@ module RestaurantManagement
     config.time_zone = "Asia/Ho_Chi_Minh"
     config.active_record.default_timezone = :utc
 
+    # Background jobs go through Sidekiq (Redis/Valkey). Solid Queue gems are
+    # kept installed for an easy rollback, but are no longer the adapter.
+    config.active_job.queue_adapter = :sidekiq
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files
