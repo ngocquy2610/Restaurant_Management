@@ -1,0 +1,38 @@
+<% content_for :title, "My Low Stock Requests" %>
+<div class="min-h-screen bg-[#f4e6e2] pt-[5.25rem] text-[#2f1f1d]">
+  <div class="flex min-h-screen">
+    <%= render "layouts/kitchen_sidebar" %>
+    <main class="flex-1 bg-[#f6efee] px-8 py-6">
+      <div class="mx-auto max-w-[1260px]">
+        <%= render "layouts/flash" %>
+        <div class="flex items-end justify-between gap-4">
+          <div>
+            <h2 class="font-serif text-[3rem] leading-none tracking-[-0.06em]">Low Stock Requests</h2>
+            <p class="mt-3 text-[1.05rem] text-[#7a5a56]">Ask the inventory team to restock.</p>
+          </div>
+          <%= link_to "New request", new_kitchen_low_stock_request_path, class: "rounded-md bg-[#7b1f2a] px-5 py-3 font-semibold text-white hover:bg-[#661a23]" %>
+        </div>
+        <div class="mt-6 overflow-hidden rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] shadow-sm">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-[#f1e3df] text-[0.72rem] uppercase tracking-[0.14em] text-[#9b6a63]">
+              <tr><th class="px-5 py-3">Ingredient</th><th class="px-5 py-3">Status</th><th class="px-5 py-3">Sent</th><th class="px-5 py-3"></th></tr>
+            </thead>
+            <tbody class="divide-y divide-[#e4d6d2]">
+              <% @low_stock_requests.each do |request| %>
+                <tr>
+                  <td class="px-5 py-3 font-semibold"><%= request.ingredient.name %></td>
+                  <td class="px-5 py-3"><%= low_stock_request_status_badge(request.status) %></td>
+                  <td class="px-5 py-3 text-[#7a5a56]"><%= inventory_time(request.created_at) %></td>
+                  <td class="px-5 py-3 text-right"><%= link_to "View", kitchen_low_stock_request_path(request), class: "font-semibold text-[#7b1f2a] hover:underline" %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+          <% if @low_stock_requests.empty? %>
+            <p class="px-5 py-6 text-sm text-[#7a5a56]">No requests yet. Send your first one.</p>
+          <% end %>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

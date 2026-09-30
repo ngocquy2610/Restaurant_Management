@@ -1,0 +1,33 @@
+<% content_for :title, "Waste Report ##{@waste_report.id}" %>
+<div class="min-h-screen bg-[#f4e6e2] pt-[5.25rem] text-[#2f1f1d]">
+  <div class="flex min-h-screen">
+    <%= render "layouts/inventory_sidebar" %>
+    <main class="flex-1 bg-[#f6efee] px-8 py-6">
+      <div class="mx-auto max-w-[900px]">
+        <%= render "layouts/flash" %>
+        <%= link_to "Back to reports", inventory_waste_reports_path, class: "text-sm font-semibold text-[#7b1f2a] hover:underline" %>
+        <h2 class="mt-3 font-serif text-[2.6rem] leading-none">Waste #<%= @waste_report.id %></h2>
+        <dl class="mt-6 space-y-3 rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-6 shadow-sm">
+          <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Ingredient</dt><dd class="font-semibold"><%= @waste_report.ingredient.name %></dd></div>
+          <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Reported</dt><dd class="font-semibold"><%= inventory_quantity(@waste_report.quantity, @waste_report.ingredient.unit) %></dd></div>
+          <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Verified</dt><dd class="font-semibold"><%= @waste_report.verified_quantity.present? ? inventory_quantity(@waste_report.verified_quantity, @waste_report.ingredient.unit) : "—" %></dd></div>
+          <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Status</dt><dd><%= waste_report_status_badge(@waste_report.status) %></dd></div>
+          <div><dt class="text-[#7a5a56]">Reason</dt><dd class="mt-1 rounded-md bg-[#f1e3df] px-4 py-3 text-sm"><%= @waste_report.reason %></dd></div>
+          <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">By</dt><dd><%= @waste_report.user&.full_name || "System" %></dd></div>
+        </dl>
+        <% if policy(@waste_report).verify? && @waste_report.pending? %>
+          <%= form_with(url: verify_inventory_waste_report_path(@waste_report), method: :patch, class: "mt-4 space-y-4 rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-6 shadow-sm") do |form| %>
+            <div>
+              <%= form.label :verified_quantity, "Verified quantity (#{@waste_report.ingredient.unit})", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+              <%= form.number_field "waste_report[verified_quantity]", step: 0.01, min: 0, value: @waste_report.quantity, class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3" %>
+            </div>
+            <div class="flex flex-wrap gap-3">
+              <%= form.button "Approve", name: "waste_report[status]", value: "approved", class: "cursor-pointer rounded-md bg-[#25512d] px-5 py-3 font-semibold text-white hover:bg-[#1c4023]" %>
+              <%= form.button "Reject", name: "waste_report[status]", value: "rejected", class: "cursor-pointer rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </main>
+  </div>
+</div>

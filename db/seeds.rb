@@ -7,7 +7,7 @@
 
 # =====================================================================
 # Ingredient catalog
-# name => [unit, unit_cost, current_stock, low_stock_threshold]
+# name => [unit, unit_cost, current_quantity, low_stock_threshold]
 # =====================================================================
 INGREDIENTS = {
   # ---- Meats & seafood -------------------------------------------------

@@ -1,0 +1,31 @@
+<aside class="sticky top-[5.25rem] z-10 h-[calc(100vh-5.25rem)] w-[270px] shrink-0 self-start overflow-y-auto border-r border-[#d8b6af] bg-[#f8eeee] px-5 py-6">
+  <p class="mb-3 px-3 text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#9b6a63]">Kitchen</p>
+
+  <nav class="space-y-2">
+    <%= link_to kitchen_root_path, class: sidebar_nav_class(kitchen_root_path) do %>
+      <span class="flex h-5 w-5 items-center justify-center">
+        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      </span>
+      <span>Overview</span>
+    <% end %>
+
+    <%= link_to kitchen_low_stock_requests_path, class: sidebar_nav_class(kitchen_low_stock_requests_path) do %>
+      <span class="flex h-5 w-5 items-center justify-center">
+        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></svg>
+      </span>
+      <span>Low Stock Requests</span>
+    <% end %>
+
+    <%= link_to kitchen_waste_reports_path, class: sidebar_nav_class(kitchen_waste_reports_path) do %>
+      <span class="flex h-5 w-5 items-center justify-center">
+        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14l-1 13H6z"/><path d="M9 7V4h6v3"/></svg>
+      </span>
+      <span>Waste Reports</span>
+    <% end %>
+  </nav>
+
+  <div class="mt-6 border-t border-[#d8b6af] pt-5">
+    <%= link_to "Kitchen queue", admin_kitchen_queues_path,
+          class: "flex justify-center items-center rounded-md bg-[#7b1f2a] px-3 py-3 text-[1.05rem] font-semibold text-white shadow-sm hover:bg-[#661a23]" %>
+  </div>
+</aside>

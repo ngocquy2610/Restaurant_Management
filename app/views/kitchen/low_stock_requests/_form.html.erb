@@ -1,0 +1,20 @@
+<%= form_with(model: [:kitchen, low_stock_request], class: "space-y-6") do |form| %>
+  <% if low_stock_request.errors.any? %>
+    <div class="rounded-md border border-[#e5b3ad] bg-[#fbe9e6] px-4 py-3 text-[#8f1f2a]">
+      <ul class="list-disc pl-5">
+        <% low_stock_request.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <div>
+    <%= form.label :ingredient_id, "Ingredient", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+    <%= form.collection_select :ingredient_id, ingredients, :id, :name, { prompt: "Select an ingredient" }, class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3" %>
+  </div>
+  <div>
+    <%= form.label :note, "Note", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+    <%= form.text_area :note, rows: 3, placeholder: "e.g. Running low before dinner rush", class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3" %>
+  </div>
+  <%= form.submit "Send request", class: "cursor-pointer rounded-md bg-[#7b1f2a] px-5 py-3 font-semibold text-white hover:bg-[#661a23]" %>
+<% end %>

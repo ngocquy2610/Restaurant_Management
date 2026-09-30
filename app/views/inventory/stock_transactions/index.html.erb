@@ -1,0 +1,35 @@
+<% content_for :title, "Stock Transactions" %>
+<div class="min-h-screen bg-[#f4e6e2] pt-[5.25rem] text-[#2f1f1d]">
+  <div class="flex min-h-screen">
+    <%= render "layouts/inventory_sidebar" %>
+    <main class="flex-1 bg-[#f6efee] px-8 py-6">
+      <div class="mx-auto max-w-[1260px]">
+        <%= render "layouts/flash" %>
+        <h2 class="font-serif text-[3rem] leading-none tracking-[-0.06em]">Stock Transactions</h2>
+        <p class="mt-3 text-[1.05rem] text-[#7a5a56]">Append-only ledger. Corrections go in as new adjustment entries.</p>
+        <div class="mt-6 overflow-hidden rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] shadow-sm">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-[#f1e3df] text-[0.72rem] uppercase tracking-[0.14em] text-[#9b6a63]">
+              <tr><th class="px-5 py-3">Time</th><th class="px-5 py-3">Ingredient</th><th class="px-5 py-3">Type</th><th class="px-5 py-3">Qty</th><th class="px-5 py-3">Before / After</th><th class="px-5 py-3"></th></tr>
+            </thead>
+            <tbody class="divide-y divide-[#e4d6d2]">
+              <% @transactions.each do |tx| %>
+                <tr>
+                  <td class="px-5 py-3 text-[#7a5a56]"><%= inventory_time(tx.created_at) %></td>
+                  <td class="px-5 py-3 font-semibold"><%= tx.ingredient.name %></td>
+                  <td class="px-5 py-3"><%= stock_transaction_type_badge(tx.transaction_type) %></td>
+                  <td class="px-5 py-3"><%= inventory_quantity(tx.quantity, tx.ingredient.unit) %></td>
+                  <td class="px-5 py-3 text-[#7a5a56]"><%= inventory_quantity(tx.quantity_before) %> / <%= inventory_quantity(tx.quantity_after) %></td>
+                  <td class="px-5 py-3 text-right"><%= link_to "View", inventory_stock_transaction_path(tx), class: "font-semibold text-[#7b1f2a] hover:underline" %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+          <% if @transactions.empty? %>
+            <p class="px-5 py-6 text-sm text-[#7a5a56]">No transactions yet.</p>
+          <% end %>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

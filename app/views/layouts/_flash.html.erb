@@ -1,0 +1,7 @@
+<%# Flash messages shared by the inventory/kitchen consoles. %>
+<% if notice.present? %>
+  <p class="mb-5 inline-block rounded-md bg-green-50 px-3 py-2 text-sm font-medium text-green-700" id="notice"><%= notice %></p>
+<% end %>
+<% if alert.present? %>
+  <p class="mb-5 inline-block rounded-md bg-red-50 px-3 py-2 text-sm font-medium text-red-700" id="alert"><%= alert %></p>
+<% end %>

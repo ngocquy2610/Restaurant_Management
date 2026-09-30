@@ -1,0 +1,27 @@
+<% content_for :title, "Request ##{@low_stock_request.id}" %>
+<div class="min-h-screen bg-[#f4e6e2] pt-[5.25rem] text-[#2f1f1d]">
+  <div class="flex min-h-screen">
+    <%= render "layouts/inventory_sidebar" %>
+    <main class="flex-1 bg-[#f6efee] px-8 py-6">
+      <div class="mx-auto max-w-[900px]">
+        <%= render "layouts/flash" %>
+        <%= link_to "Back to requests", inventory_low_stock_requests_path, class: "text-sm font-semibold text-[#7b1f2a] hover:underline" %>
+        <h2 class="mt-3 font-serif text-[2.6rem] leading-none">Request #<%= @low_stock_request.id %></h2>
+        <dl class="mt-6 space-y-3 rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-6 shadow-sm">
+          <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Ingredient</dt><dd class="font-semibold"><%= @low_stock_request.ingredient.name %></dd></div>
+          <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">From</dt><dd class="font-semibold"><%= @low_stock_request.user.full_name %></dd></div>
+          <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Status</dt><dd><%= low_stock_request_status_badge(@low_stock_request.status) %></dd></div>
+          <div><dt class="text-[#7a5a56]">Note</dt><dd class="mt-1 rounded-md bg-[#f1e3df] px-4 py-3 text-sm"><%= @low_stock_request.note.presence || "—" %></dd></div>
+          <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Reviewed by</dt><dd><%= @low_stock_request.reviewed_by&.full_name || "—" %></dd></div>
+          <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Reviewed at</dt><dd><%= @low_stock_request.reviewed_at ? inventory_time(@low_stock_request.reviewed_at) : "—" %></dd></div>
+        </dl>
+        <% if policy(@low_stock_request).review? && @low_stock_request.pending? %>
+          <div class="mt-4 flex flex-wrap gap-3">
+            <%= button_to "Approve", review_inventory_low_stock_request_path(@low_stock_request), method: :patch, params: { low_stock_request: { status: "approved" } }, class: "cursor-pointer rounded-md bg-[#25512d] px-5 py-3 font-semibold text-white hover:bg-[#1c4023]" %>
+            <%= button_to "Reject", review_inventory_low_stock_request_path(@low_stock_request), method: :patch, params: { low_stock_request: { status: "rejected" } }, class: "cursor-pointer rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+          </div>
+        <% end %>
+      </div>
+    </main>
+  </div>
+</div>
