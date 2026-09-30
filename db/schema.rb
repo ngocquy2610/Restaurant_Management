@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_30_024059) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_30_025758) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -253,6 +253,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_30_024059) do
     t.check_constraint "rating >= 1 AND rating <= 5", name: "reviews_rating_range"
   end
 
+  create_table "stock_transactions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "ingredient_id", null: false
+    t.decimal "quantity", precision: 10, scale: 2, null: false
+    t.decimal "quantity_after", precision: 10, scale: 2
+    t.decimal "quantity_before", precision: 10, scale: 2
+    t.string "reason"
+    t.string "reference", limit: 80
+    t.integer "transaction_type", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.index ["ingredient_id", "created_at"], name: "index_stock_transactions_on_ingredient_id_and_created_at"
+    t.index ["ingredient_id"], name: "index_stock_transactions_on_ingredient_id"
+    t.index ["transaction_type"], name: "index_stock_transactions_on_transaction_type"
+    t.index ["user_id"], name: "index_stock_transactions_on_user_id"
+  end
+
   create_table "table_types", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.decimal "price_add_on", precision: 10, scale: 2
@@ -328,6 +345,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_30_024059) do
   add_foreign_key "reservations", "users"
   add_foreign_key "reviews", "reservations"
   add_foreign_key "reviews", "users"
+  add_foreign_key "stock_transactions", "ingredients"
+  add_foreign_key "stock_transactions", "users"
   add_foreign_key "tables", "areas"
   add_foreign_key "tables", "table_types"
   add_foreign_key "users", "member_tiers"
