@@ -16,6 +16,25 @@
 
     <%= render @reservation %>
 
+    <% meal_review = @reservation.meal_review %>
+    <% if meal_review.present? %>
+      <div class="space-y-3">
+        <h2 class="font-serif text-xl font-semibold text-gray-900">Your review of this meal</h2>
+        <%= render meal_review %>
+      </div>
+    <% elsif policy(@reservation).review_meal? %>
+      <div class="rounded-[2rem] border border-dashed border-[#8A1C2B]/30 bg-white p-6 text-center shadow-sm">
+        <p class="font-serif text-xl font-semibold text-gray-900">How was your meal?</p>
+        <p class="mt-2 text-sm text-gray-600">
+          Share your experience of Table <%= @reservation.table&.table_number %> on
+          <%= @reservation.reservation_date&.strftime("%d %b %Y") %>.
+        </p>
+        <%= link_to "Review this meal",
+              new_review_path(reservation_id: @reservation.id, review_type: "meal"),
+              class: "mt-4 inline-flex items-center rounded-full bg-[#8A1C2B] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#6f1622]" %>
+      </div>
+    <% end %>
+
     <%# Staff-only status actions (reject / approve / check-in etc.) %>
     <% if current_user&.admin? || current_user&.receptionist? %>
       <div class="rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm">

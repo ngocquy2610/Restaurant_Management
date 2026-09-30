@@ -80,6 +80,41 @@
             </div>
           <% end %>
         </div>
+        <section id="restaurant-reviews" class="mt-8 rounded-[20px] border border-[#d7b9b2] bg-[#f8f3f1] p-6 shadow-sm">
+          <div class="mb-5 flex flex-wrap items-end justify-between gap-4 border-b border-[#e4d2ce] pb-4">
+            <div>
+              <h3 class="font-serif text-[2rem] font-semibold tracking-tight text-[#2f1f1d]">Guest reviews</h3>
+              <p class="mt-1 text-[0.95rem] text-[#7a5a56]">
+                <% if @average_rating.present? %>
+                  ⭐ <span class="font-semibold text-[#7b1f2a]"><%= @average_rating %>/5</span>
+                  · <%= pluralize(@restaurant_review_count, "review") %>
+                <% else %>
+                  No reviews yet — be the first to share your experience.
+                <% end %>
+              </p>
+            </div>
+
+            <% if current_user && policy(Review).create_restaurant? %>
+              <%= link_to "Write a review", new_review_path(review_type: "restaurant"),
+                    class: "rounded-md bg-[#7b1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#661a23]" %>
+            <% elsif current_user && Review.for_customer(current_user, :restaurant).exists? %>
+              <span class="rounded-full bg-[#f0e7e5] px-3 py-1 text-[0.75rem] font-semibold uppercase tracking-[0.08em] text-[#5d4b49]">You already reviewed us ✓</span>
+            <% end %>
+          </div>
+
+          <% if @restaurant_reviews.any? %>
+            <div class="grid grid-cols-1 gap-5 lg:grid-cols-3"><%= render @restaurant_reviews %></div>
+            <div class="mt-5 text-right">
+              <%= link_to "See all reviews →", reviews_path(type: "restaurant"),
+                    class: "text-sm font-semibold text-[#7b1f2a] hover:text-[#661a23]" %>
+            </div>
+          <% else %>
+            <p class="rounded-[16px] border-2 border-dashed border-[#d7b9b2] bg-[#f8f3f1] py-8 text-center text-[1.05rem] text-[#8a6f6a]">
+              Guest reviews will appear here after their first visit.
+            </p>
+          <% end %>
+        </section>
+
       </div>
     </main>
   </div>

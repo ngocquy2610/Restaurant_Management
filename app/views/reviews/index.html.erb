@@ -1,0 +1,59 @@
+<% content_for :title, "Guest Reviews" %>
+
+<div class="min-h-screen bg-[#FBF0EC] px-4 py-10 pt-28">
+  <div class="mx-auto max-w-5xl space-y-8">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-[0.32em] text-[#8A1C2B]/80">Guest reviews</p>
+        <h1 class="mt-3 font-serif text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl">What our guests say</h1>
+        <p class="mt-3 text-sm">
+          <% if @average_rating.present? %>
+            <span class="font-semibold text-[#8A1C2B]">⭐ <%= @average_rating %>/5</span>
+            <span class="text-gray-500">from <%= pluralize(@review_count, "review") %></span>
+          <% else %>
+            <span class="text-gray-500">No reviews yet — be the first to share your experience.</span>
+          <% end %>
+        </p>
+      </div>
+
+      <% if current_user && policy(Review).create_restaurant? %>
+        <%= link_to "Write a review", new_review_path(review_type: "restaurant"),
+              class: "inline-flex items-center rounded-full bg-[#8A1C2B] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#6f1622]" %>
+      <% end %>
+    </div>
+
+    <% if notice.present? %>
+      <p class="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700" id="notice"><%= notice %></p>
+    <% end %>
+    <% if alert.present? %>
+      <p class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700" id="alert"><%= alert %></p>
+    <% end %>
+
+    <%
+      filters = [
+        ["All reviews", reviews_path, params[:type].blank?],
+        ["Meals", reviews_path(type: "meal"), params[:type] == "meal"],
+        ["Restaurant", reviews_path(type: "restaurant"), params[:type] == "restaurant"]
+      ]
+    %>
+    <div class="flex flex-wrap items-center gap-2">
+      <% filters.each do |label, path, active| %>
+        <%= link_to label, path,
+              class: active \
+                ? "inline-flex items-center rounded-full bg-[#8A1C2B] px-4 py-2 text-sm font-semibold text-white shadow-sm" \
+                : "inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-[#8A1C2B]/30 hover:bg-[#FAF5F1]" %>
+      <% end %>
+    </div>
+
+    <% if @reviews.any? %>
+      <div class="space-y-4"><%= render @reviews %></div>
+      <div class="mt-6"><%= paginate @reviews %></div>
+    <% else %>
+      <div class="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-12 text-center shadow-sm">
+        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#8A1C2B]/10 text-2xl">⭐</div>
+        <p class="mt-4 font-serif text-lg font-semibold text-gray-900">No reviews yet</p>
+        <p class="mt-2 text-sm text-gray-500">Reviews appear here once guests have finished a meal.</p>
+      </div>
+    <% end %>
+  </div>
+</div>

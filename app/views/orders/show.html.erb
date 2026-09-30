@@ -195,6 +195,25 @@
       <% end %>
     </div>
 
+
+    <% if @order.reservation.present? %>
+      <% meal_review = @order.reservation.meal_review %>
+      <% if meal_review.present? %>
+        <div class="space-y-3">
+          <h2 class="font-serif text-2xl font-semibold text-gray-900">Customer review</h2>
+          <%= render meal_review %>
+        </div>
+      <% elsif current_user && policy(@order.reservation).review_meal? %>
+        <div class="rounded-4xl border border-dashed border-[#8A1C2B]/30 bg-white p-6 text-center shadow-sm">
+          <p class="font-serif text-2xl font-semibold text-gray-900">How was this meal?</p>
+          <p class="mt-2 text-sm text-gray-600">Your review will be attached to reservation #<%= @order.reservation.id %>.</p>
+          <%= link_to "Review this meal",
+                new_review_path(reservation_id: @order.reservation.id, review_type: "meal"),
+                class: "mt-4 inline-flex items-center rounded-full bg-[#8A1C2B] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#6f1622]" %>
+        </div>
+      <% end %>
+    <% end %>
+
     <!-- Add another dish -->
     <% if policy(@order).update? && !@order.completed? %>
       <div class="rounded-4xl border border-gray-200 bg-white p-6 shadow-sm">
