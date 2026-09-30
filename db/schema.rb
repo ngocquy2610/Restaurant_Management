@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_25_120001) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_29_065328) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -233,6 +233,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_25_120001) do
     t.index ["user_id"], name: "index_reservations_on_user_id"
   end
 
+  create_table "reviews", force: :cascade do |t|
+    t.text "comment"
+    t.datetime "created_at", null: false
+    t.integer "rating", null: false
+    t.bigint "reservation_id", null: false
+    t.integer "review_type", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.index ["reservation_id"], name: "index_reviews_on_reservation_id"
+    t.index ["reservation_id"], name: "index_reviews_unique_meal_per_reservation", unique: true, where: "(review_type = 0)"
+    t.index ["review_type"], name: "index_reviews_on_review_type"
+    t.index ["user_id"], name: "index_reviews_on_user_id"
+    t.index ["user_id"], name: "index_reviews_unique_restaurant_per_customer", unique: true, where: "(review_type = 1)"
+    t.check_constraint "rating >= 1 AND rating <= 5", name: "reviews_rating_range"
+  end
+
   create_table "table_types", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.decimal "price_add_on", precision: 10, scale: 2
@@ -306,6 +322,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_25_120001) do
   add_foreign_key "recipe_items", "ingredients"
   add_foreign_key "reservations", "tables"
   add_foreign_key "reservations", "users"
+  add_foreign_key "reviews", "reservations"
+  add_foreign_key "reviews", "users"
   add_foreign_key "tables", "areas"
   add_foreign_key "tables", "table_types"
   add_foreign_key "users", "member_tiers"

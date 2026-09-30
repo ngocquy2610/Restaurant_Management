@@ -1,7 +1,7 @@
 class Reservation < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :table
-
+  has_many :reviews, dependent: :destroy
   has_many :orders, dependent: :destroy
 
   validates :guest_name,        presence: true
@@ -29,7 +29,7 @@ class Reservation < ApplicationRecord
   validate :table_must_be_bookable
   validate :reservation_time_must_be_a_meal_slot  # (ko—gie-túi) xem bên dưới
 
-  # ---- Các helper thời gian ----
+  # ---- Helper thời gian ----
 
   # Thời điểm bắt đầu của slot (kết hợp reservation_date + reservation_time).
   def slot_start
@@ -70,6 +70,35 @@ class Reservation < ApplicationRecord
       window = slot...(slot + MEAL_DURATION)
       ranges.any? { |r| ranges_overlap?(window, r) }
     end
+  end
+
+  REVIEW_BLOCKED_STATUSES = %w[pending rejected cancelled].freeze
+  REVIEWABLE_STATUSES     = %w[approved checked_in completed].freeze
+  
+  def reviewable?
+    return false if REVIEW_BLOCKED_STATUSES.include?(status.to_s)
+    return false if user_id.blank?
+
+    completed? || (slot_end.present? && slot_end <= Time.zone.now)
+  end
+
+  def reviewable_by?(customer)
+    customer.present? && user_id == customer.id && reviewable?
+  end
+
+  # Memoised: the reservation card and the policy both ask for it, and when the
+  # association is already eager-loaded we avoid SQL entirely.
+  def meal_review
+    return @meal_review if defined?(@meal_review)
+
+    @meal_review = reviews.loaded? ? reviews.detect(&:meal?) : reviews.meal.first
+  end
+
+  # Array (not a relation) — the per-customer set is tiny and #reviewable? is Ruby-side.
+  def self.reviewable_for(user)
+    where(user_id: user.id, status: REVIEWABLE_STATUSES)
+      .order(reservation_date: :desc)
+      .select(&:reviewable?)
   end
 
   private

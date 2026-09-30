@@ -1,0 +1,33 @@
+<% content_for :title, "Review ##{@review.id}" %>
+
+<div class="min-h-screen bg-[#FBF0EC] px-4 py-10 pt-28">
+  <div class="mx-auto max-w-3xl space-y-6">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <p class="text-sm font-semibold uppercase tracking-[0.32em] text-[#8A1C2B]/80">Review</p>
+        <h1 class="mt-3 font-serif text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl">Guest feedback</h1>
+      </div>
+      <%= link_to "All reviews", reviews_path,
+            class: "inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50" %>
+    </div>
+
+    <% if notice.present? %>
+      <p class="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700" id="notice"><%= notice %></p>
+    <% end %>
+    <% if alert.present? %>
+      <p class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700" id="alert"><%= alert %></p>
+    <% end %>
+
+    <%= render @review %>
+
+    <div class="flex flex-wrap items-center gap-3">
+      <% if @review.restaurant? %>
+        <%= link_to "See all restaurant reviews", reviews_path(type: "restaurant"),
+              class: "inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-[#8A1C2B] hover:text-[#8A1C2B]" %>
+      <% elsif @review.reservation.present? %>
+        <%= link_to "Back to reservation ##{@review.reservation.id}", reservation_path(@review.reservation),
+              class: "inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-[#8A1C2B] hover:text-[#8A1C2B]" %>
+      <% end %>
+    </div>
+  </div>
+</div>

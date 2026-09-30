@@ -1,0 +1,20 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+#
+# Fixtures are inserted with raw SQL, so model validations/callbacks do not run.
+# `customer` (the model's association to User, backed by reviews.user_id) must be
+# declared explicitly on a restaurant review, otherwise user_id stays NULL and the
+# partial unique index ("one restaurant review per customer") can never apply.
+
+meal_review:
+  reservation: one
+  customer: one
+  review_type: 0
+  rating: 4
+  comment: Lovely meal, attentive service.
+
+restaurant_review:
+  reservation: two
+  customer: two
+  review_type: 1
+  rating: 5
+  comment: Best dining room in town.

@@ -29,6 +29,10 @@ class ReservationPolicy < ApplicationPolicy
     staff?
   end
 
+  def review_meal?
+    user.present? && record.reviewable_by?(user) && record.meal_review.nil?
+  end
+
   def permitted_attributes
     if staff?
       %i[status table_id]

@@ -5,6 +5,12 @@ Rails.application.routes.draw do
     mount Sidekiq::Web => "/sidekiq"
   end
 
+  resources :reviews, only: %i[ index show new create edit update destroy ] do
+    collection do
+      get :restaurant
+    end
+  end
+
   resources :order_items, only: [:create, :destroy] do
     member do
       patch :update_status

@@ -1,0 +1,52 @@
+<% form_url = review.persisted? ? review_path(review) : reviews_path %>
+<%= form_with model: review, url: form_url, class: "space-y-6" do |form| %>
+  <%= form.hidden_field :review_type, value: review.review_type %>
+  <%= form.hidden_field :reservation_id, value: review.reservation_id %>
+
+  <% if review.errors.any? %>
+    <div id="review_error_explanation" class="rounded-md border border-[#e5b3ad] bg-[#fbe9e6] px-4 py-3 text-sm text-[#8f1f2a]">
+      <% review.errors.full_messages.each do |message| %>
+        <p><%= message %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="rounded-2xl border border-gray-200 bg-[#FBF0EC]/60 p-4">
+    <p class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-400">Reviewing</p>
+    <p class="mt-1 font-serif text-lg text-gray-900">
+      <%= review.restaurant? ? "The restaurant" : "Meal at Table #{review.table&.table_number || '—'}" %>
+    </p>
+    <p class="mt-1 text-sm text-gray-500"><%= review.meal_label %></p>
+  </div>
+
+  <div data-controller="star-rating">
+    <span class="mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]">Rating</span>
+    <div class="flex items-center gap-1" role="radiogroup" aria-label="Rating">
+      <% (1..5).each do |value| %>
+        <label class="cursor-pointer">
+          <%= form.radio_button :rating, value, class: "peer sr-only",
+                "aria-label": "#{value} #{'star'.pluralize(value)}",
+                data: { star_rating_target: "input", action: "change->star-rating#refresh" } %>
+          <span data-star-rating-target="star" data-value="<%= value %>"
+                data-action="mouseenter->star-rating#preview mouseleave->star-rating#reset click->star-rating#select"
+                class="text-3xl leading-none text-gray-300 transition">★</span>
+        </label>
+      <% end %>
+      <span data-star-rating-target="label" class="ml-3 text-sm font-semibold text-gray-600"></span>
+    </div>
+  </div>
+
+  <div>
+    <%= form.label :comment, "Comment",
+          class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+    <%= form.text_area :comment, rows: 4, maxlength: 1000, placeholder: "Tell other guests what you thought…",
+          class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-3">
+    <%= form.submit review.persisted? ? "Update review" : "Submit review",
+          class: "cursor-pointer rounded-md bg-[#7b1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#661a23]" %>
+    <%= link_to "Cancel", review.persisted? ? review_path(review) : reviews_path,
+          class: "rounded-full border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50" %>
+  </div>
+<% end %>
