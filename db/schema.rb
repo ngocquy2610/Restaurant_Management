@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_29_065328) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_30_024059) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -91,14 +91,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_065328) do
   end
 
   create_table "ingredients", force: :cascade do |t|
+    t.string "category", default: "other", null: false
     t.datetime "created_at", null: false
-    t.decimal "current_stock", precision: 10, scale: 2
+    t.decimal "current_quantity", precision: 10, scale: 2
     t.decimal "low_stock_threshold", precision: 10, scale: 2
     t.string "name"
+    t.integer "status", default: 0, null: false
     t.string "unit"
     t.decimal "unit_cost", precision: 10, scale: 2
     t.datetime "updated_at", null: false
+    t.index ["category"], name: "index_ingredients_on_category"
     t.index ["name"], name: "index_ingredients_on_name", unique: true
+    t.index ["status"], name: "index_ingredients_on_status"
   end
 
   create_table "jwt_denylists", force: :cascade do |t|

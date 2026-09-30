@@ -29,6 +29,14 @@
     </div>
 
     <div>
+      <%= form.label :category, "Category", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]"%>
+      <%= form.select :category,
+          Ingredient::CATEGORIES.map { |c| [c.humanize, c] },
+          { prompt: "Select a category" },
+          class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+    </div>
+
+    <div>
       <%= form.label :unit_cost, "Unit cost", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
       <div class="relative">
         <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#7a5d5a]">$</span>
@@ -40,8 +48,8 @@
     </div>
 
     <div>
-      <%= form.label :current_stock, "Current stock", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
-      <%= form.number_field :current_stock,
+      <%= form.label :current_quantity, "Current stock", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.number_field :current_quantity,
             step: 0.01, min: 0, placeholder: "0.00",
             class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] placeholder:text-[#7a5d5a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
     </div>

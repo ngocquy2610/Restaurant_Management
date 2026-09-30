@@ -237,7 +237,7 @@ recipes.each do |food_name, ingredients|
     ingredient = Ingredient.find_or_create_by!(name: ingredient_name) do |i|
       i.unit = attrs[0]
       i.unit_cost = attrs[1]
-      i.current_stock = attrs[2]
+      i.current_quantity = attrs[2]
       i.low_stock_threshold = attrs[3]
     end
 
