@@ -79,7 +79,7 @@ gem 'stripe'
 # Background jobs via Sidekiq + Redis/Valkey
 gem 'sidekiq', '~> 8.1'
 gem 'sidekiq-cron', '~> 2.0'
-gem 'redis', '~> 5.0'
+gem 'redis', '~> 6.0'
 
 gem "prawn"
 gem "prawn-table"
