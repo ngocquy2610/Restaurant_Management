@@ -9,6 +9,9 @@ class StockTransaction < ApplicationRecord
 
   validates :quantity, presence: true, numericality: { greater_than: 0 }
 
+  validates :quantity, presence: true, numericality: { greater_than: 0 }, unless: :adjustment?
+  validates :quantity, presence: true, numericality: { other_than: 0 },  if: :adjustment?
+
   before_validation :fill_quantities, on: :create
 
   def signed_quantity
@@ -23,10 +26,9 @@ class StockTransaction < ApplicationRecord
 
   def fill_quantities
     return if ingredient.blank?
-
+    return if quantity_before.present? && quantity_after.present?   # service đã set → tôn trọng
     before = ingredient.current_quantity.to_d
     self.quantity_before = before
     self.quantity_after  = before + signed_quantity
-    ingredient.current_quantity = quantity_after   # before_save của Ingredient tự sync status
   end
 end

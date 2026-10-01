@@ -14,6 +14,7 @@ class OrderItem < ApplicationRecord
   before_validation :assign_unit_price
   after_save :recalculate_order_total
   after_destroy :recalculate_order_total
+  after_update :auto_consume_stock, if: -> { saved_change_to_status? && served? }
 
   IN_KITCHEN_STATUSES = %i[pending accepted preparing] #Array of Symbols
 
@@ -37,6 +38,19 @@ class OrderItem < ApplicationRecord
 
     price = food.base_price.to_f + (food_variant ? food_variant.price_adjustment.to_f : 0)
     self.unit_price = price.round(2)
+  end
+
+  def consumption_recipe_items
+    if food_variant_id.present?
+      variant_items = RecipeItem.includes(:ingredient)
+                                .where(food_id: food_id, food_variant_id: food_variant_id)
+      return variant_items.to_a if variant_items.any?
+    end
+    RecipeItem.includes(:ingredient).where(food_id: food_id, food_variant_id: nil).to_a
+  end
+
+  def auto_consume_stock
+    StockService.consume_order_item!(self)
   end
 
   private

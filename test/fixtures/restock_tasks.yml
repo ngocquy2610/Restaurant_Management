@@ -1,0 +1,11 @@
+pending_auto:
+  ingredient: two
+  quantity: 20.00
+  status: 0
+  source: 0
+
+in_progress_request:
+  ingredient: one
+  quantity: 10.00
+  status: 1
+  source: 0

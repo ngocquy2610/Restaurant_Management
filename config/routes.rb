@@ -9,22 +9,22 @@ Rails.application.routes.draw do
     root "dashboards#index"
 
     resources :stock_transactions, only: %i[index show]
-    resources :restock_tasks,      only: %i[index show] do
+    resources :restock_tasks, only: %i[index show] do
       member { patch :advance }
     end
     resources :low_stock_requests, only: %i[index show] do
       member { patch :review }
     end
-    resources :waste_reports,      only: %i[index show] do
+    resources :waste_reports, only: %i[index show] do
       member { patch :verify }
     end
   end
 
   namespace :kitchen do
-    root "dashboards#index"                     # kitchen_root_path
+    root "dashboards#index"
 
     resources :low_stock_requests, only: %i[index show new create]
-    resources :waste_reports,      only: %i[index show new create]
+    resources :waste_reports, only: %i[index show new create]
   end
 
   resources :reviews, only: %i[ index show new create edit update destroy ] do

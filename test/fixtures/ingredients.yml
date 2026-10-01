@@ -1,15 +1,18 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
 one:
   name: Tomato
   unit: kg
+  category: produce
   unit_cost: 9.99
   current_quantity: 9.99
-  low_stock_threshold: 9.99
+  low_stock_threshold: 4.00
+  status: 0
 
 two:
   name: Cheese
   unit: kg
+  category: dairy
   unit_cost: 9.99
-  current_quantity: 9.99
-  low_stock_threshold: 9.99
+  current_quantity: 2.00
+  low_stock_threshold: 3.00
+  status: 1
+

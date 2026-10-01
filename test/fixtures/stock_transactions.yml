@@ -1,0 +1,19 @@
+stock_in_one:
+  ingredient: one
+  user: admin
+  transaction_type: 0
+  quantity: 5.00
+  quantity_before: 4.99
+  quantity_after: 9.99
+  reason: Weekly delivery
+  reference: PO-1001
+
+stock_out_one:
+  ingredient: one
+  user: admin
+  transaction_type: 1
+  quantity: 2.00
+  quantity_before: 9.99
+  quantity_after: 7.99
+  reason: Dinner service
+  reference: ORDER-BATCH-7
