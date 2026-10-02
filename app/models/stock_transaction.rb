@@ -6,8 +6,14 @@ class StockTransaction < ApplicationRecord
        default: :stock_in
 
   scope :recent, -> { order(created_at: :desc) }
-
-  validates :quantity, presence: true, numericality: { greater_than: 0 }
+  scope :by_ingredient, ->(id) { where(ingredient_id: id) if id.present? }
+  scope :by_type, ->(type) { where(transaction_type: type) if type.present? && transaction_types.key?(type) }
+  scope :between, ->(from, to) do
+    rel = all
+    rel = rel.where("created_at >= ?", Time.zone.parse(from).beginning_of_day) if from.present?
+    rel = rel.where("created_at <= ?", Time.zone.parse(to).end_of_day)       if to.present?
+    rel
+  end
 
   validates :quantity, presence: true, numericality: { greater_than: 0 }, unless: :adjustment?
   validates :quantity, presence: true, numericality: { other_than: 0 },  if: :adjustment?

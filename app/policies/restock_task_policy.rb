@@ -1,7 +1,8 @@
 class RestockTaskPolicy < ApplicationPolicy
   def index?   = user.present? && (user.admin? || user.inventory_manager? || user.kitchen_staff?)
   def show?    = index?
-  def advance? = user.present? && (user.admin? || user.inventory_manager?)
+  def refill?  = user.present? && (user.admin? || user.inventory_manager?)
+  def complete? = refill?
 
   class Scope < Scope
     def resolve

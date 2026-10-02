@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_30_032451) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_01_020854) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -91,6 +91,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_30_032451) do
   end
 
   create_table "ingredients", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
     t.string "category", default: "other", null: false
     t.datetime "created_at", null: false
     t.decimal "current_quantity", precision: 10, scale: 2
@@ -100,6 +101,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_30_032451) do
     t.string "unit"
     t.decimal "unit_cost", precision: 10, scale: 2
     t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_ingredients_on_active"
     t.index ["category"], name: "index_ingredients_on_category"
     t.index ["name"], name: "index_ingredients_on_name", unique: true
     t.index ["status"], name: "index_ingredients_on_status"
@@ -254,13 +256,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_30_032451) do
   end
 
   create_table "restock_tasks", force: :cascade do |t|
+    t.datetime "completed_at"
     t.datetime "created_at", null: false
     t.datetime "due_on"
     t.bigint "ingredient_id", null: false
     t.bigint "low_stock_request_id"
+    t.string "note"
     t.decimal "quantity", precision: 10, scale: 2, null: false
+    t.decimal "received_quantity", precision: 10, scale: 2
     t.integer "source", default: 0, null: false
     t.integer "status", default: 0, null: false
+    t.string "supplier"
     t.datetime "updated_at", null: false
     t.bigint "waste_report_id"
     t.index ["ingredient_id"], name: "index_restock_tasks_on_ingredient_id"

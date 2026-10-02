@@ -6,6 +6,7 @@ one:
   current_quantity: 9.99
   low_stock_threshold: 4.00
   status: 0
+  active: true
 
 two:
   name: Cheese
@@ -15,4 +16,5 @@ two:
   current_quantity: 2.00
   low_stock_threshold: 3.00
   status: 1
+  active: true
 

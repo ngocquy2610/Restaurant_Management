@@ -7,7 +7,15 @@
         <%= render "layouts/flash" %>
         <h2 class="font-serif text-[3rem] leading-none tracking-[-0.06em]">Restock Tasks</h2>
         <p class="mt-3 text-[1.05rem] text-[#7a5a56]">Work queue for replenishing ingredients.</p>
-        <div class="mt-6 overflow-hidden rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] shadow-sm">
+
+        <div class="mt-5 flex flex-wrap gap-2">
+          <% [["All", nil], ["Pending", "pending"], ["In progress", "in_progress"], ["Completed", "completed"], ["Cancelled", "cancelled"]].each do |label, val| %>
+            <%= link_to label, inventory_restock_tasks_path(status: val),
+                  class: "rounded-full px-4 py-2 text-sm font-semibold #{params[:status] == val ? 'bg-[#7b1f2a] text-white' : 'bg-[#f1e3df] text-[#5c4543] hover:bg-[#e9d4d0]'}" %>
+          <% end %>
+        </div>
+
+        <div class="mt-5 overflow-hidden rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] shadow-sm">
           <table class="w-full text-left text-sm">
             <thead class="bg-[#f1e3df] text-[0.72rem] uppercase tracking-[0.14em] text-[#9b6a63]">
               <tr><th class="px-5 py-3">Ingredient</th><th class="px-5 py-3">Qty</th><th class="px-5 py-3">Status</th><th class="px-5 py-3">Source</th><th class="px-5 py-3">Due</th><th class="px-5 py-3"></th></tr>
@@ -20,10 +28,11 @@
                   <td class="px-5 py-3"><%= restock_task_status_badge(task.status) %></td>
                   <td class="px-5 py-3"><%= restock_task_source_badge(task.source) %></td>
                   <td class="px-5 py-3 text-[#7a5a56]"><%= task.due_on ? inventory_time(task.due_on) : "—" %></td>
-                  <td class="px-5 py-3 text-right">
-                    <% if policy(task).advance? && !task.completed? && !task.cancelled? %>
-                      <%= button_to "Complete", advance_inventory_restock_task_path(task), method: :patch, class: "cursor-pointer rounded-md bg-[#7b1f2a] px-3 py-2 text-xs font-semibold text-white hover:bg-[#661a23]" %>
+                  <td class="px-5 py-3 text-right whitespace-nowrap">
+                    <% if policy(task).refill? && !task.completed? && !task.cancelled? %>
+                      <%= link_to "Refill", refill_inventory_restock_task_path(task), class: "rounded-md bg-[#7b1f2a] px-3 py-2 text-xs font-semibold text-white hover:bg-[#661a23]" %>
                     <% end %>
+                    <%= link_to "View", inventory_restock_task_path(task), class: "ml-3 font-semibold text-[#7b1f2a] hover:underline" %>
                   </td>
                 </tr>
               <% end %>
@@ -33,7 +42,10 @@
             <p class="px-5 py-6 text-sm text-[#7a5a56]">No restock tasks yet.</p>
           <% end %>
         </div>
+
+        <%= paginate @restock_tasks %>
       </div>
     </main>
   </div>
 </div>
+

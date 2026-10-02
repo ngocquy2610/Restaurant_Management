@@ -7,10 +7,37 @@
         <%= render "layouts/flash" %>
         <h2 class="font-serif text-[3rem] leading-none tracking-[-0.06em]">Stock Transactions</h2>
         <p class="mt-3 text-[1.05rem] text-[#7a5a56]">Append-only ledger. Corrections go in as new adjustment entries.</p>
-        <div class="mt-6 overflow-hidden rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] shadow-sm">
+
+        <%= form_with url: inventory_stock_transactions_path, method: :get, class: "mt-5 flex flex-wrap items-end gap-3" do |f| %>
+          <div>
+            <%= f.label :ingredient_id, "Ingredient", class: "mb-1 block text-xs font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+            <%= f.collection_select :ingredient_id, @ingredients, :id, :name,
+                  { include_blank: "All ingredients", selected: params[:ingredient_id] },
+                  class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-3 py-2 text-sm text-[#2c1c1a]" %>
+          </div>
+          <div>
+            <%= f.label :transaction_type, "Type", class: "mb-1 block text-xs font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+            <%= f.select :transaction_type,
+                  options_for_select([["IN", "stock_in"], ["OUT", "stock_out"], ["ADJUSTMENT", "adjustment"], ["WASTE", "waste"]], params[:transaction_type]),
+                  { include_blank: "All types" },
+                  class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-3 py-2 text-sm text-[#2c1c1a]" %>
+          </div>
+          <div>
+            <%= f.label :from, "From", class: "mb-1 block text-xs font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+            <%= f.date_field :from, value: params[:from], class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-3 py-2 text-sm text-[#2c1c1a]" %>
+          </div>
+          <div>
+            <%= f.label :to, "To", class: "mb-1 block text-xs font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+            <%= f.date_field :to, value: params[:to], class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-3 py-2 text-sm text-[#2c1c1a]" %>
+          </div>
+          <%= f.submit "Filter", class: "cursor-pointer rounded-md bg-[#7b1f2a] px-4 py-2 text-sm font-semibold text-white hover:bg-[#661a23]" %>
+          <%= link_to "Clear", inventory_stock_transactions_path, class: "pb-2 text-sm font-semibold text-[#7b1f2a] hover:underline" %>
+        <% end %>
+
+        <div class="mt-5 overflow-hidden rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] shadow-sm">
           <table class="w-full text-left text-sm">
             <thead class="bg-[#f1e3df] text-[0.72rem] uppercase tracking-[0.14em] text-[#9b6a63]">
-              <tr><th class="px-5 py-3">Time</th><th class="px-5 py-3">Ingredient</th><th class="px-5 py-3">Type</th><th class="px-5 py-3">Qty</th><th class="px-5 py-3">Before / After</th><th class="px-5 py-3"></th></tr>
+              <tr><th class="px-5 py-3">Time</th><th class="px-5 py-3">Ingredient</th><th class="px-5 py-3">Type</th><th class="px-5 py-3">Qty</th><th class="px-5 py-3">Before / After</th><th class="px-5 py-3">By</th><th class="px-5 py-3"></th></tr>
             </thead>
             <tbody class="divide-y divide-[#e4d6d2]">
               <% @transactions.each do |tx| %>
@@ -18,18 +45,22 @@
                   <td class="px-5 py-3 text-[#7a5a56]"><%= inventory_time(tx.created_at) %></td>
                   <td class="px-5 py-3 font-semibold"><%= tx.ingredient.name %></td>
                   <td class="px-5 py-3"><%= stock_transaction_type_badge(tx.transaction_type) %></td>
-                  <td class="px-5 py-3"><%= inventory_quantity(tx.quantity, tx.ingredient.unit) %></td>
+                  <td class="px-5 py-3 <%= tx.signed_quantity.negative? ? 'text-[#8f1f2a]' : 'text-[#25512d]' %>"><%= inventory_quantity(tx.signed_quantity, tx.ingredient.unit) %></td>
                   <td class="px-5 py-3 text-[#7a5a56]"><%= inventory_quantity(tx.quantity_before) %> / <%= inventory_quantity(tx.quantity_after) %></td>
+                  <td class="px-5 py-3 text-[#7a5a56]"><%= tx.user&.full_name || "System" %></td>
                   <td class="px-5 py-3 text-right"><%= link_to "View", inventory_stock_transaction_path(tx), class: "font-semibold text-[#7b1f2a] hover:underline" %></td>
                 </tr>
               <% end %>
             </tbody>
           </table>
           <% if @transactions.empty? %>
-            <p class="px-5 py-6 text-sm text-[#7a5a56]">No transactions yet.</p>
+            <p class="px-5 py-6 text-sm text-[#7a5a56]">No transactions match your filters.</p>
           <% end %>
         </div>
+
+        <%= paginate @transactions %>
       </div>
     </main>
   </div>
 </div>
+

@@ -13,6 +13,11 @@ class Ingredient < ApplicationRecord
   scope :needs_restock, -> { where(status: %i[low_stock out_of_stock]) }
   scope :by_category,   ->(category) { where(category: category) if category.present? }
 
+  scope :active,    -> { where(active: true) }
+  scope :archived,  -> { where(active: false) }
+  scope :search,    ->(term) { where("name ILIKE :t", t: "%#{term.to_s.strip}%") if term.present? }
+  scope :by_status, ->(status) { where(status: status) if status.present? && statuses.key?(status) }
+
   before_save :sync_status!
 
   validates :name, presence: true, uniqueness: { case_sensitive: false }
@@ -21,6 +26,9 @@ class Ingredient < ApplicationRecord
   validates :unit_cost, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :current_quantity,    numericality: { greater_than_or_equal_to: 0 }
   validates :low_stock_threshold, numericality: { greater_than_or_equal_to: 0 }
+
+  def deactivate! = update!(active: false)
+  def reactivate! = update!(active: true)
 
   private
 

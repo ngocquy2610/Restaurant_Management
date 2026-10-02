@@ -1,15 +1,27 @@
 class IngredientsController < ApplicationController
-  before_action :set_ingredient, only: %i[ show edit update destroy ]
+  before_action :authenticate_user!
+  before_action :set_ingredient, only: %i[show edit update destroy deactivate reactivate]
 
   # GET /ingredients or /ingredients.json
   def index
     authorize Ingredient, :index?
-    @ingredients = Ingredient.all
+    @ingredients = policy_scope(Ingredient)
+                  .active
+                  .search(params[:q])
+                  .by_category(params[:category])
+                  .by_status(params[:status])
+                  .order(:name)
+                  .page(params[:page])
+                  .per(10)
   end
 
-  # GET /ingredients/1 or /ingredients/1.json
   def show
     authorize @ingredient
+    @recent_transactions = @ingredient.stock_transactions
+                                        .recent
+                                        .includes(:user)
+                                        .limit(10)
+    @open_restock_task = @ingredient.restock_tasks.open.recent.first
   end
 
   # GET /ingredients/new
@@ -65,6 +77,21 @@ class IngredientsController < ApplicationController
       body: "The ingredient #{@ingredient.name} has been destroyed."
     )
     redirect_to ingredients_path, notice: "Ingredient was successfully destroyed."
+  end
+
+  def deactivate
+    authorize @ingredient, :deactivate?
+    @ingredient.deactivate!
+    notify_user(recipient: current_user,
+                title: "Ingredient deactivated",
+                body: "#{@ingredient.name} was deactivated.")
+    redirect_to ingredients_path, notice: "Ingredient deactivated.", status: :see_other
+  end
+
+  def reactivate
+    authorize @ingredient, :reactivate?
+    @ingredient.reactivate!
+    redirect_to ingredients_path, notice: "Ingredient reactivated.", status: :see_other
   end
 
   private

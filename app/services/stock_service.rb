@@ -77,6 +77,23 @@ module StockService
 
     private
 
+    def ensure_restock_task!(ingredient)
+      return unless ingredient.low_stock? || ingredient.out_of_stock?
+      return if RestockTask.open.exists?(ingredient_id: ingredient.id)
+
+      threshold = ingredient.low_stock_threshold.to_d
+      suggested = threshold - ingredient.current_quantity.to_d
+      suggested = threshold if suggested <= 0
+      suggested = 1.to_d  if suggested <= 0   # fallback khi threshold = 0 và hết hàng
+
+      RestockTask.create!(
+        ingredient: ingredient,
+        quantity:   suggested,
+        source:     :auto,
+        status:     :pending
+      )
+    end
+
     def signed_delta(type, quantity)
       qty = quantity.to_d
       case type

@@ -10,7 +10,10 @@ Rails.application.routes.draw do
 
     resources :stock_transactions, only: %i[index show]
     resources :restock_tasks, only: %i[index show] do
-      member { patch :advance }
+      member do
+        get   :refill
+        patch :complete
+      end
     end
     resources :low_stock_requests, only: %i[index show] do
       member { patch :review }
@@ -18,6 +21,8 @@ Rails.application.routes.draw do
     resources :waste_reports, only: %i[index show] do
       member { patch :verify }
     end
+
+    resources :stock_adjustments, only: %i[new create]
   end
 
   namespace :kitchen do
@@ -80,7 +85,12 @@ Rails.application.routes.draw do
   resources :food_variants
   resources :recipe_items, only: [:new, :edit, :create, :update, :destroy]
 
-  resources :ingredients, except: [:show]
+  resources :ingredients do
+    member do
+      patch :deactivate
+      patch :reactivate
+    end
+  end
 
   resources :reservations do
     member do

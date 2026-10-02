@@ -8,6 +8,7 @@ class RestockTask < ApplicationRecord
 
   scope :open,   -> { where(status: %i[pending in_progress]) }
   scope :recent, -> { order(created_at: :desc) }
+  scope :by_status, ->(status) { where(status: status) if status.present? && statuses.key?(status) }
 
   validates :quantity, presence: true, numericality: { greater_than: 0 }
 
