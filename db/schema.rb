@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_01_020854) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_02_024327) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -117,15 +117,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_01_020854) do
     t.datetime "created_at", null: false
     t.bigint "ingredient_id", null: false
     t.text "note"
+    t.text "review_note"
     t.datetime "reviewed_at"
     t.bigint "reviewed_by_id"
     t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
+    t.integer "urgency", default: 0, null: false
     t.bigint "user_id", null: false
     t.index ["ingredient_id", "status"], name: "index_low_stock_requests_on_ingredient_id_and_status"
     t.index ["ingredient_id"], name: "index_low_stock_requests_on_ingredient_id"
     t.index ["reviewed_by_id"], name: "index_low_stock_requests_on_reviewed_by_id"
     t.index ["status"], name: "index_low_stock_requests_on_status"
+    t.index ["urgency"], name: "index_low_stock_requests_on_urgency"
     t.index ["user_id"], name: "index_low_stock_requests_on_user_id"
   end
 

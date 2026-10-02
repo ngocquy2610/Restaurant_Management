@@ -38,4 +38,43 @@ class LowStockRequestTest < ActiveSupport::TestCase
     low_stock_requests(:pending_request).update!(status: :rejected)
     assert_not_includes LowStockRequest.open, low_stock_requests(:pending_request)
   end
+
+  test "approve creates a request-sourced restock task" do
+    ingredient = Ingredient.create!(name: "Approve Me", unit: "kg", category: "other",
+                                    unit_cost: 1, current_quantity: 1, low_stock_threshold: 5)
+    request = LowStockRequest.create!(user: users(:kitchen_staff), ingredient: ingredient, note: "low")
+
+    assert_difference("RestockTask.count", 1) do
+      request.review!(users(:one), "approved")
+    end
+
+    task = RestockTask.last
+    assert task.request?
+    assert_equal request, task.low_stock_request
+    assert_equal ingredient, task.ingredient
+    assert task.quantity.positive?
+    assert request.reload.approved?
+  end
+
+  test "approve does not create a duplicate when an open task exists" do
+    request = low_stock_requests(:pending_request) # ingredient two already has an open task
+
+    assert_no_difference("RestockTask.count") do
+      request.review!(users(:one), "approved")
+    end
+    assert request.reload.approved?
+  end
+
+  test "reject requires a reason" do
+    request = low_stock_requests(:pending_request)
+    assert_raises(ArgumentError) { request.review!(users(:one), "rejected") }
+    assert request.reload.pending?
+  end
+
+  test "reject stores the reason" do
+    request = low_stock_requests(:pending_request)
+    request.review!(users(:one), "rejected", note: "Enough stock")
+    assert request.reload.rejected?
+    assert_equal "Enough stock", request.review_note
+  end
 end

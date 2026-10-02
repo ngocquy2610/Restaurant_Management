@@ -36,6 +36,6 @@ class Kitchen::LowStockRequestsController < Kitchen::BaseController
   private
 
   def low_stock_request_params
-    params.require(:low_stock_request).permit(:ingredient_id, :note)
+    params.require(:low_stock_request).permit(:ingredient_id, :note, :urgency)
   end
 end

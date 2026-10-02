@@ -1,4 +1,10 @@
 module InventoryHelper
+  LOW_STOCK_REQUEST_URGENCY_META = {
+    "low"    => { label: "Low",    chip: "bg-slate-100", text: "text-slate-600" },
+    "normal" => { label: "Normal", chip: "bg-blue-100",  text: "text-blue-700" },
+    "high"   => { label: "High",   chip: "bg-red-100",   text: "text-red-700" }
+  }.freeze
+
   INGREDIENT_STATUS_META = {
     "in_stock"     => { label: "In stock",     chip: "bg-green-100", text: "text-green-700" },
     "low_stock"    => { label: "Low stock",    chip: "bg-amber-100", text: "text-amber-700" },
@@ -44,6 +50,7 @@ module InventoryHelper
   def restock_task_status_badge(status) = inventory_badge(RESTOCK_TASK_STATUS_META, status)
   def restock_task_source_badge(source) = inventory_badge(RESTOCK_TASK_SOURCE_META, source)
   def stock_transaction_type_badge(type) = inventory_badge(STOCK_TRANSACTION_TYPE_META, type)
+  def low_stock_request_urgency_badge(urgency) = inventory_badge(LOW_STOCK_REQUEST_URGENCY_META, urgency)
 
   # Shared sidebar styling so every inventory/kitchen page stays visually identical.
   def sidebar_nav_class(path)

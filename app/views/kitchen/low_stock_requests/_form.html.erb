@@ -13,6 +13,10 @@
     <%= form.collection_select :ingredient_id, ingredients, :id, :name, { prompt: "Select an ingredient" }, class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3" %>
   </div>
   <div>
+    <%= form.label :urgency, "Urgency", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+    <%= form.select :urgency, LowStockRequest.urgencies.keys.map { |key| [key.humanize, key] }, {}, class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3" %>
+  </div>
+  <div>
     <%= form.label :note, "Note", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
     <%= form.text_area :note, rows: 3, placeholder: "e.g. Running low before dinner rush", class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3" %>
   </div>

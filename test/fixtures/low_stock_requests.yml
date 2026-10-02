@@ -3,11 +3,13 @@ pending_request:
   ingredient: two
   note: Nearly out of cheese.
   status: 0
+  urgency: 2
 
 approved_request:
   user: kitchen_staff
   ingredient: one
   note: Need more tomatoes.
   status: 1
+  urgency: 1
   reviewed_by: one
   reviewed_at: 2026-09-29 10:00:00

@@ -15,12 +15,13 @@
         <div class="mt-6 overflow-hidden rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] shadow-sm">
           <table class="w-full text-left text-sm">
             <thead class="bg-[#f1e3df] text-[0.72rem] uppercase tracking-[0.14em] text-[#9b6a63]">
-              <tr><th class="px-5 py-3">Ingredient</th><th class="px-5 py-3">Status</th><th class="px-5 py-3">Sent</th><th class="px-5 py-3"></th></tr>
+              <tr><th class="px-5 py-3">Ingredient</th><th class="px-5 py-3">Urgency</th><th class="px-5 py-3">Status</th><th class="px-5 py-3">Sent</th><th class="px-5 py-3"></th></tr>
             </thead>
             <tbody class="divide-y divide-[#e4d6d2]">
               <% @low_stock_requests.each do |request| %>
                 <tr>
                   <td class="px-5 py-3 font-semibold"><%= request.ingredient.name %></td>
+                  <td class="px-5 py-3"><%= low_stock_request_urgency_badge(request.urgency) %></td>
                   <td class="px-5 py-3"><%= low_stock_request_status_badge(request.status) %></td>
                   <td class="px-5 py-3 text-[#7a5a56]"><%= inventory_time(request.created_at) %></td>
                   <td class="px-5 py-3 text-right"><%= link_to "View", kitchen_low_stock_request_path(request), class: "font-semibold text-[#7b1f2a] hover:underline" %></td>
