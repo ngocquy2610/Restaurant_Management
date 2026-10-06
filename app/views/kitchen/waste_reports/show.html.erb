@@ -10,8 +10,12 @@
         <dl class="mt-6 space-y-3 rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-6 shadow-sm">
           <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Ingredient</dt><dd class="font-semibold"><%= @waste_report.ingredient.name %></dd></div>
           <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Quantity</dt><dd class="font-semibold"><%= inventory_quantity(@waste_report.quantity, @waste_report.ingredient.unit) %></dd></div>
+          <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Verified</dt><dd class="font-semibold"><%= @waste_report.verified_quantity.present? ? inventory_quantity(@waste_report.verified_quantity, @waste_report.ingredient.unit) : "—" %></dd></div>
           <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Status</dt><dd><%= waste_report_status_badge(@waste_report.status) %></dd></div>
           <div><dt class="text-[#7a5a56]">Reason</dt><dd class="mt-1 rounded-md bg-[#f1e3df] px-4 py-3 text-sm"><%= @waste_report.reason %></dd></div>
+          <% if @waste_report.review_note.present? %>
+            <div><dt class="text-[#7a5a56]">Review note</dt><dd class="mt-1 rounded-md bg-[#f1e3df] px-4 py-3 text-sm"><%= @waste_report.review_note %></dd></div>
+          <% end %>
         </dl>
       </div>
     </main>

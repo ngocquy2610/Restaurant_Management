@@ -18,6 +18,9 @@ class Ingredient < ApplicationRecord
   scope :search,    ->(term) { where("name ILIKE :t", t: "%#{term.to_s.strip}%") if term.present? }
   scope :by_status, ->(status) { where(status: status) if status.present? && statuses.key?(status) }
 
+  scope :low_stock, -> { where("current_quantity > 0 AND current_quantity <= low_stock_threshold") }
+  scope :out_of_stock, -> { where("current_quantity = 0") }
+
   before_save :sync_status!
 
   validates :name, presence: true, uniqueness: { case_sensitive: false }

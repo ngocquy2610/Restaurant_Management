@@ -1,0 +1,214 @@
+<% content_for :title, "Inventory Report" %>
+<div class="min-h-screen bg-[#f4e6e2] pt-21 text-[#2f1f1d]">
+  <div class="flex min-h-screen">
+    <%= render "layouts/inventory_sidebar" %>
+    <main class="min-w-0 flex-1 bg-[#f6efee] px-5 py-6 md:px-8">
+      <div class="mx-auto max-w-315">
+        <%= render "layouts/flash" %>
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h2 class="font-serif text-[2.5rem] leading-none md:text-[3rem]">Inventory Report</h2>
+            <p class="mt-3 text-sm text-[#7a5a56]">Stock activity from <%= l(@from_date, format: :long) %> to <%= l(@to_date, format: :long) %></p>
+          </div>
+          <%= link_to "View all transactions", inventory_stock_transactions_path,
+                class: "text-sm font-semibold text-[#7b1f2a] hover:underline" %>
+        </div>
+
+        <%= form_with url: inventory_reports_path, method: :get,
+              class: "mt-6 flex flex-wrap items-end gap-3 rounded-md border border-[#d7b9b2] bg-[#f8f3f1] p-4" do |form| %>
+          <div>
+            <%= form.label :from_date, "From", class: "mb-1 block text-xs font-semibold uppercase text-[#7c5d58]" %>
+            <%= form.date_field :from_date, value: @from_date,
+                  class: "rounded-md border border-[#d8c1bc] bg-white px-3 py-2 text-sm" %>
+          </div>
+          <div>
+            <%= form.label :to_date, "To", class: "mb-1 block text-xs font-semibold uppercase text-[#7c5d58]" %>
+            <%= form.date_field :to_date, value: @to_date,
+                  class: "rounded-md border border-[#d8c1bc] bg-white px-3 py-2 text-sm" %>
+          </div>
+          <%= form.submit "Apply dates",
+                class: "cursor-pointer rounded-md bg-[#7b1f2a] px-4 py-2 text-sm font-semibold text-white hover:bg-[#661a23]" %>
+          <%= link_to "Reset", inventory_reports_path,
+                class: "pb-2 text-sm font-semibold text-[#7b1f2a] hover:underline" %>
+        <% end %>
+
+        <% if @range_error.present? %>
+          <p role="alert" class="mt-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"><%= @range_error %></p>
+        <% end %>
+
+        <section aria-label="Current inventory" class="mt-6">
+          <h3 class="mb-3 text-xs font-semibold uppercase tracking-wide text-[#7c5d58]">Current inventory</h3>
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <article class="rounded-md border border-[#d7b9b2] bg-[#f8f3f1] p-4">
+              <p class="text-sm text-[#7a5a56]">Active ingredients</p>
+              <p class="mt-2 text-2xl font-semibold"><%= number_with_delimiter(@total_ingredients) %></p>
+            </article>
+            <article class="rounded-md border border-[#d7b9b2] bg-[#f8f3f1] p-4">
+              <p class="text-sm text-[#7a5a56]">Current stock value</p>
+              <p class="mt-2 text-2xl font-semibold"><%= number_to_currency(@total_stock_value) %></p>
+              <p class="mt-1 text-xs text-[#7a5a56]">Estimated from current quantity and current unit cost</p>
+            </article>
+            <article class="rounded-md border border-[#d7b9b2] bg-[#f8f3f1] p-4">
+              <p class="text-sm text-[#7a5a56]">Low stock</p>
+              <p class="mt-2 text-2xl font-semibold text-amber-800"><%= number_with_delimiter(@low_stock_count) %></p>
+            </article>
+            <article class="rounded-md border border-[#d7b9b2] bg-[#f8f3f1] p-4">
+              <p class="text-sm text-[#7a5a56]">Out of stock</p>
+              <p class="mt-2 text-2xl font-semibold text-red-800"><%= number_with_delimiter(@out_of_stock_count) %></p>
+            </article>
+          </div>
+        </section>
+
+        <section aria-label="Activity in selected period" class="mt-6">
+          <h3 class="mb-3 text-xs font-semibold uppercase tracking-wide text-[#7c5d58]">Activity in selected period</h3>
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <article class="rounded-md border border-[#d7b9b2] bg-[#f8f3f1] p-4">
+              <p class="text-sm text-[#7a5a56]">Stock-in transactions</p>
+              <p class="mt-2 text-2xl font-semibold text-green-800"><%= number_with_delimiter(@stock_ins.count) %></p>
+              <p class="mt-1 text-xs text-[#7a5a56]">Across all ingredients</p>
+            </article>
+            <article class="rounded-md border border-[#d7b9b2] bg-[#f8f3f1] p-4">
+              <p class="text-sm text-[#7a5a56]">Stock-out transactions</p>
+              <p class="mt-2 text-2xl font-semibold text-blue-800"><%= number_with_delimiter(@stock_outs.count) %></p>
+              <p class="mt-1 text-xs text-[#7a5a56]">Across all ingredients</p>
+            </article>
+            <article class="rounded-md border border-[#d7b9b2] bg-[#f8f3f1] p-4">
+              <p class="text-sm text-[#7a5a56]">Restock tasks created</p>
+              <p class="mt-2 text-2xl font-semibold"><%= number_with_delimiter(@total_restock_tasks) %></p>
+              <p class="mt-1 text-xs text-[#7a5a56]"><%= @completed_restock_tasks %> completed · <%= @pending_restock_tasks %> open</p>
+            </article>
+            <article class="rounded-md border border-[#d7b9b2] bg-[#f8f3f1] p-4">
+              <p class="text-sm text-[#7a5a56]">Restock quantities</p>
+              <p class="mt-2 text-lg font-semibold">Received <%= number_with_delimiter(@restock_tasks.where(status: :completed).count) %> tasks</p>
+              <p class="mt-1 text-sm text-[#7a5a56]">Open <%= number_with_delimiter(@pending_restock_tasks) %> tasks</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="mt-8">
+          <div class="mb-3 flex flex-wrap items-end justify-between gap-2">
+            <h3 class="font-serif text-xl font-semibold">Ingredient movement and days of cover</h3>
+            <p class="text-xs text-[#7a5a56]">Estimated using stock-out average per day; waste is excluded.</p>
+          </div>
+          <div class="overflow-x-auto rounded-md border border-[#d7b9b2] bg-[#f8f3f1]">
+            <table class="w-full min-w-225 text-left text-sm">
+              <thead class="bg-[#f1e3df] text-xs uppercase text-[#7c5d58]">
+                <tr>
+                  <th class="px-4 py-3">Ingredient</th>
+                  <th class="px-4 py-3">Current stock</th>
+                  <th class="px-4 py-3">Received</th>
+                  <th class="px-4 py-3">Issued</th>
+                  <th class="px-4 py-3">Waste</th>
+                  <th class="px-4 py-3">Avg. issued / day</th>
+                  <th class="px-4 py-3">Estimated days left</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[#e4d6d2]">
+                <% @paginated_ingredients.each do |ingredient| %>
+                  <% movement = @ingredient_movements.fetch(ingredient.id) %>
+                  <tr>
+                    <td class="px-4 py-3 font-semibold"><%= ingredient.name %></td>
+                    <td class="whitespace-nowrap px-4 py-3"><%= inventory_quantity(ingredient.current_quantity, ingredient.unit) %></td>
+                    <td class="whitespace-nowrap px-4 py-3 text-green-800"><%= inventory_quantity(movement[:received], ingredient.unit) %></td>
+                    <td class="whitespace-nowrap px-4 py-3 text-blue-800"><%= inventory_quantity(movement[:issued], ingredient.unit) %></td>
+                    <td class="whitespace-nowrap px-4 py-3 text-red-800"><%= inventory_quantity(movement[:wasted], ingredient.unit) %></td>
+                    <td class="whitespace-nowrap px-4 py-3"><%= inventory_quantity(movement[:average_daily_issue], "#{ingredient.unit}/day") %></td>
+                    <td class="whitespace-nowrap px-4 py-3 font-semibold"><%= movement[:days_left] ? "#{number_with_precision(movement[:days_left], precision: 1)} days" : "Not enough usage data" %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+            <% if @ingredients.empty? %>
+              <p class="px-4 py-6 text-sm text-[#7a5a56]">No active ingredients.</p>
+            <% end %>
+          </div>
+          <%= paginate @paginated_ingredients, param_name: :ingredients_page,
+                params: request.query_parameters %>
+        </section>
+
+        <section class="mt-8">
+          <div class="mb-3 flex items-center justify-between gap-3">
+            <h3 class="font-serif text-xl font-semibold">Stock transaction details</h3>
+            <span class="text-sm text-[#7a5a56]"><%= number_with_delimiter(@stock_transactions_count) %> records</span>
+          </div>
+          <div class="overflow-x-auto rounded-md border border-[#d7b9b2] bg-[#f8f3f1]">
+            <table class="w-full min-w-225 text-left text-sm">
+              <thead class="bg-[#f1e3df] text-xs uppercase text-[#7c5d58]">
+                <tr>
+                  <th class="px-4 py-3">Time</th>
+                  <th class="px-4 py-3">Ingredient</th>
+                  <th class="px-4 py-3">Type</th>
+                  <th class="px-4 py-3">Change</th>
+                  <th class="px-4 py-3">Before / After</th>
+                  <th class="px-4 py-3">Reason</th>
+                  <th class="px-4 py-3">Recorded by</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[#e4d6d2]">
+                <% @paginated_stock_transactions.each do |transaction| %>
+                  <tr>
+                    <td class="whitespace-nowrap px-4 py-3 text-[#7a5a56]"><%= inventory_time(transaction.created_at) %></td>
+                    <td class="px-4 py-3 font-semibold"><%= transaction.ingredient.name %></td>
+                    <td class="px-4 py-3"><%= stock_transaction_type_badge(transaction.transaction_type) %></td>
+                    <td class="whitespace-nowrap px-4 py-3 <%= transaction.signed_quantity.negative? ? 'text-red-800' : 'text-green-800' %>"><%= inventory_quantity(transaction.signed_quantity, transaction.ingredient.unit) %></td>
+                    <td class="whitespace-nowrap px-4 py-3 text-[#7a5a56]">
+                      <%= inventory_quantity(transaction.quantity_before, transaction.ingredient.unit) %> / <%= inventory_quantity(transaction.quantity_after, transaction.ingredient.unit) %>
+                    </td>
+                    <td class="max-w-65 px-4 py-3"><%= transaction.reason.presence || "—" %></td>
+                    <td class="whitespace-nowrap px-4 py-3 text-[#7a5a56]"><%= transaction.user&.full_name || "System" %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+            <% if @stock_transactions.empty? %>
+              <p class="px-4 py-6 text-sm text-[#7a5a56]">No stock transactions in this date range.</p>
+            <% end %>
+          </div>
+          <%= paginate @paginated_stock_transactions, param_name: :transactions_page,
+                params: request.query_parameters %>
+        </section>
+
+        <section class="mt-8">
+          <div class="mb-3 flex items-center justify-between gap-3">
+            <h3 class="font-serif text-xl font-semibold">Restock tasks created in period</h3>
+            <%= link_to "All restock tasks", inventory_restock_tasks_path,
+                  class: "text-sm font-semibold text-[#7b1f2a] hover:underline" %>
+          </div>
+          <div class="overflow-x-auto rounded-md border border-[#d7b9b2] bg-[#f8f3f1]">
+            <table class="w-full min-w-175 text-left text-sm">
+              <thead class="bg-[#f1e3df] text-xs uppercase text-[#7c5d58]">
+                <tr>
+                  <th class="px-4 py-3">Created</th>
+                  <th class="px-4 py-3">Ingredient</th>
+                  <th class="px-4 py-3">Source</th>
+                  <th class="px-4 py-3">Planned</th>
+                  <th class="px-4 py-3">Received</th>
+                  <th class="px-4 py-3">Supplier / note</th>
+                  <th class="px-4 py-3">Status</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[#e4d6d2]">
+                <% @paginated_restock_tasks.each do |task| %>
+                  <tr>
+                    <td class="whitespace-nowrap px-4 py-3 text-[#7a5a56]"><%= inventory_time(task.created_at) %></td>
+                    <td class="px-4 py-3 font-semibold"><%= link_to task.ingredient.name, inventory_restock_task_path(task), class: "hover:underline" %></td>
+                    <td class="px-4 py-3"><%= restock_task_source_badge(task.source) %></td>
+                    <td class="whitespace-nowrap px-4 py-3"><%= inventory_quantity(task.quantity, task.ingredient.unit) %></td>
+                    <td class="whitespace-nowrap px-4 py-3"><%= task.received_quantity.present? ? inventory_quantity(task.received_quantity, task.ingredient.unit) : "—" %></td>
+                    <td class="max-w-65 px-4 py-3"><%= [task.supplier, task.note].select(&:present?).join(" · ").presence || "—" %></td>
+                    <td class="px-4 py-3"><%= restock_task_status_badge(task.status) %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+            <% if @restock_tasks.empty? %>
+              <p class="px-4 py-6 text-sm text-[#7a5a56]">No restock tasks created in this date range.</p>
+            <% end %>
+          </div>
+          <%= paginate @paginated_restock_tasks, param_name: :restock_tasks_page,
+                params: request.query_parameters %>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>

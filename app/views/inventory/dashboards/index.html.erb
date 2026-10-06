@@ -7,15 +7,29 @@
         <%= render "layouts/flash" %>
         <h2 class="font-serif text-[3rem] leading-none tracking-[-0.06em]">Inventory Overview</h2>
         <p class="mt-3 text-[1.05rem] text-[#7a5a56]">Stock levels, open restock work, and pending reviews.</p>
+        <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          <%= render "summary_card", count: @summary[:total_ingredients], label: "Total ingredients",
+                color: "green", hint: "Active ingredients", path: ingredients_path %>
+          <%= render "summary_card", count: @summary[:low_stock], label: "Low stock",
+                color: "amber", hint: "At or below threshold", path: ingredients_path(status: "low_stock") %>
+          <%= render "summary_card", count: @summary[:out_of_stock], label: "Out of stock",
+                color: "red", hint: "Needs immediate refill", path: ingredients_path(status: "out_of_stock") %>
+          <%= render "summary_card", count: @summary[:pending_requests], label: "Pending requests",
+                color: "blue", hint: "Kitchen requests awaiting review",
+                path: inventory_low_stock_requests_path(status: "pending") %>
+          <%= render "summary_card", count: @summary[:pending_waste_reports], label: "Pending waste",
+                color: "blue", hint: "Waste reports awaiting verify",
+                path: inventory_waste_reports_path(status: "pending") %>
+        </div>
         <div class="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
           <section class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-6 shadow-sm">
             <div class="mb-4 flex items-center justify-between">
               <h3 class="font-serif text-[1.4rem] font-semibold">Needs restock</h3>
               <%= link_to "Manage ingredients", ingredients_path, class: "text-sm font-semibold text-[#7b1f2a] hover:underline" %>
             </div>
-            <% if @low_stock_ingredients.any? %>
+            <% if @need_restock.any? %>
               <ul class="divide-y divide-[#e4d6d2]">
-                <% @low_stock_ingredients.each do |ingredient| %>
+                <% @need_restock.each do |ingredient| %>
                   <li class="flex items-center justify-between gap-3 py-3">
                     <div><p class="font-semibold"><%= ingredient.name %></p>
                     <p class="text-sm text-[#7a5a56]"><%= inventory_quantity(ingredient.current_quantity, ingredient.unit) %> / threshold <%= inventory_quantity(ingredient.low_stock_threshold, ingredient.unit) %></p></div>

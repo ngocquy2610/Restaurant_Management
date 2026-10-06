@@ -23,6 +23,13 @@
       <span>Stock Transactions</span>
     <% end %>
 
+    <%= link_to inventory_reports_path, class: sidebar_nav_class(inventory_reports_path) do %>
+      <span class="flex h-5 w-5 items-center justify-center">
+        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"/><path d="M4 19h17"/><path d="m7 15 4-4 3 2 6-7"/></svg>
+      </span>
+      <span>Inventory Report</span>
+    <% end %>
+
     <%= link_to inventory_restock_tasks_path, class: sidebar_nav_class(inventory_restock_tasks_path) do %>
       <span class="flex h-5 w-5 items-center justify-center">
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h11l4 4-4 4H4z"/><path d="M9 11h7"/></svg>

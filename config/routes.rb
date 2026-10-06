@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   namespace :inventory do
     root "dashboards#index"
 
+    resources :reports
     resources :stock_transactions, only: %i[index show]
     resources :restock_tasks, only: %i[index show] do
       member do
