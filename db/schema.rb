@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_29_065328) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_02_063740) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -91,20 +91,45 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_065328) do
   end
 
   create_table "ingredients", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.string "category", default: "other", null: false
     t.datetime "created_at", null: false
-    t.decimal "current_stock", precision: 10, scale: 2
+    t.decimal "current_quantity", precision: 10, scale: 2
     t.decimal "low_stock_threshold", precision: 10, scale: 2
     t.string "name"
+    t.integer "status", default: 0, null: false
     t.string "unit"
     t.decimal "unit_cost", precision: 10, scale: 2
     t.datetime "updated_at", null: false
+    t.index ["active"], name: "index_ingredients_on_active"
+    t.index ["category"], name: "index_ingredients_on_category"
     t.index ["name"], name: "index_ingredients_on_name", unique: true
+    t.index ["status"], name: "index_ingredients_on_status"
   end
 
   create_table "jwt_denylists", force: :cascade do |t|
     t.datetime "exp", null: false
     t.string "jti", null: false
     t.index ["jti"], name: "index_jwt_denylists_on_jti"
+  end
+
+  create_table "low_stock_requests", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "ingredient_id", null: false
+    t.text "note"
+    t.text "review_note"
+    t.datetime "reviewed_at"
+    t.bigint "reviewed_by_id"
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.integer "urgency", default: 0, null: false
+    t.bigint "user_id", null: false
+    t.index ["ingredient_id", "status"], name: "index_low_stock_requests_on_ingredient_id_and_status"
+    t.index ["ingredient_id"], name: "index_low_stock_requests_on_ingredient_id"
+    t.index ["reviewed_by_id"], name: "index_low_stock_requests_on_reviewed_by_id"
+    t.index ["status"], name: "index_low_stock_requests_on_status"
+    t.index ["urgency"], name: "index_low_stock_requests_on_urgency"
+    t.index ["user_id"], name: "index_low_stock_requests_on_user_id"
   end
 
   create_table "member_tiers", force: :cascade do |t|
@@ -233,6 +258,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_065328) do
     t.index ["user_id"], name: "index_reservations_on_user_id"
   end
 
+  create_table "restock_tasks", force: :cascade do |t|
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "due_on"
+    t.bigint "ingredient_id", null: false
+    t.bigint "low_stock_request_id"
+    t.string "note"
+    t.decimal "quantity", precision: 10, scale: 2, null: false
+    t.decimal "received_quantity", precision: 10, scale: 2
+    t.integer "source", default: 0, null: false
+    t.integer "status", default: 0, null: false
+    t.string "supplier"
+    t.datetime "updated_at", null: false
+    t.bigint "waste_report_id"
+    t.index ["ingredient_id"], name: "index_restock_tasks_on_ingredient_id"
+    t.index ["low_stock_request_id"], name: "index_restock_tasks_on_low_stock_request_id"
+    t.index ["source"], name: "index_restock_tasks_on_source"
+    t.index ["status"], name: "index_restock_tasks_on_status"
+    t.index ["waste_report_id"], name: "index_restock_tasks_on_waste_report_id"
+  end
+
   create_table "reviews", force: :cascade do |t|
     t.text "comment"
     t.datetime "created_at", null: false
@@ -247,6 +293,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_065328) do
     t.index ["user_id"], name: "index_reviews_on_user_id"
     t.index ["user_id"], name: "index_reviews_unique_restaurant_per_customer", unique: true, where: "(review_type = 1)"
     t.check_constraint "rating >= 1 AND rating <= 5", name: "reviews_rating_range"
+  end
+
+  create_table "stock_transactions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "ingredient_id", null: false
+    t.decimal "quantity", precision: 10, scale: 2, null: false
+    t.decimal "quantity_after", precision: 10, scale: 2
+    t.decimal "quantity_before", precision: 10, scale: 2
+    t.string "reason"
+    t.string "reference", limit: 80
+    t.integer "transaction_type", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.index ["ingredient_id", "created_at"], name: "index_stock_transactions_on_ingredient_id_and_created_at"
+    t.index ["ingredient_id"], name: "index_stock_transactions_on_ingredient_id"
+    t.index ["transaction_type"], name: "index_stock_transactions_on_transaction_type"
+    t.index ["user_id"], name: "index_stock_transactions_on_user_id"
   end
 
   create_table "table_types", force: :cascade do |t|
@@ -300,12 +363,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_065328) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "waste_reports", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "ingredient_id", null: false
+    t.decimal "quantity", precision: 10, scale: 2, null: false
+    t.text "reason"
+    t.text "review_note"
+    t.datetime "reviewed_at"
+    t.bigint "reviewed_by_id"
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.decimal "verified_quantity", precision: 10, scale: 2
+    t.index ["ingredient_id", "created_at"], name: "index_waste_reports_on_ingredient_id_and_created_at"
+    t.index ["ingredient_id"], name: "index_waste_reports_on_ingredient_id"
+    t.index ["reviewed_by_id"], name: "index_waste_reports_on_reviewed_by_id"
+    t.index ["status"], name: "index_waste_reports_on_status"
+    t.index ["user_id"], name: "index_waste_reports_on_user_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "customer_queues", "tables"
   add_foreign_key "customer_queues", "users"
   add_foreign_key "food_variants", "foods"
   add_foreign_key "foods", "categories"
+  add_foreign_key "low_stock_requests", "ingredients"
+  add_foreign_key "low_stock_requests", "users"
+  add_foreign_key "low_stock_requests", "users", column: "reviewed_by_id"
   add_foreign_key "notifications", "users", column: "recipient_id"
   add_foreign_key "order_items", "food_variants"
   add_foreign_key "order_items", "foods"
@@ -322,9 +407,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_065328) do
   add_foreign_key "recipe_items", "ingredients"
   add_foreign_key "reservations", "tables"
   add_foreign_key "reservations", "users"
+  add_foreign_key "restock_tasks", "ingredients"
+  add_foreign_key "restock_tasks", "low_stock_requests"
+  add_foreign_key "restock_tasks", "waste_reports"
   add_foreign_key "reviews", "reservations"
   add_foreign_key "reviews", "users"
+  add_foreign_key "stock_transactions", "ingredients"
+  add_foreign_key "stock_transactions", "users"
   add_foreign_key "tables", "areas"
   add_foreign_key "tables", "table_types"
   add_foreign_key "users", "member_tiers"
+  add_foreign_key "waste_reports", "ingredients"
+  add_foreign_key "waste_reports", "users"
+  add_foreign_key "waste_reports", "users", column: "reviewed_by_id"
 end

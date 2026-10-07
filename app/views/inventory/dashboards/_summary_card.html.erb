@@ -1,0 +1,22 @@
+<%# locals: count:, label:, color: ("slate"|"amber"|"red"|"blue"|"green"), path:, hint: nil %>
+<%
+  color_classes = {
+    "slate" => { ring: "border-[#d7b9b2]", dot: "bg-slate-400", number: "text-[#2f1f1d]" },
+    "green" => { ring: "border-[#bcd8c3]", dot: "bg-green-500", number: "text-green-700" },
+    "amber" => { ring: "border-[#e6c98a]", dot: "bg-amber-400", number: "text-amber-700" },
+    "red"   => { ring: "border-[#e3a8a3]", dot: "bg-red-500",   number: "text-red-700" },
+    "blue"  => { ring: "border-[#a9c4e8]", dot: "bg-blue-500",  number: "text-blue-700" }
+  }
+  style = color_classes.fetch(color.to_s, color_classes["slate"])
+%>
+<%= link_to path, class: "block rounded-[16px] border #{style[:ring]} bg-[#f8f3f1] p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" do %>
+  <div class="flex items-center gap-2">
+    <span class="inline-block h-2.5 w-2.5 rounded-full <%= style[:dot] %>"></span>
+    <p class="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#9b6a63]"><%= label %></p>
+  </div>
+  <p class="mt-2 font-serif text-[2.25rem] font-semibold leading-none <%= style[:number] %>"><%= count %></p>
+  <% if hint.present? %>
+    <p class="mt-2 text-sm text-[#7a5a56]"><%= hint %></p>
+  <% end %>
+  <p class="mt-3 text-sm font-semibold text-[#7b1f2a]">View &rarr;</p>
+<% end %>

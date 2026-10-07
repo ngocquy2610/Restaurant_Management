@@ -1,0 +1,53 @@
+<% content_for :title, "Kitchen Overview" %>
+<div class="min-h-screen bg-[#f4e6e2] pt-[5.25rem] text-[#2f1f1d]">
+  <div class="flex min-h-screen">
+    <%= render "layouts/kitchen_sidebar" %>
+    <main class="flex-1 bg-[#f6efee] px-8 py-6">
+      <div class="mx-auto max-w-[1260px]">
+        <%= render "layouts/flash" %>
+        <h2 class="font-serif text-[3rem] leading-none tracking-[-0.06em]">Kitchen Overview</h2>
+        <p class="mt-3 text-[1.05rem] text-[#7a5a56]">Your requests and waste reports.</p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <%= link_to "New low stock request", new_kitchen_low_stock_request_path, class: "rounded-md bg-[#7b1f2a] px-5 py-3 font-semibold text-white hover:bg-[#661a23]" %>
+          <%= link_to "New waste report", new_kitchen_waste_report_path, class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+        </div>
+        <div class="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <section class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-6 shadow-sm">
+            <div class="mb-4 flex items-center justify-between">
+              <h3 class="font-serif text-[1.4rem] font-semibold">My requests</h3>
+              <%= link_to "All", kitchen_low_stock_requests_path, class: "text-sm font-semibold text-[#7b1f2a] hover:underline" %>
+            </div>
+            <% if @my_requests.any? %>
+              <ul class="divide-y divide-[#e4d6d2]">
+                <% @my_requests.first(8).each do |request| %>
+                  <li class="flex items-center justify-between gap-3 py-3">
+                    <div><p class="font-semibold"><%= link_to request.ingredient.name, kitchen_low_stock_request_path(request), class: "hover:underline" %></p>
+                    <p class="text-sm text-[#7a5a56]"><%= inventory_time(request.created_at) %></p></div>
+                    <%= low_stock_request_status_badge(request.status) %>
+                  </li>
+                <% end %>
+              </ul>
+            <% else %><p class="rounded-md bg-[#f1e3df] px-4 py-3 text-sm text-[#7a5a56]">No requests yet.</p><% end %>
+          </section>
+          <section class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-6 shadow-sm">
+            <div class="mb-4 flex items-center justify-between">
+              <h3 class="font-serif text-[1.4rem] font-semibold">My waste reports</h3>
+              <%= link_to "All", kitchen_waste_reports_path, class: "text-sm font-semibold text-[#7b1f2a] hover:underline" %>
+            </div>
+            <% if @my_reports.any? %>
+              <ul class="divide-y divide-[#e4d6d2]">
+                <% @my_reports.first(8).each do |report| %>
+                  <li class="flex items-center justify-between gap-3 py-3">
+                    <div><p class="font-semibold"><%= link_to report.ingredient.name, kitchen_waste_report_path(report), class: "hover:underline" %></p>
+                    <p class="text-sm text-[#7a5a56]"><%= inventory_quantity(report.quantity, report.ingredient.unit) %> · <%= inventory_time(report.created_at) %></p></div>
+                    <%= waste_report_status_badge(report.status) %>
+                  </li>
+                <% end %>
+              </ul>
+            <% else %><p class="rounded-md bg-[#f1e3df] px-4 py-3 text-sm text-[#7a5a56]">No reports yet.</p><% end %>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

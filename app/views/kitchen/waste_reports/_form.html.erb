@@ -1,0 +1,24 @@
+<%= form_with(model: [:kitchen, waste_report], class: "space-y-6") do |form| %>
+  <% if waste_report.errors.any? %>
+    <div class="rounded-md border border-[#e5b3ad] bg-[#fbe9e6] px-4 py-3 text-[#8f1f2a]">
+      <ul class="list-disc pl-5">
+        <% waste_report.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <div>
+    <%= form.label :ingredient_id, "Ingredient", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+    <%= form.collection_select :ingredient_id, ingredients, :id, :name, { prompt: "Select an ingredient" }, class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3" %>
+  </div>
+  <div>
+    <%= form.label :quantity, "Quantity wasted", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+    <%= form.number_field :quantity, step: 0.01, min: 0.01, placeholder: "0.00", class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3" %>
+  </div>
+  <div>
+    <%= form.label :reason, "Reason", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+    <%= form.text_area :reason, rows: 3, placeholder: "e.g. Spoiled overnight, dropped tray", class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3" %>
+  </div>
+  <%= form.submit "Submit report", class: "cursor-pointer rounded-md bg-[#7b1f2a] px-5 py-3 font-semibold text-white hover:bg-[#661a23]" %>
+<% end %>

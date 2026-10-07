@@ -82,6 +82,12 @@
             <%= link_to "Customer queue", admin_customer_queues_path, class: "block px-4 py-2 text-sm text-gray-800 hover:bg-amber-50" %>
             <%= link_to "Kitchen queue", admin_kitchen_queues_path, class: "block px-4 py-2 text-sm text-gray-800 hover:bg-amber-50" %>
           <% end %>
+          <% if current_user.inventory_manager? %>
+            <%= link_to "Inventory console", inventory_root_path, class: "block px-4 py-2 text-sm text-gray-800 hover:bg-amber-50" %>
+          <% end %>
+          <% if current_user.kitchen_staff? %>
+            <%= link_to "Kitchen requests", kitchen_root_path, class: "block px-4 py-2 text-sm text-gray-800 hover:bg-amber-50" %>
+          <% end %>
           <% if current_user.kitchen_staff? %>
             <%= link_to "Kitchen queue", admin_kitchen_queues_path, class: "block px-4 py-2 text-sm text-gray-800 hover:bg-amber-50" %>
           <% end %>

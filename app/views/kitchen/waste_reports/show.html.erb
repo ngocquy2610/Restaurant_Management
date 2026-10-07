@@ -1,0 +1,23 @@
+<% content_for :title, "Waste Report ##{@waste_report.id}" %>
+<div class="min-h-screen bg-[#f4e6e2] pt-[5.25rem] text-[#2f1f1d]">
+  <div class="flex min-h-screen">
+    <%= render "layouts/kitchen_sidebar" %>
+    <main class="flex-1 bg-[#f6efee] px-8 py-6">
+      <div class="mx-auto max-w-[900px]">
+        <%= render "layouts/flash" %>
+        <%= link_to "Back to reports", kitchen_waste_reports_path, class: "text-sm font-semibold text-[#7b1f2a] hover:underline" %>
+        <h2 class="mt-3 font-serif text-[2.6rem] leading-none">Waste #<%= @waste_report.id %></h2>
+        <dl class="mt-6 space-y-3 rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-6 shadow-sm">
+          <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Ingredient</dt><dd class="font-semibold"><%= @waste_report.ingredient.name %></dd></div>
+          <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Quantity</dt><dd class="font-semibold"><%= inventory_quantity(@waste_report.quantity, @waste_report.ingredient.unit) %></dd></div>
+          <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Verified</dt><dd class="font-semibold"><%= @waste_report.verified_quantity.present? ? inventory_quantity(@waste_report.verified_quantity, @waste_report.ingredient.unit) : "—" %></dd></div>
+          <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Status</dt><dd><%= waste_report_status_badge(@waste_report.status) %></dd></div>
+          <div><dt class="text-[#7a5a56]">Reason</dt><dd class="mt-1 rounded-md bg-[#f1e3df] px-4 py-3 text-sm"><%= @waste_report.reason %></dd></div>
+          <% if @waste_report.review_note.present? %>
+            <div><dt class="text-[#7a5a56]">Review note</dt><dd class="mt-1 rounded-md bg-[#f1e3df] px-4 py-3 text-sm"><%= @waste_report.review_note %></dd></div>
+          <% end %>
+        </dl>
+      </div>
+    </main>
+  </div>
+</div>

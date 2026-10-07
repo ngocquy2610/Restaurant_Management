@@ -15,6 +15,8 @@ class User < ApplicationRecord
   has_one_attached :avatar
   has_many :reservations, dependent: :destroy
   has_many :notifications, foreign_key: :recipient_id, dependent: :destroy, inverse_of: :recipient
+  has_many :stock_transactions, dependent: :nullify
+  has_many :waste_reports, dependent: :nullify
 
   validate :avatar_type_and_size
 

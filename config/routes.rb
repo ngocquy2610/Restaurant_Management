@@ -5,6 +5,34 @@ Rails.application.routes.draw do
     mount Sidekiq::Web => "/sidekiq"
   end
 
+  namespace :inventory do
+    root "dashboards#index"
+
+    resources :reports
+    resources :stock_transactions, only: %i[index show]
+    resources :restock_tasks, only: %i[index show] do
+      member do
+        get   :refill
+        patch :complete
+      end
+    end
+    resources :low_stock_requests, only: %i[index show] do
+      member { patch :review }
+    end
+    resources :waste_reports, only: %i[index show] do
+      member { patch :verify }
+    end
+
+    resources :stock_adjustments, only: %i[new create]
+  end
+
+  namespace :kitchen do
+    root "dashboards#index"
+
+    resources :low_stock_requests, only: %i[index show new create]
+    resources :waste_reports, only: %i[index show new create]
+  end
+
   resources :reviews, only: %i[ index show new create edit update destroy ] do
     collection do
       get :restaurant
@@ -58,7 +86,12 @@ Rails.application.routes.draw do
   resources :food_variants
   resources :recipe_items, only: [:new, :edit, :create, :update, :destroy]
 
-  resources :ingredients, except: [:show]
+  resources :ingredients do
+    member do
+      patch :deactivate
+      patch :reactivate
+    end
+  end
 
   resources :reservations do
     member do

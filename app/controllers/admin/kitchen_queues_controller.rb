@@ -83,7 +83,7 @@ class Admin::KitchenQueuesController < ApplicationController
 
     totals.values.map do |entry|
       ingredient = entry[:ingredient]
-      stock = ingredient&.current_stock.to_d
+      stock = ingredient&.current_quantity.to_d
       threshold = ingredient&.low_stock_threshold.to_d
       entry.merge(low_stock: ingredient.present? && stock <= threshold)
     end.sort_by { |e| e[:ingredient]&.name.to_s }

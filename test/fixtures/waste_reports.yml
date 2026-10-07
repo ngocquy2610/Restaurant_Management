@@ -1,0 +1,16 @@
+pending_waste:
+  ingredient: one
+  user: kitchen_staff
+  quantity: 1.50
+  reason: Spoiled overnight
+  status: 0
+
+approved_waste:
+  ingredient: two
+  user: kitchen_staff
+  quantity: 1.00
+  verified_quantity: 0.80
+  reason: Dropped tray
+  status: 1
+  reviewed_by: one
+  reviewed_at: 2026-09-29 11:00:00

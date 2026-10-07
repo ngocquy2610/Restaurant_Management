@@ -11,6 +11,10 @@ class IngredientPolicy < ApplicationPolicy
     user.admin? || user.inventory_manager?
   end
 
+  def deactivate? = update?
+
+  def reactivate? = update?
+
   def update?
     user.admin? || user.inventory_manager?
   end
