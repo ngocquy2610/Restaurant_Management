@@ -1,0 +1,167 @@
+<%# Our Story — static page %>
+
+<div class="pt-20 bg-[#f4e6e2] text-[#2f1f1d]">
+
+<%# ── HERO ──────────────────────────────────────────────── %>
+<section class="relative h-[500px] w-full overflow-hidden sm:h-[580px]">
+  <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('/Fine-dining-in-Hanoi-01_1687944552.webp');"></div>
+  <div class="absolute inset-0 bg-gradient-to-t from-[#2f1f1d]/90 via-[#2f1f1d]/40 to-transparent"></div>
+
+  <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+    <p class="text-sm font-semibold uppercase tracking-[0.3em] text-[#e8c9c2]">Est. 2018 · Paris-inspired</p>
+    <h1 class="mt-4 font-serif text-4xl font-bold leading-tight text-white drop-shadow-lg sm:text-6xl">
+      Our Story
+    </h1>
+    <div class="mt-5 h-0.5 w-20 bg-[#e8c9c2] rounded-full"></div>
+    <p class="mt-5 max-w-xl text-lg text-[#f1e3df]/90 leading-relaxed">
+      A journey of passion, heritage, and the timeless art of French fine dining.
+    </p>
+  </div>
+</section>
+
+<%# ── FOUNDING ──────────────────────────────────────────── %>
+<section class="bg-[#f8f3f1]">
+  <div class="mx-auto grid w-full max-w-[1200px] items-center gap-12 px-6 py-20 sm:px-10 md:grid-cols-2">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-[0.28em] text-[#8f1f2a]">How it began</p>
+      <h2 class="mt-3 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">Born From a Lifelong Dream</h2>
+      <div class="mt-4 h-1 w-16 rounded-full bg-[#8f1f2a]"></div>
+      <p class="mt-7 leading-relaxed text-[#5c443f]">
+        Lumière Dining was founded in 2018 by Chef Élise Moreau, a native of Lyon who fell in love with Vietnamese
+        ingredients during a culinary residency in Hà Nội. Struck by the way fresh herbs, slow-simmered broths, and
+        communal tables mirrored the spirit of a French countryside kitchen, she resolved to weave both traditions
+        into a single dining experience.
+      </p>
+      <p class="mt-4 leading-relaxed text-[#5c443f]">
+        What started as an intimate 20-seat bistro hidden down a lantern-lit alley has grown into a beloved destination —
+        yet the soul of that first evening, candles low and laughter high, remains unchanged.
+      </p>
+    </div>
+
+    <div class="relative">
+      <div class="aspect-[4/3] w-full overflow-hidden rounded-[16px] shadow-xl">
+        <%= image_tag "/Fine-dining-in-Hanoi-banner.jpg", class: "h-full w-full object-cover", alt: "Founding kitchen" %>
+      </div>
+      <div class="absolute -bottom-4 -right-4 rounded-[12px] bg-[#8f1f2a] px-6 py-4 text-white shadow-lg">
+        <p class="font-serif text-3xl font-bold">2018</p>
+        <p class="mt-0.5 text-xs font-semibold uppercase tracking-widest text-[#f1c9c4]">Year Founded</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%# ── VALUES ────────────────────────────────────────────── %>
+<section class="bg-[#f4e6e2]">
+  <div class="mx-auto w-full max-w-[1200px] px-6 py-20 sm:px-10">
+    <div class="text-center">
+      <p class="text-xs font-semibold uppercase tracking-[0.28em] text-[#8f1f2a]">What we stand for</p>
+      <h2 class="mt-3 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">Our Pillars</h2>
+    </div>
+
+    <div class="mt-14 grid gap-8 sm:grid-cols-3">
+      <% [
+        { icon: "🌿", title: "Farm-to-Table",
+          body: "Every ingredient travels the shortest path — from the hands of local farmers to your plate. We partner with twelve family farms within 50 km of the city." },
+        { icon: "👨‍🍳", title: "Craft & Technique",
+          body: "Our kitchen blends classical French technique with the bold aromatics of Southeast Asian cooking, producing flavors that feel both familiar and beautifully new." },
+        { icon: "🕯️", title: "Warm Hospitality",
+          body: "A meal at Lumière is a memory waiting to be made. Our team is trained not to serve, but to welcome — every guest is family at our table." }
+      ].each do |pillar| %>
+        <div class="rounded-[16px] border border-[#e3cdc8] bg-white p-8 text-center shadow-sm">
+          <span class="text-5xl"><%= pillar[:icon] %></span>
+          <h3 class="mt-5 font-serif text-xl font-semibold"><%= pillar[:title] %></h3>
+          <p class="mt-3 text-sm leading-relaxed text-[#7a5a56]"><%= pillar[:body] %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<%# ── CHEF PROFILE ───────────────────────────────────────── %>
+<section class="bg-[#f8f3f1]">
+  <div class="mx-auto grid w-full max-w-[1200px] items-center gap-12 px-6 py-20 sm:px-10 md:grid-cols-2">
+    <div class="order-2 md:order-1">
+      <p class="text-xs font-semibold uppercase tracking-[0.28em] text-[#8f1f2a]">The Visionary</p>
+      <h2 class="mt-3 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">Chef Élise Moreau</h2>
+      <div class="mt-4 h-1 w-16 rounded-full bg-[#8f1f2a]"></div>
+      <p class="mt-7 leading-relaxed text-[#5c443f]">
+        Trained at the Institut Paul Bocuse in Lyon and mentored by Michelin-starred chefs across Paris and Tokyo,
+        Élise spent a decade refining her craft before following her heart to Southeast Asia.
+      </p>
+      <p class="mt-4 leading-relaxed text-[#5c443f]">
+        Her cooking philosophy is simple: <em>"Food is how we say I love you without words."</em>
+        Every tasting menu she designs tells a story — of seasons, of travel, and of the people who grew each ingredient.
+      </p>
+
+      <div class="mt-8 flex gap-8">
+        <% [["12+", "Years cooking"], ["3", "Culinary Awards"], ["200+", "Seasonal dishes crafted"]].each do |stat| %>
+          <div class="text-center">
+            <p class="font-serif text-3xl font-bold text-[#8f1f2a]"><%= stat[0] %></p>
+            <p class="mt-1 text-xs uppercase tracking-widest text-[#7a5a56]"><%= stat[1] %></p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="order-1 md:order-2">
+      <div class="aspect-[3/4] w-full overflow-hidden rounded-[16px] shadow-xl">
+        <%= image_tag "/Fine-dining-in-Hanoi-04_1687944496.webp", class: "h-full w-full object-cover", alt: "Chef Élise Moreau" %>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%# ── TIMELINE ────────────────────────────────────────────── %>
+<section class="bg-[#2f1f1d] text-white">
+  <div class="mx-auto w-full max-w-[800px] px-6 py-20 sm:px-10">
+    <div class="text-center">
+      <p class="text-xs font-semibold uppercase tracking-[0.28em] text-[#e8c9c2]">The milestones</p>
+      <h2 class="mt-3 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">Our Journey</h2>
+    </div>
+
+    <ol class="relative mt-14 border-l border-[#5c3a35]">
+      <% [
+        { year: "2018", title: "Doors Open",
+          body: "A 20-seat bistro launches in a quiet alley, serving a single 5-course tasting menu each evening." },
+        { year: "2019", title: "Recognition",
+          body: "Named 'Best New Restaurant' by the city's leading culinary guide. Waiting list grows to six weeks." },
+        { year: "2021", title: "Through the Storm",
+          body: "The pandemic pauses dining. We pivot to chef-curated meal kits and free community meals for frontline workers." },
+        { year: "2023", title: "Grand Expansion",
+          body: "A full renovation doubles capacity and introduces The Cellar, a private dining room for intimate gatherings." },
+        { year: "2025", title: "Today",
+          body: "More than 50,000 guests served, countless memories made — and the best chapters yet to be written." }
+      ].each do |event| %>
+        <li class="mb-10 ml-8">
+          <span class="absolute -left-3.5 flex h-7 w-7 items-center justify-center rounded-full bg-[#8f1f2a] ring-4 ring-[#2f1f1d]">
+            <svg class="h-3 w-3 text-white" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="5"/></svg>
+          </span>
+          <p class="text-xs font-semibold uppercase tracking-widest text-[#e8c9c2]"><%= event[:year] %></p>
+          <h3 class="mt-1 font-serif text-xl font-semibold"><%= event[:title] %></h3>
+          <p class="mt-2 text-sm leading-relaxed text-[#c9a8a1]"><%= event[:body] %></p>
+        </li>
+      <% end %>
+    </ol>
+  </div>
+</section>
+
+<%# ── CTA ────────────────────────────────────────────────── %>
+<section class="bg-[#f8f3f1]">
+  <div class="mx-auto w-full max-w-[1200px] px-6 py-20 sm:px-10 text-center">
+    <h2 class="font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
+      Be Part of the Story
+    </h2>
+    <p class="mt-4 max-w-xl mx-auto text-[#7a5a56] leading-relaxed">
+      Every reservation, every shared dish, every moment of laughter adds a new page to our story.
+      We can't wait to write the next one with you.
+    </p>
+    <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
+      <%= link_to "Reserve a Table", reservations_path,
+            class: "inline-block rounded-sm bg-[#8f1f2a] px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-lg transition hover:bg-[#7a1a23]" %>
+      <%= link_to "View Our Menu", menus_path,
+            class: "inline-block rounded-sm border border-[#8f1f2a] px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-[#8f1f2a] transition hover:bg-[#8f1f2a] hover:text-white" %>
+    </div>
+  </div>
+</section>
+
+</div><%# /pt-20 wrapper %>
