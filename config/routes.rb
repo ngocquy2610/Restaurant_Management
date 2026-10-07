@@ -134,6 +134,8 @@ Rails.application.routes.draw do
     root to: 'home#index', as: :authenticated_root
   end
   root to: 'home#index'
+  get "our-story", to: "home#our_story", as: :our_story
+
   
   get 'admin/users', to: "users#index"
   get 'admin/dashboards', to: "dashboards#index"

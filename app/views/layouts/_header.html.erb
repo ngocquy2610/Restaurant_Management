@@ -2,7 +2,7 @@
   <span class="text-[#8F000D] font-serif text-3xl font-bold"><%= link_to "Lumière Dining", root_path%></span>
   <div class="flex gap-10 text-black">
     <%= link_to "Menu", menus_path %>
-    <a href="#">Our Story</a>
+    <%= link_to "Our Story", our_story_path %>
     <%= link_to "Reviews", reviews_path %>
     <%= link_to "Reservation", reservations_path %>
     <% if current_user && !current_user.customer? %>

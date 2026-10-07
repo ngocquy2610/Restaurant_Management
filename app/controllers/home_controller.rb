@@ -12,4 +12,7 @@ class HomeController < ApplicationController
                           .order(created_at: :desc)
                           .limit(3)
   end
+
+  def our_story
+  end
 end
