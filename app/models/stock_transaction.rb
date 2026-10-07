@@ -22,9 +22,9 @@ class StockTransaction < ApplicationRecord
 
   def signed_quantity
     case transaction_type.to_sym
-    when :stock_in          then  quantity.to_d
+    when :stock_in then  quantity.to_d
     when :stock_out, :waste then -quantity.to_d
-    else                         quantity.to_d
+    else quantity.to_d
     end
   end
 

@@ -12,4 +12,16 @@ class Inventory::ReportsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
   end
+
+  test "build_report_summary aggregates stock health and totals" do
+    controller = Inventory::ReportsController.new
+    controller.instance_variable_set(:@ingredients, Ingredient.active)
+
+    summary = controller.send(:build_report_summary)
+
+    assert_equal 2, summary[:total_ingredients]
+    assert_operator summary[:total_stock_value].to_d, :>, 0
+    assert_equal 1, summary[:low_stock_count]
+    assert_equal 0, summary[:out_of_stock_count]
+  end
 end
