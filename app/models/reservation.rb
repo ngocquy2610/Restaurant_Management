@@ -24,6 +24,7 @@ class Reservation < ApplicationRecord
   after_create  :sync_table_status
   after_update  :sync_table_status, if: -> { saved_change_to_status? || saved_change_to_table_id? }
   after_destroy :sync_table_status
+  after_update :enqueue_confirmation_email, if: :status_changed_to_approved?
 
   validate :table_must_not_be_double_booked
   validate :table_must_be_bookable
@@ -150,5 +151,13 @@ class Reservation < ApplicationRecord
 
   def self.ranges_overlap?(a, b)
     a.begin < b.end && b.begin < a.end
+  end
+
+  def enqueue_confirmation_email
+    ReservationConfirmationJob.perform_later(id)
+  end
+
+  def status_changed_to_approved?
+    saved_change_to_status? && approved?
   end
 end

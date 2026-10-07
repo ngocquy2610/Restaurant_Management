@@ -45,7 +45,7 @@ class Admin::KitchenQueuesController < ApplicationController
   # Keep the chef on the order detail page when the action comes from there,
   # otherwise fall back to the queue board.
   def redirect_target_after_update
-    if params[:kitchen_queue_id].present?
+    if params[:from] == "show" && params[:kitchen_queue_id].present?
       admin_kitchen_queue_path(params[:kitchen_queue_id])
     else
       admin_kitchen_queues_path
