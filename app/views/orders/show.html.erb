@@ -15,6 +15,7 @@
       </div>
       <div class="flex items-center gap-3">
         <%= order_status_badge(@order.status) %>
+        <%= link_to "Back to dashboard", admin_dashboards_path, class: "inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50" %>
         <% if policy(@order).edit? %>
           <%= link_to "Edit order", edit_order_path(@order), class: "inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-700 transition hover:bg-gray-50" %>
         <% end %>

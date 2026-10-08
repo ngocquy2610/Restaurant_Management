@@ -76,6 +76,8 @@ class OrdersControllerTest < ActionDispatch::IntegrationTest
   test "should show order" do
     get order_url(@order)
     assert_response :success
+    assert_select "a[href='/admin/dashboards']", text: /Back to dashboard/i
+    assert_select "input[type='submit'][value='Create payment']", count: 1
   end
 
   test "should update order status" do

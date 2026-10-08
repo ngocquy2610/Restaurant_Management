@@ -61,6 +61,9 @@ Rails.application.routes.draw do
 
   resources :reservations do
     resources :preorders, only: %i[ new create ]
+    member do
+      patch :update_status
+    end
   end
   resources :preorders, only: %i[ show index destroy ] do
     member do
@@ -73,11 +76,9 @@ Rails.application.routes.draw do
       patch :mark_all_read
     end
   end
-  resources :reservations
   resources :promotions
   resources :menus, only: [:index, :show]
   resources :categories
-  resources :foods
 
   resources :foods do
     resources :recipe_items, only: [:new, :edit, :create, :update, :destroy], shallow: true
@@ -93,13 +94,6 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :reservations do
-    member do
-      patch :update_status
-    end
-  end
-
-  
   resources :tables
   resources :table_types
   # Public read-only floor-map viewer (single area at a time). Editing/drag-drop
@@ -135,8 +129,11 @@ Rails.application.routes.draw do
   end
   root to: 'home#index'
   get "our-story", to: "home#our_story", as: :our_story
+  get "contact-us", to: "home#contact_us", as: :contact_us
+  get "careers", to: "home#careers", as: :careers
+  get "privacy-policy", to: "home#privacy_policy", as: :privacy_policy
+  get "terms-of-service", to: "home#terms_of_service", as: :terms_of_service
 
-  
   get 'admin/users', to: "users#index"
   get 'admin/dashboards', to: "dashboards#index"
 # Admin/receptionist reservation review and confirmation (separate from the
