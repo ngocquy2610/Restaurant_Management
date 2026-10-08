@@ -1,0 +1,12 @@
+Reservation Confirm
+
+Hello <%= @user&.email || @reservation.guest_name %>,
+
+Your reservation in Lumière Dining was success. Please check the information below.
+
+- Customer: <%= @reservation.guest_name %>
+- Date: <%= @reservation.reservation_date %>
+- Time: <%= @reservation.reservation_time.strftime("%H:%M") %>
+- Table: <%= @table.table_number %>
+
+Thank you for making a reservation at our restaurant. Enjoy your meal!

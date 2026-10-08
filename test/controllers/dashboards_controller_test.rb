@@ -13,6 +13,14 @@ class DashboardsControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href='/promotions']", text: /Promotions/i
   end
 
+  test "admin dashboard uses a real reports navigation link instead of a dead anchor" do
+    get admin_dashboards_url
+    assert_response :success
+
+    assert_select "a[href='/inventory/reports']", text: /Reports/i
+    assert_select "a[href='#']", false
+  end
+
   test "recent reservations shows active reservations from the database" do
     get admin_dashboards_url
     assert_response :success

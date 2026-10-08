@@ -15,4 +15,16 @@ class HomeController < ApplicationController
 
   def our_story
   end
+
+  def contact_us
+  end
+
+  def careers
+  end
+
+  def privacy_policy
+  end
+
+  def terms_of_service
+  end
 end

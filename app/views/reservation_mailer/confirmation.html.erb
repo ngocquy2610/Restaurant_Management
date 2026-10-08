@@ -1,0 +1,14 @@
+<h2>Reservation Confirm</h2>
+
+<p>Hello <%= @user&.email || @reservation.guest_name %>,</p>
+
+<p>Your reservation in Lumière Dining was success. Please check the information below.</p>
+
+<ul>
+  <li>Customer: <%= @reservation.guest_name %></li>
+  <li>Date: <%= @reservation.reservation_date %></li>
+  <li>Time: <%= @reservation.reservation_time.strftime("%H:%M") %></li>
+  <li>Table: <%= @table.table_number %></li>
+</ul>
+
+<p>Thank you for making a reservation at our restaurant. Enjoy your meal!</p>

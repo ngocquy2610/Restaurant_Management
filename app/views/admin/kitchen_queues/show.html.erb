@@ -65,7 +65,7 @@
                   <%= order_item_status_badge(item.status) %>
                   <div class="flex flex-wrap justify-end gap-2">
                     <% order_item_next_statuses(item.status).each do |ns| %>
-                      <%= button_to ns.to_s.humanize, admin_kitchen_queue_update_item_status_path(@order, item), method: :patch, params: { order_item: { status: ns } }, class: "cursor-pointer inline-flex rounded-full px-3 py-1.5 text-xs font-semibold bg-[#8A1C2B] text-white hover:bg-[#6d1420]" %>
+                      <%= button_to ns.to_s.humanize, admin_kitchen_queue_update_item_status_path(@order, item), method: :patch, params: { order_item: { status: ns }, from: "show" }, class: "cursor-pointer inline-flex rounded-full px-3 py-1.5 text-xs font-semibold bg-[#8A1C2B] text-white hover:bg-[#6d1420]" %>
                     <% end %>
                   </div>
                 </div>

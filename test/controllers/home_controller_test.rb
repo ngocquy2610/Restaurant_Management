@@ -90,4 +90,22 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "button[data-action='promo-slider#next']", 0
     assert_select "button[data-action='promo-slider#prev']", 0
   end
+
+  test "renders static footer pages" do
+    get contact_us_url
+    assert_response :success
+    assert_match "Contact Us", response.body
+
+    get careers_url
+    assert_response :success
+    assert_match "Careers", response.body
+
+    get privacy_policy_url
+    assert_response :success
+    assert_match "Privacy Policy", response.body
+
+    get terms_of_service_url
+    assert_response :success
+    assert_match "Terms of Service", response.body
+  end
 end
