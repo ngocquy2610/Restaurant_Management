@@ -21,10 +21,7 @@
     <%= render @review %>
 
     <div class="flex flex-wrap items-center gap-3">
-      <% if @review.restaurant? %>
-        <%= link_to "See all restaurant reviews", reviews_path(type: "restaurant"),
-              class: "inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-[#8A1C2B] hover:text-[#8A1C2B]" %>
-      <% elsif @review.reservation.present? %>
+      <% if @review.reservation.present? %>
         <%= link_to "Back to reservation ##{@review.reservation.id}", reservation_path(@review.reservation),
               class: "inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-[#8A1C2B] hover:text-[#8A1C2B]" %>
       <% end %>

@@ -21,11 +21,10 @@ class ReviewTest < ActiveSupport::TestCase
     Reservation.create!(defaults.merge(overrides))
   end
 
-  test "defaults to a meal review and derives the customer from the reservation" do
+  test "derives the customer and the visit label from the reservation" do
     reservation = completed_reservation
     review = Review.create!(reservation: reservation, rating: 5, comment: "Excellent")
 
-    assert review.meal?
     assert_equal reservation, review.reservation
     assert_equal @customer.id, review.user_id
     assert_equal @customer.full_name, review.reviewer_name
@@ -65,34 +64,21 @@ class ReviewTest < ActiveSupport::TestCase
     assert_not Review.new(reservation: reservation, rating: 4, comment: "a" * 1001).valid?
   end
 
-  test "a meal can only be reviewed once" do
+  test "a customer can leave only one restaurant review" do
     reservation = completed_reservation
     Review.create!(reservation: reservation, rating: 5, comment: "First")
 
-    duplicate = Review.new(reservation: reservation, rating: 3)
+    other_visit = completed_reservation(reservation_date: Date.current - 2)
+    duplicate = Review.new(reservation: other_visit, rating: 3)
     assert_not duplicate.valid?
-    assert_includes duplicate.errors[:base], "You have already reviewed this meal."
-  end
-
-  test "a customer may review a meal and the restaurant once each" do
-    reservation = completed_reservation
-    Review.create!(reservation: reservation, rating: 5)
-
-    restaurant = Review.new(reservation: reservation, review_type: :restaurant, rating: 4)
-    assert restaurant.valid?, restaurant.errors.full_messages.join(", ")
-    restaurant.save!
-
-    second = Review.new(reservation: reservation, review_type: :restaurant, rating: 2)
-    assert_not second.valid?
-    assert_includes second.errors[:base], "You have already reviewed the restaurant."
+    assert_includes duplicate.errors[:base], "You have already reviewed the restaurant."
   end
 
   test "another customer may still review the restaurant" do
-    reservation = completed_reservation
-    Review.create!(reservation: reservation, review_type: :restaurant, rating: 4)
+    Review.create!(reservation: completed_reservation, rating: 4)
 
-    other = completed_reservation(user: users(:one))
-    assert Review.new(reservation: other, review_type: :restaurant, rating: 5).valid?
+    other = completed_reservation(user: users(:waiter), reservation_date: Date.current - 2)
+    assert Review.new(reservation: other, rating: 5).valid?
   end
 
   test "pending, rejected, cancelled and upcoming visits cannot be reviewed" do
@@ -142,18 +128,20 @@ class ReviewTest < ActiveSupport::TestCase
     assert_includes review.errors[:user_id], "must match the reservation's customer"
   end
 
-  test "for_customer scopes by type and average_rating averages the scope" do
-    reservation = completed_reservation
-    Review.create!(reservation: reservation, rating: 5, comment: "Meal")
-    Review.create!(reservation: reservation, review_type: :restaurant, rating: 3, comment: "Room")
+  test "for_customer scopes by customer and average_rating averages the scope" do
+    Review.create!(reservation: completed_reservation, rating: 5, comment: "Meal")
+    Review.create!(
+      reservation: completed_reservation(user: users(:waiter), reservation_date: Date.current - 2),
+      rating: 3, comment: "Room"
+    )
 
-    assert_equal 1, Review.for_customer(@customer, :meal).count
-    assert_equal 1, Review.for_customer(@customer, :restaurant).count
-    assert_equal 0, Review.for_customer(users(:two), :meal).count
-    assert_in_delta 4.0, Review.average_rating(Review.where(reservation_id: reservation.id)), 0.01
+    assert_equal 1, Review.for_customer(@customer).count
+    assert_equal 1, Review.for_customer(users(:waiter)).count
+    assert_equal 0, Review.for_customer(users(:kitchen_staff)).count
+    assert_in_delta 4.0, Review.average_rating(Review.where(user_id: [@customer.id, users(:waiter).id])), 0.01
   end
 
-  test "the database rejects a second meal review for the same reservation" do
+  test "the database rejects a second review for the same customer" do
     reservation = completed_reservation
     Review.create!(reservation: reservation, rating: 4)
 
@@ -161,22 +149,7 @@ class ReviewTest < ActiveSupport::TestCase
       Review.transaction(requires_new: true) do
         Review.insert!({
           reservation_id: reservation.id, user_id: @customer.id,
-          review_type: 0, rating: 3,
-          created_at: Time.zone.now, updated_at: Time.zone.now
-        })
-      end
-    end
-  end
-
-  test "the database rejects a second restaurant review for the same customer" do
-    reservation = completed_reservation
-    Review.create!(reservation: reservation, review_type: :restaurant, rating: 4)
-
-    assert_raises(ActiveRecord::RecordNotUnique) do
-      Review.transaction(requires_new: true) do
-        Review.insert!({
-          reservation_id: reservation.id, user_id: @customer.id,
-          review_type: 1, rating: 5,
+          rating: 3,
           created_at: Time.zone.now, updated_at: Time.zone.now
         })
       end
@@ -189,8 +162,8 @@ class ReviewTest < ActiveSupport::TestCase
     assert_raises(ActiveRecord::StatementInvalid) do
       Review.transaction(requires_new: true) do
         Review.connection.execute(
-          "INSERT INTO reviews (reservation_id, review_type, rating, created_at, updated_at) " \
-          "VALUES (#{reservation.id}, 0, 9, NOW(), NOW())"
+          "INSERT INTO reviews (reservation_id, rating, created_at, updated_at) " \
+          "VALUES (#{reservation.id}, 9, NOW(), NOW())"
         )
       end
     end

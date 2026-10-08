@@ -6,8 +6,6 @@ class ReviewsController < ApplicationController
     authorize Review, :index?
 
     @scope = policy_scope(Review).visible
-    @scope = @scope.restaurant if params[:type] == "restaurant"
-    @scope = @scope.meal       if params[:type] == "meal"
 
     @average_rating = @scope.average(:rating)&.round(1)
     @review_count   = @scope.count
@@ -19,23 +17,21 @@ class ReviewsController < ApplicationController
   end
 
   def new
-    @review_type = resolved_review_type
-    @reservation = reservation_for(@review_type)
-
-    if @reservation.blank?
-      redirect_to reviews_path, alert: "You can leave a review once a visit is complete."
-      return
-    end
-
     # Already reviewed? Send the customer to the review they can still edit
     # instead of rendering a form that is bound to fail on submit.
-    existing = @review_type == :restaurant ? Review.for_customer(current_user, :restaurant).first : @reservation.meal_review
+    existing = Review.for_customer(current_user).first
     if existing.present?
       redirect_to existing, notice: "You have already submitted this review — you can edit or delete it below."
       return
     end
 
-    @review = Review.new(reservation: @reservation, review_type: @review_type)
+    @reservation = reservation_for_review
+    if @reservation.blank?
+      redirect_to reviews_path, alert: "You can leave a review once a visit is complete."
+      return
+    end
+
+    @review = Review.new(reservation: @reservation)
     authorize @review
   end
 
@@ -46,18 +42,17 @@ class ReviewsController < ApplicationController
       return
     end
 
-    redirect_to new_review_path(review_type: "restaurant", reservation_id: reservation.id)
+    redirect_to new_review_path(reservation_id: reservation.id)
   end
 
   def create
-    @review_type = resolved_review_type
-    @reservation = reservation_for(@review_type)
+    @reservation = reservation_for_review
 
     @review = Review.new(
       reservation: @reservation,
-      review_type: @review_type,
       rating: review_params[:rating],
-      comment: review_params[:comment]
+      comment: review_params[:comment],
+      image: review_params[:image]
     )
     authorize @review
 
@@ -67,7 +62,7 @@ class ReviewsController < ApplicationController
     else
       render :new, status: :unprocessable_content
     end
-  rescue ActiveRecord::RecordNotUnique   # double-submit race caught by the partial unique index
+  rescue ActiveRecord::RecordNotUnique   # double-submit race caught by the unique index
     @review.errors.add(:base, "This review has already been submitted.")
     render :new, status: :unprocessable_content
   end
@@ -78,6 +73,11 @@ class ReviewsController < ApplicationController
 
   def update
     authorize @review
+
+    if review_params[:image].present?
+      @review.image.attach(review_params[:image])
+    end
+
     if @review.update(rating: review_params[:rating], comment: review_params[:comment])
       redirect_to @review, notice: "Review updated.", status: :see_other
     else
@@ -98,31 +98,22 @@ class ReviewsController < ApplicationController
     @review = Review.find(params.expect(:id))
   end
 
-  # review_type is whitelisted → a tampered value can never raise an enum ArgumentError.
-  def resolved_review_type
-    type = (params.dig(:review, :review_type).presence || params[:review_type].presence || "meal").to_s
-    Review.review_types.key?(type) ? type.to_sym : :meal
-  end
+  # The visit the review is written against: the one the customer picked, or
+  # their most recent finished visit.
+  def reservation_for_review
+    id = params.dig(:review, :reservation_id).presence || params[:reservation_id]
+    return current_user.reservations.find_by(id: id) if id.present?
 
-  def reservation_for(type)
-    if type == :restaurant
-      Reservation.reviewable_for(current_user).first
-    else
-      id = params.dig(:review, :reservation_id).presence || params[:reservation_id]
-      current_user.reservations.find_by(id: id)
-    end
+    Reservation.reviewable_for(current_user).first
   end
 
   def review_params
-    params.require(:review).permit(:rating, :comment, :review_type, :reservation_id)
+    params.require(:review).permit(:rating, :comment, :reservation_id, :image)
   end
 
-  def after_write_path(review)
-    review.restaurant? ? reviews_path(type: "restaurant") : reservation_path(review.reservation)
-  end
+  def after_write_path(_review) = reviews_path
 
   def review_notification_body(review)
-    target = review.restaurant? ? "the restaurant" : "a meal at Table #{review.table&.table_number}"
-    "#{review.reviewer_name} rated #{review.rating}/5 for #{target} (#{review.meal_label})."
+    "#{review.reviewer_name} rated #{review.rating}/5 for the restaurant (#{review.meal_label})."
   end
 end

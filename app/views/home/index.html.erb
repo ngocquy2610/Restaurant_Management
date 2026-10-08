@@ -23,6 +23,8 @@
       </div>
 
       <% @promotions.each do |promo| %>
+        <% next unless promo.image.attached? %>
+
         <div data-promo-slider-target="slide" class="promo-slide">
           <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<%= url_for(promo.image) %>');"></div>
           <div class="absolute inset-0 bg-gradient-to-t from-[#2f1f1d]/90 via-[#2f1f1d]/35 to-transparent"></div>

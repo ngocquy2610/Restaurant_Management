@@ -30,7 +30,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
   # ---------- public wall ----------
 
   test "index is visible to signed out visitors" do
-    Review.create!(reservation: @reservation, review_type: :restaurant, rating: 4, comment: "Great room")
+    Review.create!(reservation: @reservation, rating: 4, comment: "Great room")
 
     get reviews_url
 
@@ -38,15 +38,20 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_match "Great room", response.body
   end
 
-  test "index can be filtered to restaurant reviews only" do
-    Review.create!(reservation: @reservation, rating: 5, comment: "Meal only")
-    Review.create!(reservation: @reservation, review_type: :restaurant, rating: 2, comment: "Room only")
+  test "the index mixes every review into one restaurant wall" do
+    Review.create!(reservation: @reservation, rating: 5, comment: "Room only")
+    other_visit = Reservation.create!(
+      user: users(:waiter), table: @other_table, guest_name: "Walk-in",
+      guest_phone: "0812345678", status: :completed,
+      reservation_date: Date.current - 2, reservation_time: "19:00"
+    )
+    Review.create!(reservation: other_visit, rating: 3, comment: "Second opinion")
 
-    get reviews_url(type: "restaurant")
+    get reviews_url
 
     assert_response :success
     assert_match "Room only", response.body
-    assert_no_match "Meal only", response.body
+    assert_match "Second opinion", response.body
   end
 
   test "show renders a review publicly" do
@@ -57,47 +62,66 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  # ---------- meal reviews ----------
+  # ---------- writing a review ----------
 
   test "a guest is sent to the login page when opening the review form" do
-    get new_review_url(reservation_id: @reservation.id, review_type: "meal")
+    get new_review_url
 
     assert_redirected_to new_user_session_path
   end
 
-  test "a customer can open the meal review form for their own finished visit" do
+  test "a customer can open the review form for their own finished visit" do
     sign_in @customer
 
-    get new_review_url(reservation_id: @reservation.id, review_type: "meal")
+    get new_review_url(reservation_id: @reservation.id)
 
     assert_response :success
-    assert_match "How was your meal?", response.body
+    assert_match "How was Lumière Dining?", response.body
   end
 
-  test "an already reviewed meal redirects to the existing review" do
+  test "an already reviewed customer is redirected to their existing review" do
     review = Review.create!(reservation: @reservation, rating: 4, comment: "Done")
     sign_in @customer
 
-    get new_review_url(reservation_id: @reservation.id, review_type: "meal")
+    get new_review_url(reservation_id: @reservation.id)
 
     assert_redirected_to review_path(review)
   end
 
-  test "creating a meal review attaches it to the reservation and its customer" do
+  test "creating a review attaches it to the reservation and its customer" do
     sign_in @customer
 
     assert_difference("Review.count") do
       post reviews_url, params: {
-        review: { reservation_id: @reservation.id, review_type: "meal", rating: 5, comment: "Delicious" }
+        review: { reservation_id: @reservation.id, rating: 5, comment: "Delicious" }
       }
     end
 
     review = Review.last
-    assert review.meal?
     assert_equal @reservation.id, review.reservation_id
     assert_equal @customer.id, review.user_id
     assert_equal 5, review.rating
-    assert_redirected_to reservation_path(@reservation)
+    assert_redirected_to reviews_path
+  end
+
+  test "creating a review accepts an uploaded photo" do
+    sign_in @customer
+
+    assert_difference("Review.count") do
+      post reviews_url, params: {
+        review: {
+          reservation_id: @reservation.id,
+          rating: 5,
+          comment: "Loved it",
+          image: fixture_file_upload("test/fixtures/files/avatar.png", "image/png")
+        }
+      }
+    end
+
+    review = Review.last
+    assert review.image.attached?
+    assert_equal "avatar.png", review.image.filename.to_s
+    assert_redirected_to reviews_path
   end
 
   test "an out of range rating is rejected" do
@@ -111,7 +135,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_select "#review_error_explanation"
   end
 
-  test "a second review for the same meal is rejected" do
+  test "a second review from the same customer is rejected" do
     Review.create!(reservation: @reservation, rating: 4, comment: "First")
     sign_in @customer
 
@@ -120,7 +144,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :unprocessable_content
-    assert_match "You have already reviewed this meal.", response.body
+    assert_match "You have already reviewed the restaurant.", response.body
   end
 
   test "a customer cannot review another customer's reservation" do
@@ -145,28 +169,27 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
-  # ---------- restaurant reviews ----------
+  # ---------- restaurant entry point ----------
 
   test "a customer can submit the one time restaurant review" do
     sign_in @customer
 
     assert_difference("Review.count") do
-      post reviews_url, params: { review: { review_type: "restaurant", rating: 5, comment: "Beautiful room" } }
+      post reviews_url, params: { review: { rating: 5, comment: "Beautiful room" } }
     end
 
     review = Review.last
-    assert review.restaurant?
     assert_equal @customer.id, review.user_id
     assert_equal @reservation.id, review.reservation_id
-    assert_redirected_to reviews_path(type: "restaurant")
+    assert_redirected_to reviews_path
   end
 
   test "the restaurant review can only be submitted once" do
-    Review.create!(reservation: @reservation, review_type: :restaurant, rating: 4)
+    Review.create!(reservation: @reservation, rating: 4)
     sign_in @customer
 
     assert_no_difference("Review.count") do
-      post reviews_url, params: { review: { review_type: "restaurant", rating: 5 } }
+      post reviews_url, params: { review: { rating: 5 } }
     end
 
     assert_response :unprocessable_content
@@ -177,7 +200,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     sign_in users(:waiter)   # no reservations at all
 
     assert_no_difference("Review.count") do
-      post reviews_url, params: { review: { review_type: "restaurant", rating: 5 } }
+      post reviews_url, params: { review: { rating: 5 } }
     end
 
     assert_response :forbidden
@@ -188,7 +211,7 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
 
     get restaurant_reviews_url
 
-    assert_redirected_to new_review_path(review_type: "restaurant", reservation_id: @reservation.id)
+    assert_redirected_to new_review_path(reservation_id: @reservation.id)
   end
 
   test "the restaurant entry point sends ineligible customers back to the wall" do

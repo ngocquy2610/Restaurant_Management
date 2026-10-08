@@ -1,9 +1,8 @@
 class Review < ApplicationRecord
   belongs_to :reservation
-
   belongs_to :customer, class_name: "User", foreign_key: :user_id, optional: true
 
-  enum :review_type, { meal: 0, restaurant: 1 }, default: :meal
+  has_one_attached :image
 
   before_validation :assign_customer, on: :create
 
@@ -12,13 +11,13 @@ class Review < ApplicationRecord
   validates :comment, length: { maximum: 1000 }, allow_blank: true
   validate  :customer_must_match_reservation
   validate  :reservation_must_be_reviewable, on: :create
-  validate  :no_duplicate_review
+  validate  :one_review_per_customer
 
   scope :recent,  -> { order(created_at: :desc) }
   # `customer` powers `reviewer_name` on every card, so it must be preloaded too.
   scope :visible, -> { includes(:customer, reservation: [:table, :user]) }
 
-  def self.for_customer(customer, type) = where(user_id: customer.id, review_type: type)
+  def self.for_customer(customer) = where(user_id: customer.id)
 
   def self.average_rating(scope = nil) = (scope || all).average(:rating)&.round(1)
 
@@ -53,17 +52,11 @@ class Review < ApplicationRecord
     errors.add(:reservation, "cannot be reviewed yet") unless reservation.reviewable?
   end
 
-  def no_duplicate_review
-    return if reservation.blank?
+  # Every customer gets exactly one restaurant review, ever.
+  def one_review_per_customer
+    return if user_id.blank?
+    return unless self.class.where(user_id: user_id).where.not(id: id).exists?
 
-    duplicate =
-      if restaurant?
-        user_id.present? && self.class.restaurant.where(user_id: user_id).where.not(id: id).exists?
-      else
-        self.class.meal.where(reservation_id: reservation_id).where.not(id: id).exists?
-      end
-
-    return unless duplicate
-    errors.add(:base, restaurant? ? "You have already reviewed the restaurant." : "You have already reviewed this meal.")
+    errors.add(:base, "You have already reviewed the restaurant.")
   end
 end

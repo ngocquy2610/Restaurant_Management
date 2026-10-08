@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_02_063740) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_08_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -284,14 +284,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_063740) do
     t.datetime "created_at", null: false
     t.integer "rating", null: false
     t.bigint "reservation_id", null: false
-    t.integer "review_type", default: 0, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id"
     t.index ["reservation_id"], name: "index_reviews_on_reservation_id"
-    t.index ["reservation_id"], name: "index_reviews_unique_meal_per_reservation", unique: true, where: "(review_type = 0)"
-    t.index ["review_type"], name: "index_reviews_on_review_type"
-    t.index ["user_id"], name: "index_reviews_on_user_id"
-    t.index ["user_id"], name: "index_reviews_unique_restaurant_per_customer", unique: true, where: "(review_type = 1)"
+    t.index ["user_id"], name: "index_reviews_on_user_id", unique: true
     t.check_constraint "rating >= 1 AND rating <= 5", name: "reviews_rating_range"
   end
 

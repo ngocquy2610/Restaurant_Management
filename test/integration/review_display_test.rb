@@ -18,23 +18,20 @@ class ReviewDisplayTest < ActionDispatch::IntegrationTest
     )
     @order = Order.create!(table: @table, reservation: @reservation, status: :completed)
 
-    @meal_review = Review.create!(reservation: @reservation, rating: 5, comment: "Superb tasting menu")
-    @restaurant_review = Review.create!(
-      reservation: @reservation, review_type: :restaurant, rating: 4, comment: "Elegant dining room"
-    )
+    @review = Review.create!(reservation: @reservation, rating: 5, comment: "Superb tasting menu")
   end
 
-  test "the reservation page shows the meal review for that visit" do
+  test "the reservation page shows the review for that visit" do
     sign_in @customer
 
     get reservation_path(@reservation)
 
     assert_response :success
-    assert_match "Your review of this meal", response.body
+    assert_match "Your review", response.body
     assert_match "Superb tasting menu", response.body
   end
 
-  test "the order page shows the meal review of its reservation" do
+  test "the order page shows the review of its reservation" do
     sign_in @customer
 
     get order_path(@order)
@@ -44,13 +41,12 @@ class ReviewDisplayTest < ActionDispatch::IntegrationTest
     assert_match "Superb tasting menu", response.body
   end
 
-  test "the public menu page shows the restaurant review wall only" do
+  test "the public menu page shows the review wall" do
     get menus_path
 
     assert_response :success
     assert_match "Guest reviews", response.body
-    assert_match "Elegant dining room", response.body
-    assert_no_match "Superb tasting menu", response.body
+    assert_match "Superb tasting menu", response.body
   end
 
   test "the customer profile marks the visit as reviewed" do
@@ -59,6 +55,6 @@ class ReviewDisplayTest < ActionDispatch::IntegrationTest
     get user_path(@customer)
 
     assert_response :success
-    assert_match "You reviewed this meal", response.body
+    assert_match "You reviewed the restaurant", response.body
   end
 end
