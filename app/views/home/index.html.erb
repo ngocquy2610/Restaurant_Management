@@ -43,7 +43,7 @@
                 <%= l(promo.start_date, format: :short) if promo.start_date %> - <%= l(promo.end_date, format: :short) if promo.end_date %>
               </p>
 
-              <%= link_to tables_path(), class: "mt-7 inline-flex items-center gap-2 rounded-sm bg-[#8f1f2a] px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-lg transition hover:bg-[#7a1a23]" do %>
+              <%= link_to reservations_path, class: "mt-7 inline-flex items-center gap-2 rounded-sm bg-[#8f1f2a] px-8 py-3.5 text-sm font-semibold uppercase tracking-[0.12em] text-white shadow-lg transition hover:bg-[#7a1a23]" do %>
                 Book a Table
                 <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
               <% end %>

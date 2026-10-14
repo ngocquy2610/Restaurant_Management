@@ -67,8 +67,12 @@
     <% end %>
 
     <div class="flex items-center gap-3">
-      <%= link_to "Edit this reservation", edit_reservation_path(@reservation), class: "inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50" %>
-      <%= button_to "Destroy this reservation", @reservation, method: :delete, form_class: "inline-block", class: "cursor-pointer rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500", data: { turbo_confirm: "Are you sure?" } %>
+      <% if policy(@reservation).update? %>
+        <%= link_to "Edit this reservation", edit_reservation_path(@reservation), class: "inline-flex items-center rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50" %>
+      <% end %>
+      <% if policy(@reservation).destroy? %>
+        <%= button_to "Destroy this reservation", @reservation, method: :delete, form_class: "inline-block", class: "cursor-pointer rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500", data: { turbo_confirm: "Are you sure?" } %>
+      <% end %>
     </div>
   </div>
 </div>

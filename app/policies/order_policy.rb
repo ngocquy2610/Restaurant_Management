@@ -16,11 +16,11 @@ class OrderPolicy < ApplicationPolicy
   end
 
   def update?
-    order_taker?
+    order_taker? && !record.completed?
   end
 
   def edit?
-    order_taker?
+    order_taker? && !record.completed?
   end
 
   def update_status?

@@ -1,5 +1,7 @@
 
 class ReservationPolicy < ApplicationPolicy
+  EDITABLE = %w[pending approved].freeze
+  
   def index?
     true
   end
@@ -13,11 +15,11 @@ class ReservationPolicy < ApplicationPolicy
   end
 
   def update?
-    owner?
+    staff? ? false : owner? && EDITABLE.include?(record.status)
   end
 
   def destroy?
-    owner?
+    update?
   end
 
   def update_status?

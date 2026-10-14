@@ -5,7 +5,7 @@
     <%= link_to "Our Story", our_story_path %>
     <%= link_to "Reviews", reviews_path %>
     <%= link_to "Reservation", reservations_path %>
-    <% if current_user && !current_user.customer? %>
+    <% if current_user && policy(Order).index? %>
       <%= link_to "Orders", orders_path %>
     <% end %>
   </div>

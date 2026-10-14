@@ -2,7 +2,7 @@
   # Small helper to format monetary values consistently (e.g. "$1,250.00").
   money = ->(value) { value.nil? ? "—" : number_to_currency(value) }
 %>
-<div class="relative"><%= render "layouts/header" %></div>
+
 <div class="min-h-screen bg-[#FBF0EC] py-10 px-4 pt-28">
   <div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
 
@@ -154,18 +154,6 @@
             <p class="mt-2 text-sm text-gray-500">Completed paid orders will appear here with invoice links.</p>
           </div>
         <% end %>
-      </div>
-
-      <!-- Culinary favorites - PLACEHOLDER -->
-      <div>
-        <h2 class="font-serif text-xl text-gray-900 border-b border-gray-200 pb-3 mb-4">Culinary Favorites</h2>
-        <div class="bg-gray-200 rounded-xl h-48"></div>
-      </div>
-
-      <!-- Account settings - PLACEHOLDER -->
-      <div>
-        <h2 class="font-serif text-xl text-gray-900 border-b border-gray-200 pb-3 mb-4">Account Settings</h2>
-        <div class="bg-gray-200 rounded-xl h-40"></div>
       </div>
 
     </div>

@@ -1,6 +1,5 @@
 <% customer = @order.customer %>
 <% content_for :title, "Invoice ##{@payment.id} - Order ##{@order.id}" %>
-<div class="relative"><%= render "layouts/header" %></div>
 <div class="min-h-screen bg-[#FBF0EC] px-4 py-10 pt-28">
   <div class="mx-auto max-w-3xl space-y-4">
     <div class="flex flex-wrap items-center justify-between gap-3 print:hidden">
@@ -62,8 +61,8 @@
                   <td class="px-4 py-3 font-medium text-gray-900"><%= item.food&.name || "Dish" %></td>
                   <td class="px-4 py-3 text-gray-500"><%= item.food_variant&.name || "-" %></td>
                   <td class="px-4 py-3 text-center"><%= item.quantity %></td>
-                  <td class="px-4 py-3 text-right"><%= number_to_currency(item.unit_price, unit: "₫", precision: 0) %></td>
-                  <td class="px-4 py-3 text-right font-semibold"><%= number_to_currency(item.unit_price.to_d * item.quantity.to_i, unit: "₫", precision: 0) %></td>
+                  <td class="px-4 py-3 text-right"><%= number_to_currency(item.unit_price, unit: "$", precision: 2) %></td>
+                  <td class="px-4 py-3 text-right font-semibold"><%= number_to_currency(item.unit_price.to_d * item.quantity.to_i, unit: "$", precision: 2) %></td>
                 </tr>
               <% end %>
               <% if @order.table_price.to_d.positive? %>
@@ -71,8 +70,8 @@
                   <td class="px-4 py-3 font-medium text-gray-900">Table fee</td>
                   <td class="px-4 py-3 text-gray-500">-</td>
                   <td class="px-4 py-3 text-center">1</td>
-                  <td class="px-4 py-3 text-right"><%= number_to_currency(@order.table_price, unit: "₫", precision: 0) %></td>
-                  <td class="px-4 py-3 text-right font-semibold"><%= number_to_currency(@order.table_price, unit: "₫", precision: 0) %></td>
+                  <td class="px-4 py-3 text-right"><%= number_to_currency(@order.table_price, unit: "$", precision: 2) %></td>
+                  <td class="px-4 py-3 text-right font-semibold"><%= number_to_currency(@order.table_price, unit: "$", precision: 2) %></td>
                 </tr>
               <% end %>
             </tbody>

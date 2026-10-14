@@ -7,7 +7,8 @@ class CustomerQueue < ApplicationRecord
   scope :waiting, -> { where(status: :waiting).order(:created_at) }
 
   validates :guest_name,  presence: true
-  validates :guest_phone, format: { with: /\A\d{9,11}\z/ }, presence: true
+  validates :guest_phone, presence: true
+  validates :guest_phone, format: { with: /\A\d{9,11}\z/, message: "must be 9–11 digits" }, allow_blank: true
 
   def hold_table!(table)
     update!(status: :seated, table: table)

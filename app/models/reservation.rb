@@ -4,10 +4,11 @@ class Reservation < ApplicationRecord
   has_many :reviews, dependent: :destroy
   has_many :orders, dependent: :destroy
 
-  validates :guest_name,        presence: true
-  validates :guest_phone,       format: { with: /\A\d{9,11}\z/ }, presence: true
-  validates :reservation_date,  presence: true
-  validates :reservation_time,  presence: true
+  validates :guest_name, presence: true
+  validates :guest_phone, presence: true
+  validates :guest_phone, format: { with: /\A\d{9,11}\z/, message: "must be 9–11 digits" }, allow_blank: true
+  validates :reservation_date, presence: true
+  validates :reservation_time, presence: true
 
   enum :status, {
     pending: 0, approved: 1, rejected: 2,
@@ -25,6 +26,7 @@ class Reservation < ApplicationRecord
   after_update  :sync_table_status, if: -> { saved_change_to_status? || saved_change_to_table_id? }
   after_destroy :sync_table_status
   after_update :enqueue_confirmation_email, if: :status_changed_to_approved?
+  after_update :start_service_for_preorders, if: -> { saved_change_to_status? && checked_in? }
 
   validate :table_must_not_be_double_booked
   validate :table_must_be_bookable
@@ -100,6 +102,13 @@ class Reservation < ApplicationRecord
     where(user_id: user.id, status: REVIEWABLE_STATUSES)
       .order(reservation_date: :desc)
       .select(&:reviewable?)
+  end
+
+  def start_service_for_preorders
+    orders.preorder.find_each do |order|
+      order.release_to_kitchen!
+      order.update!(status: :inserve)
+    end
   end
 
   private
