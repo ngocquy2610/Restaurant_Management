@@ -14,7 +14,8 @@ class PreorderReleaseJob < ApplicationJob
       Notification.create!(
         recipient: u,
         title: "Pre-order",
-        body: "#{order.reservation.guest_name} (Table #{order.table&.table_number}, Meal start at #{order.reservation.slot_start.strftime('%H:%M')})."
+        body: "#{order.reservation.guest_name} (Table #{order.table&.table_number}, Meal start at #{order.reservation.slot_start.strftime('%H:%M')}).",
+        redirect_url: Rails.application.routes.url_helpers.admin_kitchen_queue_path(order)
       )
     end
   end

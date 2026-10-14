@@ -22,7 +22,8 @@ class Admin::CustomerQueuesController < ApplicationController
     table = Table.find(params[:table_id])
     CustomerQueueManager.seat!(@customer_queue, table)
     notify_role(:receptionist, title: "Walk-in seated",
-                body: "#{@customer_queue.guest_name} seated at Table #{table.table_number}.")
+                body: "#{@customer_queue.guest_name} seated at Table #{table.table_number}.",
+                redirect_url: admin_customer_queues_path)
     redirect_to admin_customer_queues_path,
                 notice: "Seated #{@customer_queue.guest_name} at Table #{table.table_number}."
   rescue ActiveRecord::RecordInvalid => e

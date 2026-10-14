@@ -44,11 +44,13 @@ class ReservationsController < ApplicationController
     if @reservation.save
       notify_role(:receptionist,
         title: "New reservation request",
-        body: "#{@reservation.guest_name} requested a table at #{@reservation.reservation_date.strftime('%d/%m')} at #{@reservation.reservation_time.strftime('%H:%M')}. Table #{@reservation.table.table_number}."
+        body: "#{@reservation.guest_name} requested a table at #{@reservation.reservation_date.strftime('%d/%m')} at #{@reservation.reservation_time.strftime('%H:%M')}. Table #{@reservation.table.table_number}.",
+        redirect_url: admin_reservations_path
       )
       notify_role(:admin,
         title: "New reservation request",
-        body: "#{@reservation.guest_name} requested a table at #{@reservation.reservation_date.strftime('%d/%m')} at #{@reservation.reservation_time.strftime('%H:%M')}. Table #{@reservation.table.table_number}."
+        body: "#{@reservation.guest_name} requested a table at #{@reservation.reservation_date.strftime('%d/%m')} at #{@reservation.reservation_time.strftime('%H:%M')}. Table #{@reservation.table.table_number}.",
+        redirect_url: admin_reservations_path
       )
       # Let the customer pre-order dishes for the table they just booked.
       redirect_to new_reservation_preorder_path(@reservation), notice: "Table booked! Add a pre-order below."
@@ -80,7 +82,8 @@ class ReservationsController < ApplicationController
       notify_user(
         recipient: @reservation.user,
         title: "Reservation notice",
-        body: "Your reservation for #{@reservation.reservation_date.strftime('%d/%m')} at #{@reservation.reservation_time.strftime('%H:%M')} has sent successfully - Table #{@reservation.table.table_number}"
+        body: "Your reservation for #{@reservation.reservation_date.strftime('%d/%m')} at #{@reservation.reservation_time.strftime('%H:%M')} has sent successfully - Table #{@reservation.table.table_number}",
+        redirect_url: reservation_path(@reservation)
       )
       redirect_to @reservation, notice: "Reservation status updated."
     else

@@ -1,0 +1,31 @@
+<div class="border-t border-[#e6d6d2] px-8 py-8">
+  <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-[#7c5d58]">How the price is built</h2>
+  <div class="flex flex-wrap items-center gap-2 text-[1.05rem]">
+    <span class="rounded-md border border-[#d8c1bc] bg-white px-3 py-2 font-semibold">$<%= number_to_currency(base_price, precision: 2, unit: "") %> <span class="text-xs font-medium uppercase text-[#9b6a63]">base</span></span>
+    <span class="font-bold text-[#9b6a63]"><%= price_adjustment.negative? ? "−" : "+" %></span>
+    <span class="rounded-md border border-[#d8c1bc] bg-white px-3 py-2 font-semibold">$<%= number_to_currency(price_adjustment.abs, precision: 2, unit: "") %> <span class="text-xs font-medium uppercase text-[#9b6a63]">adj.</span></span>
+    <span class="font-bold text-[#7b1f2a]">=</span>
+    <span class="rounded-md bg-[#7b1f2a] px-4 py-2 font-semibold text-white">$<%= number_to_currency(final_price, precision: 2, unit: "") %> <span class="text-xs font-medium uppercase text-white/70">final</span></span>
+  </div>
+  <% if food.present? %>
+    <p class="mt-3 max-w-[680px] text-[0.95rem] leading-[1.6] text-[#5b4a48]">Base price comes from <strong><%= link_to food_name, food_path(food), class: "text-[#7b1f2a] hover:underline" %></strong><% if food.category.present? %> in category <strong><%= food.category.name %></strong><% end %>. Last updated <%= @food_variant.updated_at.strftime("%b %d, %Y at %H:%M") %>.</p>
+  <% end %>
+</div>
+<% if @sibling_variants.any? %>
+  <div class="border-t border-[#e6d6d2] bg-[#faf5f4] px-8 py-8">
+    <div class="mb-4 flex items-center justify-between gap-3">
+      <h2 class="text-sm font-semibold uppercase tracking-wide text-[#7c5d58]">Other variants of <%= food_name %> (<%= @sibling_variants.size %>)</h2>
+      <%= link_to "View all variants", food_variants_path(food_id: food.id), class: "text-sm font-semibold text-[#7b1f2a] hover:underline" %>
+    </div>
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <% @sibling_variants.first(6).each do |sibling| %>
+        <% s_adj = sibling.price_adjustment || 0 %>
+        <% s_final = (sibling.final_price rescue nil) %>
+        <%= link_to food_variant_path(sibling), class: "flex items-center justify-between gap-3 rounded-md border border-[#e4d6d2] bg-white px-4 py-3 hover:border-[#7b1f2a]/40 hover:bg-[#fbeeee]" do %>
+          <span class="min-w-0"><span class="block truncate font-semibold"><%= sibling.name %></span><span class="text-xs text-[#9b6a63]"><%= s_adj.negative? ? "−" : "+" %>$<%= number_to_currency(s_adj.abs, precision: 2, unit: "") %> adj.</span></span>
+          <span class="shrink-0 rounded-md bg-[#7b1f2a] px-3 py-1.5 font-semibold text-white">$<%= number_to_currency(s_final, precision: 2, unit: "") %></span>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

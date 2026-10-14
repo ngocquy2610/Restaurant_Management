@@ -87,12 +87,12 @@ class Reservation < ApplicationRecord
     customer.present? && user_id == customer.id && reviewable?
   end
 
-  # Memoised: the reservation card and the policy both ask for it, and when the
-  # association is already eager-loaded we avoid SQL entirely.
-  def meal_review
-    return @meal_review if defined?(@meal_review)
+  # The customer's single restaurant review, when this visit is the one it was
+  # written against. Memoised because the reservation card asks repeatedly.
+  def review
+    return @review if defined?(@review)
 
-    @meal_review = reviews.loaded? ? reviews.detect(&:meal?) : reviews.meal.first
+    @review = reviews.first
   end
 
   # Array (not a relation) — the per-customer set is tiny and #reviewable? is Ruby-side.
@@ -105,6 +105,7 @@ class Reservation < ApplicationRecord
   private
 
   def sync_table_status
+    return if destroyed? || table.nil? || table.destroyed?
     table.refresh_status_from_reservations!
   end
 

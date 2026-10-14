@@ -1,45 +1,91 @@
 <div class="min-h-screen bg-[#f4e6e2] px-6 pb-16 pt-28 text-[#2f1f1d]">
   <%= turbo_stream_from current_user %>
   <div class="mx-auto max-w-3xl">
-    <!-- Page header -->
-    <header class="mb-8">
+    <header class="mb-6">
       <p class="text-sm font-semibold uppercase tracking-[0.3em] text-[#8f1f2a]">Notifications</p>
-      <h1 class="mt-2 font-serif text-4xl font-semibold text-[#2f1f1d]">Your Updates</h1>
-      <div class="mt-4 h-1 w-16 rounded-full bg-[#8f1f2a]"></div>
-    </header>
-
-    <!-- Summary -->
-    <div class="flex justify-between items-center mb-5">
-      <div class="flex items-center gap-3 text-sm text-[#7a5a56]">
-        <span class="inline-flex items-center gap-2">
-          <span class="h-2.5 w-2.5 rounded-full bg-[#8f1f2a]"></span>
-          <strong class="text-[#2f1f1d]"><%= @notifications.unread.count %></strong> unread
-        </span>
-        <span>·</span>
-        <span class="inline-flex items-center gap-2">
-          <span class="h-2.5 w-2.5 rounded-full bg-[#c8a49a]"></span>
-          <strong class="text-[#2f1f1d]"><%= @notifications.read.count %></strong> read
-        </span>
-      </div>
-
-      <div>
-        <% if current_user.notifications.unread.exists? %>
-          <%= button_to "Mark all as read", mark_all_read_notifications_path, method: :patch, class: "px-4 py-2 rounded-md bg-[#8F000D] text-white hover:bg-[#8F000D]/90" %>
+      <div class="mt-2 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 class="font-serif text-4xl font-semibold">Your Updates</h1>
+          <p class="mt-2 text-[1rem] text-[#7a5a56]"><%= pluralize(@total_count, "notification") %> total · 10 per page</p>
+        </div>
+        <% if @unread_count.positive? %>
+          <%= button_to "Mark all as read", mark_all_read_notifications_path(q: @query, status: @status_filter), method: :patch, class: "cursor-pointer rounded-md bg-[#8F000D] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#8F000D]/90" %>
         <% end %>
       </div>
+      <div class="mt-4 h-1 w-16 rounded-full bg-[#8f1f2a]"></div>
+    </header>
+    <div class="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-5 shadow-sm">
+        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#9b6a63]">Total</p>
+        <p class="mt-1 font-serif text-4xl font-semibold"><%= @total_count %></p>
+        <p class="mt-1 text-sm text-[#7a5a56]">All notifications</p>
+      </div>
+      <div class="rounded-[16px] border border-[#8f1f2a]/25 bg-white p-5 shadow-sm">
+        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#8f1f2a]">Unread</p>
+        <p class="mt-1 font-serif text-4xl font-semibold"><%= @unread_count %></p>
+        <p class="mt-1 text-sm text-[#7a5a56]">Need your attention</p>
+      </div>
+      <div class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-5 shadow-sm">
+        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#9b6a63]">Read</p>
+        <p class="mt-1 font-serif text-4xl font-semibold"><%= @read_count %></p>
+        <p class="mt-1 text-sm text-[#7a5a56]">Already seen</p>
+      </div>
+    </div>
+    <%= form_with url: notifications_path, method: :get, local: true, class: "mb-4 rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-4 shadow-sm" do %>
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-center">
+        <label class="relative flex-1">
+          <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#9b6a63]"><svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+          <%= text_field_tag :q, @query, placeholder: "Search by title or message...", autocomplete: "off", class: "w-full rounded-md border border-[#d8c1bc] bg-white py-3 pl-11 pr-4 text-[1rem] placeholder:text-[#a0817d] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+        </label>
+        <%= hidden_field_tag :status, @status_filter %>
+        <div class="flex items-center gap-2">
+          <%= submit_tag "Search", class: "cursor-pointer rounded-md bg-[#7b1f2a] px-6 py-3 text-base font-semibold text-white hover:bg-[#661a23]" %>
+          <% if @query.present? || @status_filter != "all" %>
+            <%= link_to "Clear", notifications_path, class: "rounded-md border border-[#d8c1bc] bg-white px-5 py-3 text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="mb-5 flex flex-wrap items-center gap-2">
+      <%= link_to "All (#{@total_count})", notifications_path(q: @query, status: "all"), class: "rounded-full px-4 py-2 text-sm font-semibold #{@status_filter == 'all' ? 'bg-[#7b1f2a] text-white shadow-sm' : 'border border-[#d8c1bc] bg-white text-[#5c4543] hover:bg-[#f1dfdf]'}" %>
+      <%= link_to "Unread (#{@unread_count})", notifications_path(q: @query, status: "unread"), class: "rounded-full px-4 py-2 text-sm font-semibold #{@status_filter == 'unread' ? 'bg-[#7b1f2a] text-white shadow-sm' : 'border border-[#d8c1bc] bg-white text-[#5c4543] hover:bg-[#f1dfdf]'}" %>
+      <%= link_to "Read (#{@read_count})", notifications_path(q: @query, status: "read"), class: "rounded-full px-4 py-2 text-sm font-semibold #{@status_filter == 'read' ? 'bg-[#7b1f2a] text-white shadow-sm' : 'border border-[#d8c1bc] bg-white text-[#5c4543] hover:bg-[#f1dfdf]'}" %>
+      <span class="ml-auto text-sm text-[#7a5a56]">
+        <% if @notifications.total_count.positive? %>
+          Showing <strong class="text-[#2f1f1d]"><%= @notifications.offset_value + 1 %>-<%= @notifications.offset_value + @notifications.size %></strong> of <strong class="text-[#2f1f1d]"><%= @notifications.total_count %></strong>
+        <% end %>
+      </span>
     </div>
 
     <div id="notifications-list" class="space-y-4">
       <% if @notifications.empty? %>
-        <!-- Empty state -->
-        <div class="rounded-lg border border-[#d7b9b2]/60 bg-white p-12 text-center shadow-sm">
-          <span class="text-5xl">🔔</span>
-          <p class="mt-5 font-serif text-xl font-semibold text-[#2f1f1d]">No notifications yet</p>
-          <p class="mt-2 text-sm text-[#7a5a56]">When you receive updates they will show up here.</p>
+        <div class="rounded-[16px] border border-[#d7b9b2]/60 bg-white p-12 text-center shadow-sm">
+          <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#f1e3df] text-[#7b1f2a]"><svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+          <% if @query.present? %>
+            <p class="font-serif text-2xl font-semibold">No match for "<%= @query %>"</p>
+            <p class="mt-2 text-sm text-[#7a5a56]">Try a different spelling, or clear the search.</p>
+            <div class="mt-6"><%= link_to "Clear search", notifications_path(status: @status_filter), class: "rounded-md border border-[#d8c1bc] bg-white px-5 py-3 font-semibold hover:bg-[#f1dfdf]" %></div>
+          <% elsif @status_filter != "all" %>
+            <p class="font-serif text-2xl font-semibold">No <%= @status_filter %> notifications</p>
+            <p class="mt-2 text-sm text-[#7a5a56]">Try another filter, or check back later.</p>
+            <div class="mt-6"><%= link_to "View all", notifications_path(q: @query), class: "rounded-md border border-[#d8c1bc] bg-white px-5 py-3 font-semibold hover:bg-[#f1dfdf]" %></div>
+          <% else %>
+            <p class="font-serif text-2xl font-semibold">No notifications yet</p>
+            <p class="mt-2 text-sm text-[#7a5a56]">When you receive updates they will show up here.</p>
+          <% end %>
         </div>
       <% else %>
         <%= render @notifications %>
       <% end %>
     </div>
+
+    <% if @notifications.total_pages > 1 %>
+      <div class="mt-4 rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] px-6 py-2 shadow-sm">
+        <%= paginate @notifications, params: { q: @query, status: @status_filter } %>
+      </div>
+    <% elsif @notifications.total_count.positive? %>
+      <p class="mt-4 text-center text-sm text-[#7a5a56]">Showing all <%= pluralize(@notifications.total_count, "notification") %> · Page 1 of 1</p>
+    <% end %>
   </div>
 </div>

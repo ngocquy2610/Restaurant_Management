@@ -1,9 +1,9 @@
 class Area < ApplicationRecord
-  has_one_attached :image
+  has_one_attached :image, dependent: :purge_later
 
   validate :image_format
 
-  has_many :tables, dependent: :nullify, dependent: :destroy
+  has_many :tables, dependent: :destroy
   
   validates :name, presence: true
 

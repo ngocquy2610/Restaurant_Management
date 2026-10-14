@@ -3,7 +3,7 @@ class Order < ApplicationRecord
   belongs_to :waiter, class_name: "User", foreign_key: "user_id", optional: true
   belongs_to :reservation, optional: true
 
-  has_many :payments, dependent: :restrict_with_error
+  has_many :payments, dependent: :destroy
   belongs_to :promotion, optional: true
 
   has_many :order_items, dependent: :destroy
@@ -67,6 +67,7 @@ class Order < ApplicationRecord
   end
 
   def sync_table!
+    return if destroyed? || table.nil? || table.destroyed?
     target =
       case status.to_sym
         when :preorder  then :reserved
@@ -78,6 +79,7 @@ class Order < ApplicationRecord
   end
 
   def sync_reservation
+    return if destroyed? || reservation.nil? || reservation.destroyed?
     reservation&.update!(status: :completed)
   end
 

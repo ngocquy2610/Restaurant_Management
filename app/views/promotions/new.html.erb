@@ -1,19 +1,31 @@
 <% content_for :title, "New promotion" %>
 
-<div class="pt-[5.25rem] min-h-screen bg-[#f4e6e2] text-[#2f1f1d]">
-  <main class="mx-auto flex w-full max-w-[720px] flex-col px-6 py-12">
-    <%= link_to promotions_path, class: "mb-8 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-[#7b1f2a] hover:text-[#661a23]" do %>
-      <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-      Back to promotions
-    <% end %>
+<div class="relative"><%= render "layouts/header" %></div>
+<div class="min-h-screen bg-[#f4e6e2] py-10 pt-28 text-[#2f1f1d]">
+  <div class="w-full">
+    <div class="flex gap-6">
+      <%= render "layouts/admin_sidebar" %>
 
-    <div class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-8 shadow-sm">
-      <h1 class="font-serif text-4xl font-semibold tracking-tight text-[#2f1f1d]">New promotion</h1>
-      <p class="mt-2 text-[1.05rem] text-[#7a5a56]">Create a promotion to offer customers a discount.</p>
+      <main class="flex-1">
+        <div class="mx-auto max-w-[720px]">
+          <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <%= link_to promotions_path, class: "inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-[#7b1f2a] hover:text-[#661a23]" do %>
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+              Back to promotions
+            <% end %>
+            <%= link_to "Back to dashboard", admin_dashboards_path, class: "inline-flex items-center justify-center rounded-full bg-[#8A1C2B] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#6d1420]" %>
+          </div>
 
-      <div class="mt-8">
-        <%= render "form", promotion: @promotion %>
-      </div>
+          <div class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-8 shadow-sm">
+            <h1 class="font-serif text-4xl font-semibold tracking-tight text-[#2f1f1d]">New promotion</h1>
+            <p class="mt-2 text-[1.05rem] text-[#7a5a56]">Create a promotion to offer customers a discount.</p>
+
+            <div class="mt-8">
+              <%= render "form", promotion: @promotion %>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
-  </main>
+  </div>
 </div>

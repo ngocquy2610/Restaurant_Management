@@ -55,7 +55,8 @@ class TablesController < ApplicationController
       notify_user(
         recipient: current_user,
         title: "Table created",
-        body: "The table #{@recipe_item.name} has been created."
+        body: "The table #{@table.table_number} has been created.",
+        redirect_url: table_path(@table)
       )
       redirect_to tables_path, notice: "Table added."
     else
@@ -73,7 +74,8 @@ class TablesController < ApplicationController
       notify_user(
         recipient: current_user,
         title: "Table updated",
-        body: "The table #{@recipe_item.name} has been updated."
+        body: "The table #{@table.table_number} has been updated.",
+        redirect_url: table_path(@table)
       )
       redirect_to tables_path, notice: "Table updated."
     else
@@ -91,7 +93,8 @@ class TablesController < ApplicationController
     notify_user(
       recipient: current_user,
       title: "Table destroyed",
-      body: "The table #{@recipe_item.name} has been destroyed."
+      body: "The table #{@table.table_number} has been destroyed.",
+      redirect_url: tables_path(area_id: @table.area_id)
     )
     @areas = Area.order(:floor_level, :id)
     @area = if params[:area_id].present?

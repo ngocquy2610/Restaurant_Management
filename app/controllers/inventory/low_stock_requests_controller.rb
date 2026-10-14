@@ -29,7 +29,8 @@ class Inventory::LowStockRequestsController < Inventory::BaseController
       recipient: @low_stock_request.user,
       title: "Low stock request #{decision}",
       body: "Your request for #{@low_stock_request.ingredient.name} was #{decision}." \
-            "#{note.present? ? " Reason: #{note}" : ""}"
+        "#{note.present? ? " Reason: #{note}" : ""}",
+      redirect_url: inventory_low_stock_request_path(@low_stock_request)
     )
     redirect_to inventory_low_stock_request_path(@low_stock_request), notice: "Request #{decision}."
   end

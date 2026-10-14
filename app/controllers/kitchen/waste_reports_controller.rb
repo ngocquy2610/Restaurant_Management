@@ -23,7 +23,8 @@ class Kitchen::WasteReportsController < Kitchen::BaseController
       notify_role(
         :inventory_manager,
         title: "Waste reported",
-        body: "#{current_user.full_name} reported #{@waste_report.quantity} #{@waste_report.ingredient.unit} of #{@waste_report.ingredient.name} wasted."
+        body: "#{current_user.full_name} reported #{@waste_report.quantity} #{@waste_report.ingredient.unit} of #{@waste_report.ingredient.name} wasted.",
+        redirect_url: inventory_waste_report_path(@waste_report)
       )
       redirect_to kitchen_waste_reports_path, notice: "Waste report submitted."
     else

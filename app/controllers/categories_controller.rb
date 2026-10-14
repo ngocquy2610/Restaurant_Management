@@ -4,7 +4,34 @@ class CategoriesController < ApplicationController
   # GET /categories or /categories.json
   def index
     authorize Category, :index?
-    @categories = Category.all
+
+    @query = params[:q].to_s.strip
+    @sort = params[:sort].presence_in(%w[newest oldest name_asc name_desc most_items fewest_items]) || "newest"
+
+    dishes_count_sql = "(SELECT COUNT(*) FROM foods WHERE foods.category_id = categories.id)"
+
+    scope = Category.all
+    if @query.present?
+      pattern = "%#{ActiveRecord::Base.sanitize_sql_like(@query)}%"
+      scope = scope.where("categories.name ILIKE ?", pattern)
+    end
+
+    scope = scope.select("categories.*", "#{dishes_count_sql} AS foods_count")
+
+    scope = case @sort
+            when "oldest"       then scope.order("categories.created_at ASC")
+            when "name_asc"     then scope.order("categories.name ASC")
+            when "name_desc"    then scope.order("categories.name DESC")
+            when "most_items"   then scope.order(Arel.sql("#{dishes_count_sql} DESC, categories.name ASC"))
+            when "fewest_items" then scope.order(Arel.sql("#{dishes_count_sql} ASC, categories.name ASC"))
+            else                     scope.order("categories.created_at DESC")
+            end
+
+    @categories = scope.includes(:foods).page(params[:page]).per(8)
+
+    @total_categories = Category.count
+    @total_dishes = Food.count
+    @empty_count = Category.left_joins(:foods).where(foods: { id: nil }).count
   end
 
   # GET /categories/1 or /categories/1.json
@@ -23,11 +50,16 @@ class CategoriesController < ApplicationController
   def new
     @category = Category.new
     authorize @category
+    @existing_categories = Category.order(:name).limit(10)
+    @total_categories = Category.count
   end
 
   # GET /categories/1/edit
   def edit
     authorize @category
+    @category_foods = @category.foods.order(:name).limit(6)
+    @food_count = @category.foods.count
+    @existing_categories = Category.where.not(id: @category.id).order(:name).limit(8)
   end
 
   # POST /categories or /categories.json
@@ -39,10 +71,13 @@ class CategoriesController < ApplicationController
       notify_user(
         recipient: current_user,
         title: "Category created",
-        body: "The category #{@category.name} has been created."
+        body: "The category #{@category.name} has been created.",
+        redirect_url: category_path(@category)
       )
       redirect_to categories_path, notice: "Category added."
     else
+      @existing_categories = Category.order(:name).limit(10)
+      @total_categories = Category.count
       render 'categories/new', status: :unprocessable_entity
     end
   end
@@ -54,10 +89,14 @@ class CategoriesController < ApplicationController
       notify_user(
         recipient: current_user,
         title: "Category updated",
-        body: "The category #{@category.name} has been updated."
+        body: "The category #{@category.name} has been updated.",
+        redirect_url: category_path(@category)
       )
       redirect_to categories_path, notice: "Category updated."
     else
+      @category_foods = @category.foods.order(:name).limit(6)
+      @food_count = @category.foods.count
+      @existing_categories = Category.where.not(id: @category.id).order(:name).limit(8)
       render 'categories/edit', status: :unprocessable_entity
     end
   end
@@ -69,7 +108,8 @@ class CategoriesController < ApplicationController
       notify_user(
         recipient: current_user,
         title: "Category destroyed",
-        body: "The category #{@category.name} has been destroyed."
+        body: "The category #{@category.name} has been destroyed.",
+        redirect_url: categories_path
       )
     redirect_to categories_path, notice: "Category removed."
   end

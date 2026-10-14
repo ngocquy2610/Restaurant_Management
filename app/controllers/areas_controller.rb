@@ -16,7 +16,8 @@ class AreasController < ApplicationController
       notify_user(
         recipient: current_user,
         title: "Area created",
-        body: "The area #{@area.name} has been created."
+        body: "The area #{@area.name} has been created.",
+        redirect_url: tables_path(area_id: @area.id)
       )
       redirect_to tables_path, notice: "Area added."
     else
@@ -35,7 +36,8 @@ class AreasController < ApplicationController
       notify_user(
         recipient: current_user,
         title: "Area updated",
-        body: "The area #{@area.name} has been updated."
+        body: "The area #{@area.name} has been updated.",
+        redirect_url: tables_path(area_id: @area.id)
       )
       redirect_to tables_path, notice: "Area updated."
     else
@@ -45,13 +47,15 @@ class AreasController < ApplicationController
 
   def destroy
     authorize @area
-    @area.destroy!
-    notify_user(
-      recipient: current_user,
-      title: "Area destroyed",
-      body: "The area #{@area.name} has been destroyed."
-    )
-    redirect_to tables_path, notice: "Area removed."
+    begin
+      @area.destroy!
+      notify_user(recipient: current_user, title: "Area destroyed", body: "The area #{@area.name} has been destroyed.",
+          redirect_url: tables_path)
+      redirect_to tables_path, notice: "Area removed."
+    rescue ActiveRecord::RecordNotDestroyed => e
+      msg = e.record.errors.full_messages.to_sentence.presence || "Area has tables/orders/payments and cannot be deleted."
+      redirect_to tables_path, alert: "Cannot delete area #{@area.name}: #{msg}"
+    end
   end
 
   private

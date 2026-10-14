@@ -95,9 +95,9 @@
             </div>
 
             <% if current_user && policy(Review).create_restaurant? %>
-              <%= link_to "Write a review", new_review_path(review_type: "restaurant"),
+              <%= link_to "Write a review", new_review_path,
                     class: "rounded-md bg-[#7b1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#661a23]" %>
-            <% elsif current_user && Review.for_customer(current_user, :restaurant).exists? %>
+            <% elsif current_user && Review.for_customer(current_user).exists? %>
               <span class="rounded-full bg-[#f0e7e5] px-3 py-1 text-[0.75rem] font-semibold uppercase tracking-[0.08em] text-[#5d4b49]">You already reviewed us ✓</span>
             <% end %>
           </div>
@@ -105,7 +105,7 @@
           <% if @restaurant_reviews.any? %>
             <div class="grid grid-cols-1 gap-5 lg:grid-cols-3"><%= render @restaurant_reviews %></div>
             <div class="mt-5 text-right">
-              <%= link_to "See all reviews →", reviews_path(type: "restaurant"),
+              <%= link_to "See all reviews →", reviews_path,
                     class: "text-sm font-semibold text-[#7b1f2a] hover:text-[#661a23]" %>
             </div>
           <% else %>

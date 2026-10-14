@@ -1,0 +1,41 @@
+<div class="overflow-hidden rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] shadow-sm">
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-[#e4d2ce] text-left">
+      <thead class="bg-[#efe0de]">
+        <tr class="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#7a5550]">
+          <th scope="col" class="w-10 px-6 py-4">#</th>
+          <th scope="col" class="px-6 py-4">Variant</th>
+          <th scope="col" class="px-6 py-4">Dish</th>
+          <th scope="col" class="px-6 py-4">Category</th>
+          <th scope="col" class="px-6 py-4">Pricing detail</th>
+          <th scope="col" class="px-6 py-4">Created</th>
+          <th scope="col" class="px-6 py-4 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[#ecdfdc]">
+        <% if @food_variants.any? %>
+          <%= render "variant_rows" %>
+        <% else %>
+          <tr><td colspan="7" class="px-6 py-14"><div class="mx-auto max-w-md text-center">
+            <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#f1e3df] text-[#7b1f2a]"><svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
+            <% if @query.present? || @food_filter.present? %>
+              <h3 class="font-serif text-2xl font-semibold">No match</h3>
+              <p class="mt-2 text-[#7a5a56]">Try a different spelling, or clear the search.</p>
+              <div class="mt-6 flex items-center justify-center gap-3"><%= link_to "Clear search", food_variants_path(sort: @sort), class: "rounded-md border border-[#d8c1bc] bg-white px-5 py-3 font-semibold hover:bg-[#f1dfdf]" %></div>
+            <% else %>
+              <h3 class="font-serif text-2xl font-semibold">No variants yet</h3>
+              <p class="mt-2 text-[#7a5a56]">Start by adding the first variant for a dish.</p>
+              <%= link_to "Add First Variant", new_food_variant_path, class: "mt-6 inline-flex rounded-md bg-[#7b1f2a] px-5 py-3 font-semibold text-white hover:bg-[#661a23]" %>
+            <% end %>
+          </div></td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <div class="flex flex-col gap-3 border-t border-[#e4d2ce] bg-[#f3e9e7] px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+    <p class="text-sm text-[#7a5a56]">
+      <% if @food_variants.total_count.positive? %>Showing <strong><%= @food_variants.offset_value + 1 %>-<%= @food_variants.offset_value + @food_variants.size %></strong> of <strong><%= @food_variants.total_count %></strong> · Page <strong><%= @food_variants.current_page %></strong> of <%= @food_variants.total_pages %><% else %>No variants to show<% end %>
+    </p>
+    <%= paginate @food_variants, params: { q: @query, sort: @sort, food_id: @food_filter } %>
+  </div>
+</div>

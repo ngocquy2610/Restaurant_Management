@@ -5,6 +5,7 @@ class HomeController < ApplicationController
                           .where(status: :published)
                           .where("start_date <= ?", Time.current)
                           .where("end_date >= ?", Time.current)
+                          .select { |promo| promo.image.attached? }
     @featured_foods = Food.with_attached_image
                           .joins(:category)
                           .where(status: :active)

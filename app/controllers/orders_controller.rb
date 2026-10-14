@@ -45,7 +45,8 @@ class OrdersController < ApplicationController
     if @order.save
       notify_role(:kitchen_staff,
         title: "New order at #{@order.table&.table_number}",
-        body: "#{@order.waiter&.full_name || 'A waiter'} placed an order for #{@order.order_items.count} item(s)."
+        body: "#{@order.waiter&.full_name || 'A waiter'} placed an order for #{@order.order_items.count} item(s).",
+        redirect_url: admin_kitchen_queue_path(@order)
       )
       redirect_to @order, notice: "Order was successfully created."
     else
@@ -100,7 +101,18 @@ class OrdersController < ApplicationController
     def load_food_data(occupied_tables: false)
       @categories = Category.order(:name)
       @foods = Food.includes(:category).order(:name)
-      @tables = occupied_tables ? Table.occupied.order(:id) : Table.order(:id)
+      @tables = if occupied_tables
+                  # Order form needs every servable table: occupied tables plus
+                  # any table with a checked-in reservation (defensive in case
+                  # the cached table.status hasn't been refreshed yet).
+                  Table.left_joins(:reservations)
+                       .where("tables.status = :occupied OR reservations.status = :checked_in",
+                              occupied: Table.statuses[:occupied],
+                              checked_in: Reservation.statuses[:checked_in])
+                       .distinct.order(:id)
+                else
+                  Table.order(:id)
+                end
 
       @variants_by_food = FoodVariant.includes(:food)
                                       .order(:name)

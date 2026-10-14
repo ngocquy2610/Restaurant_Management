@@ -54,3 +54,34 @@ class StockServiceTest < ActiveSupport::TestCase
     end
   end
 end
+
+class RestaurantPerformanceServiceTest < ActiveSupport::TestCase
+  test "call includes monthly revenue trend data" do
+    payment_method = PaymentMethod.find_or_create_by!(code: :cash) do |method|
+      method.name = "Cash"
+    end
+    table = tables(:one)
+
+    order_1 = Order.create!(table: table, status: :completed)
+    order_2 = Order.create!(table: table, status: :completed)
+
+    Payment.create!(order: order_1, payment_method: payment_method, subtotal: 100, discount_amount: 0,
+                    total_amount: 100, currency: "USD", status: :completed,
+                    paid_at: 2.months.ago.beginning_of_month + 5.days)
+    Payment.create!(order: order_2, payment_method: payment_method, subtotal: 250, discount_amount: 0,
+                    total_amount: 250, currency: "USD", status: :completed,
+                    paid_at: 1.month.ago.beginning_of_month + 7.days)
+
+    service = RestaurantPerformanceService.new(
+      from_date: 3.months.ago.to_date,
+      to_date: Date.current,
+      time_range: 3.months.ago.beginning_of_day..Date.current.end_of_day
+    )
+
+    performance = service.call
+
+    assert_operator performance[:monthly_trend].size, :>=, 2
+    assert_operator performance[:monthly_trend].values.sum.to_d, :>, 0
+    assert_operator performance[:monthly_trend].keys.count { |month| month >= 3.months.ago.to_date.beginning_of_month }, :>=, 1
+  end
+end

@@ -31,6 +31,10 @@
         <%= email_field_tag :email, nil, placeholder: "Email address", class: "w-full rounded-l-sm border border-[#4a322d] bg-[#3a2320] px-4 py-2.5 text-sm text-white placeholder-[#8a6a63] focus:outline-none focus:ring-1 focus:ring-[#8f1f2a]" %>
         <button type="submit" class="rounded-r-sm bg-[#8f1f2a] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#7a1a23]" aria-label="Subscribe">→</button>
       <% end %>
+
+      <%= link_to "Review restaurant",
+            restaurant_reviews_path,
+            class: "mt-4 inline-flex w-full items-center justify-center rounded-md bg-[#8f1f2a] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#7a1a23]" %>
     </div>
   </div>
 

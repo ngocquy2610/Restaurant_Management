@@ -10,7 +10,7 @@ class ReviewPolicy < ApplicationPolicy
 
   def create_restaurant?
     user.present? &&
-      !Review.for_customer(user, :restaurant).exists? &&
+      !Review.for_customer(user).exists? &&
       Reservation.reviewable_for(user).any?
   end
 

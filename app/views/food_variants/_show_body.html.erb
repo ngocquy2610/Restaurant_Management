@@ -1,0 +1,34 @@
+<div class="p-8">
+  <div class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <h1 class="font-serif text-[3rem] leading-tight tracking-[-0.04em] text-[#2d1d1d]"><%= @food_variant.name %></h1>
+      <p class="mt-2 text-[1.05rem] text-[#7a5a56]">Variant of <strong><%= link_to food_name, food_path(food), class: "text-[#7b1f2a] hover:underline" %></strong> · <%= pluralize(@dish_variant_count, "variant") %> for this dish · Created <%= @food_variant.created_at.strftime("%b %d, %Y") %> (<%= time_ago_in_words(@food_variant.created_at) %> ago)</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <% if policy(@food_variant).update? %><%= link_to "Edit", edit_food_variant_path(@food_variant), class: "rounded-md bg-[#7b1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#661a23]" %><% end %>
+      <% if policy(@food_variant).destroy? %><%= button_to "Delete", @food_variant, method: :delete, data: { turbo_confirm: "Delete this food variant? This cannot be undone." }, class: "cursor-pointer rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %><% end %>
+    </div>
+  </div>
+  <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="rounded-md border border-[#e4d6d2] bg-[#faf5f4] px-5 py-4">
+      <h2 class="mb-1 text-sm font-semibold uppercase tracking-wide text-[#7c5d58]">Dish</h2>
+      <p class="text-[1.15rem] font-medium text-[#2f1f1d]"><%= food_name %></p>
+      <% if food.present? %><p class="mt-1 text-xs text-[#9b6a63]"><%= link_to "View dish →", food_path(food), class: "font-semibold text-[#7b1f2a] hover:underline" %></p><% end %>
+    </div>
+    <div class="rounded-md border border-[#e4d6d2] bg-[#faf5f4] px-5 py-4">
+      <h2 class="mb-1 text-sm font-semibold uppercase tracking-wide text-[#7c5d58]">Base price</h2>
+      <p class="text-[1.15rem] font-medium text-[#2f1f1d]">$<%= number_to_currency(base_price, precision: 2, unit: "") %></p>
+      <p class="mt-1 text-xs text-[#9b6a63]">Before adjustment</p>
+    </div>
+    <div class="rounded-md border border-[#e4d6d2] bg-[#faf5f4] px-5 py-4">
+      <h2 class="mb-1 text-sm font-semibold uppercase tracking-wide text-[#7c5d58]">Adjustment</h2>
+      <p class="text-[1.15rem] font-medium <%= price_adjustment.negative? ? "text-[#3f7d2f]" : "text-[#2f1f1d]" %>"><%= price_adjustment.negative? ? "−" : "+" %>$<%= number_to_currency(price_adjustment.abs, precision: 2, unit: "") %></p>
+      <p class="mt-1 text-xs text-[#9b6a63]"><%= price_adjustment.negative? ? "Discount vs. base" : price_adjustment.zero? ? "Same as base" : "Surcharge vs. base" %></p>
+    </div>
+    <div class="rounded-md border border-[#7b1f2a]/20 bg-[#fbeeee] px-5 py-4">
+      <h2 class="mb-1 text-sm font-semibold uppercase tracking-wide text-[#7b1f2a]">Final price</h2>
+      <p class="text-[1.4rem] font-semibold text-[#7b1f2a]">$<%= number_to_currency(final_price, precision: 2, unit: "") %></p>
+      <p class="mt-1 text-xs text-[#9b6a63]">Charged to customer</p>
+    </div>
+  </div>
+</div>

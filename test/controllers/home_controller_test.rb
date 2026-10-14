@@ -45,6 +45,35 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "button[data-action='promo-slider#dot']", 3
   end
 
+  test "ignores published promotions without an attached image" do
+    Promotion.create!(
+      name: "Missing Image Deal",
+      discount_type: "percentage",
+      discount_value: 15,
+      start_date: Time.current,
+      end_date: 7.days.from_now,
+      status: "published"
+    )
+
+    valid = Promotion.create!(
+      name: "Valid Promo",
+      discount_type: "fix_amount",
+      discount_value: 8,
+      start_date: Time.current,
+      end_date: 7.days.from_now,
+      status: "published"
+    )
+    valid.image.attach(io: File.open(Rails.root.join("test/fixtures/files/avatar.png")),
+                       filename: "valid.png", content_type: "image/png")
+
+    get root_url
+    assert_response :success
+
+    assert_match "Valid Promo", response.body
+    refute_match "Missing Image Deal", response.body
+    assert_select "button[data-action='promo-slider#dot']", 2
+  end
+
   test "always shows default cover slider even without published promotions" do
     get root_url
     assert_response :success

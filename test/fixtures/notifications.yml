@@ -5,9 +5,11 @@ one:
   title: MyString
   body: MyString
   status: 1
+  redirect_url: https://example.com/orders/1
 
 two:
   recipient: two
   title: MyString
   body: MyString
   status: 1
+  redirect_url: /orders/2

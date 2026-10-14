@@ -1,8 +1,11 @@
-<%= form_with(model: category, class: "contents") do |form| %>
+<%= form_with(model: category, class: "contents", data: { controller: "category-form", category_form_existing_value: (local_assigns[:existing_names] || []).to_json }) do |form| %>
   <% if category.errors.any? %>
-    <div id="error_explanation" class="mb-6 rounded-md border border-[#e5b3ad] bg-[#fbe9e6] px-4 py-3 text-[#8f1f2a]">
-      <h2 class="font-semibold"><%= pluralize(category.errors.count, "error") %> prohibited this category from being saved:</h2>
-      <ul class="mt-1 list-disc pl-5">
+    <div id="error_explanation" class="mb-6 rounded-[12px] border border-[#e5b3ad] bg-[#fbe9e6] px-5 py-4 text-[#8f1f2a]" role="alert">
+      <div class="flex items-center gap-2">
+        <svg viewBox="0 0 24 24" class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        <h2 class="font-semibold"><%= pluralize(category.errors.count, "error") %> prevented this category from being saved:</h2>
+      </div>
+      <ul class="mt-2 list-disc space-y-0.5 pl-7 text-[0.95rem]">
         <% category.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -10,16 +13,54 @@
     </div>
   <% end %>
 
-  <div class="mb-6">
-    <%= form.label :name, "Category name", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+  <div class="rounded-[12px] border border-[#e4d2ce] bg-white/60 p-5">
+    <div class="flex items-start justify-between gap-3">
+      <%= form.label :name, class: "block text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#7c5d58]" do %>
+        Category name <span class="text-[#8f1f2a]">*</span>
+      <% end %>
+      <span data-category-form-target="counter" class="shrink-0 rounded-full bg-[#efe0de] px-2.5 py-0.5 font-mono text-xs font-semibold text-[#7a5550]">0 / 60</span>
+    </div>
     <%= form.text_field :name,
-          placeholder: "e.g. Starters, Main Course, Desserts",
-          class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] placeholder:text-[#7a5d5a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+          placeholder: "e.g. Starters, Main Course, Desserts, Beverages",
+          autocomplete: "off",
+          maxlength: 60,
+          autofocus: category.errors.any?,
+          data: { category_form_target: "input", action: "input->category-form#update" },
+          aria: { describedby: "category-name-help" },
+          class: "mt-2 w-full rounded-md border border-[#d8c1bc] bg-[#fffdfc] px-4 py-3 text-lg font-medium text-[#2c1c1a] placeholder:font-normal placeholder:text-[#a0817d] focus:outline-none focus:ring-2 focus:ring-[#c0928d] #{'border-[#c0392b] ring-1 ring-[#c0392b]/40' if category.errors[:name].any?}" %>
+    <% if category.errors[:name].any? %>
+      <p class="mt-2 flex items-center gap-1.5 text-sm font-medium text-[#8f1f2a]">
+        <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        <%= category.errors[:name].first %>
+      </p>
+    <% end %>
+    <p id="category-name-help" class="mt-2 text-sm leading-relaxed text-[#8a6f6a]">
+      2–60 characters. Must be unique (case-insensitive) — e.g. <em>Dessert</em> and <em>dessert</em> count as the same.
+    </p>
+    <p data-category-form-target="duplicate" class="mt-2 hidden rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800"></p>
   </div>
 
-  <div class="flex items-center gap-3">
-    <%= form.submit class: "cursor-pointer rounded-md bg-[#7b1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#661a23]" %>
-    <%= link_to "Cancel", categories_path, class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+  <div class="mt-4 rounded-[12px] border border-dashed border-[#d8b6af] bg-[#f3e9e7] p-5">
+    <p class="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#9b6a63]">Live preview</p>
+    <div class="mt-3 flex items-center gap-3 rounded-[10px] border border-[#d7b9b2] bg-[#f8f3f1] px-4 py-3">
+      <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] bg-[#f1e3df] text-[#7b1f2a]">
+        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      </span>
+      <div class="min-w-0">
+        <p data-category-form-target="preview" class="truncate font-serif text-xl font-semibold text-[#2f1f1d]"><%= category.name.presence || "Your category name" %></p>
+        <p class="text-xs text-[#9b6a63]"><%= category.persisted? ? "ID ##{category.id} · #{pluralize(@food_count || category.foods.count, 'dish')}" : "New category · will appear in the list after saving" %></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
+    <%= form.submit(category.persisted? ? "Save changes" : "Create category",
+          data: { category_form_target: "submit" },
+          class: "cursor-pointer rounded-md bg-[#7b1f2a] px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#661a23] disabled:cursor-not-allowed disabled:opacity-50") %>
+    <%= link_to "Cancel", categories_path, class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-6 py-3 text-center text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+    <% if category.persisted? %>
+      <%= link_to "View", category_path(category), class: "rounded-md border border-[#d8c1bc] bg-white px-6 py-3 text-center text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+    <% end %>
   </div>
 <% end %>
 

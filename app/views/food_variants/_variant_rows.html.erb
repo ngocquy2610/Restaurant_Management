@@ -1,0 +1,43 @@
+<% offset = @food_variants.offset_value || 0 %>
+<% @food_variants.each_with_index do |food_variant, i| %>
+  <% food = food_variant.food %>
+  <% adj = food_variant.price_adjustment || 0 %>
+  <% final = (food_variant.final_price rescue nil) %>
+  <tr class="bg-[#f8f3f1] transition hover:bg-[#f3e7e4]">
+    <td class="whitespace-nowrap px-6 py-4 text-sm font-semibold text-[#9b6a63]"><%= offset + i + 1 %></td>
+    <td class="px-6 py-4">
+      <div class="flex items-center gap-3">
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] bg-[#f1e3df] text-[#7b1f2a]">
+          <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v5M12 21v-4M12 16v-8"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="17" r="2"/></svg>
+        </span>
+        <div class="min-w-0">
+          <%= link_to food_variant.name, food_variant_path(food_variant), class: "block truncate font-serif text-xl font-semibold hover:text-[#7b1f2a] hover:underline" %>
+          <p class="text-xs text-[#9b6a63]">ID #<%= food_variant.id %></p>
+        </div>
+      </div>
+    </td>
+    <td class="px-6 py-4">
+      <% if food.present? %>
+        <%= link_to food.name, food_path(food), class: "inline-flex max-w-[180px] truncate rounded-full bg-[#6a4c4b] px-3 py-1 text-[0.78rem] font-semibold text-white hover:bg-[#7b1f2a]", title: food.name %>
+        <p class="mt-1 text-xs text-[#9b6a63]">Base $<%= number_to_currency(food.base_price, precision: 2, unit: "") %></p>
+      <% else %>
+        <span class="text-sm italic text-[#a0817d]">No dish</span>
+      <% end %>
+    </td>
+    <td class="whitespace-nowrap px-6 py-4">
+      <span class="inline-flex items-center rounded-full bg-[#ead9d6] px-3 py-1 text-[0.78rem] font-semibold text-[#7a5550]"><%= food&.category&.name || "—" %></span>
+    </td>
+    <td class="px-6 py-4">
+      <div class="flex flex-col gap-1.5">
+        <span class="inline-flex w-fit items-center rounded-md bg-[#7b1f2a] px-3 py-1.5 text-[1.05rem] font-semibold text-white shadow-sm">$<%= number_to_currency(final, precision: 2, unit: "") %></span>
+        <span class="inline-flex w-fit items-center rounded-full border px-2.5 py-0.5 text-xs font-medium <%= adj.negative? ? "border-[#bcd9b4] bg-[#e6f0e3] text-[#3f7d2f]" : "border-[#d8c7c2] bg-[#f1e8e5] text-[#534642]" %>"><%= adj.negative? ? "−" : "+" %>$<%= number_to_currency(adj.abs, precision: 2, unit: "") %> adj.</span>
+      </div>
+    </td>
+    <td class="whitespace-nowrap px-6 py-4 text-sm text-[#5e4b48]"><%= food_variant.created_at.strftime("%b %d, %Y") %><p class="text-xs text-[#9b6a63]"><%= time_ago_in_words(food_variant.created_at) %> ago</p></td>
+    <td class="whitespace-nowrap px-6 py-4"><div class="flex items-center justify-end gap-2">
+      <%= link_to "View", food_variant_path(food_variant), class: "rounded-md border border-[#d8c1bc] bg-white px-3 py-2 text-sm font-semibold hover:bg-[#f1dfdf]" %>
+      <% if policy(food_variant).update? %><%= link_to "Edit", edit_food_variant_path(food_variant), class: "rounded-md border border-[#7b1f2a]/30 bg-[#fbeeee] px-3 py-2 text-sm font-semibold text-[#7b1f2a] hover:bg-[#f3d9d6]" %><% end %>
+      <% if policy(food_variant).destroy? %><%= button_to "Delete", food_variant_path(food_variant), method: :delete, data: { turbo_confirm: "Delete this variant?" }, class: "cursor-pointer rounded-md bg-[#8f1f2a] px-3 py-2 text-sm font-semibold text-white hover:bg-[#7a1a23]" %><% end %>
+    </div></td>
+  </tr>
+<% end %>

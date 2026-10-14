@@ -1,0 +1,22 @@
+<%= form_with url: food_variants_path, method: :get, local: true, class: "mb-5 rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-4 shadow-sm" do %>
+  <%= hidden_field_tag :food_id, @food_filter if @food_filter.present? %>
+  <div class="flex flex-col gap-3 lg:flex-row lg:items-center">
+    <label class="relative flex-1">
+      <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#9b6a63]"><svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+      <%= text_field_tag :q, @query, placeholder: "Search variants, dishes, or categories...", autocomplete: "off", class: "w-full rounded-md border border-[#d8c1bc] bg-white py-3 pl-11 pr-4 text-[1rem] placeholder:text-[#a0817d] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+    </label>
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <%= select_tag :sort, options_for_select([["Newest first","newest"],["Oldest first","oldest"],["Name A-Z","name_asc"],["Name Z-A","name_desc"],["Adjustment low-high","price_asc"],["Adjustment high-low","price_desc"]], @sort), class: "rounded-md border border-[#d8c1bc] bg-white px-4 py-3 text-[0.95rem] font-medium focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+      <div class="flex items-center gap-2">
+        <%= submit_tag "Search", class: "cursor-pointer rounded-md bg-[#7b1f2a] px-6 py-3 text-base font-semibold text-white hover:bg-[#661a23]" %>
+        <% if @query.present? || @food_filter.present? || params[:sort].present? %>
+          <%= link_to "Clear", food_variants_path, class: "rounded-md border border-[#d8c1bc] bg-white px-5 py-3 text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <% if @food_filter.present? %>
+    <% dish = @foods_for_filter.find { |f| f.id.to_s == @food_filter.to_s } %>
+    <p class="mt-3 text-sm text-[#7a5a56]">Filtering by dish: <strong class="text-[#5a1a1b]"><%= dish&.name || "##{@food_filter}" %></strong> · <%= link_to "remove", food_variants_path(q: @query, sort: @sort), class: "font-semibold text-[#7b1f2a] hover:underline" %></p>
+  <% end %>
+<% end %>

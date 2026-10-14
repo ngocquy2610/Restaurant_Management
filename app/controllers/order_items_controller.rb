@@ -10,7 +10,8 @@ class OrderItemsController < ApplicationController
     if @order_item.save
       notify_role(:kitchen_staff,
         title: "Item added to order",
-        body: "#{@order_item.quantity}x #{@order_item.food&.name} for table #{@order_item.order&.table&.table_number}."
+        body: "#{@order_item.quantity}x #{@order_item.food&.name} for table #{@order_item.order&.table&.table_number}.",
+        redirect_url: admin_kitchen_queue_path(@order_item.order)
       )
       redirect_to @order_item.order, notice: "Item was successfully added."
     else
@@ -44,7 +45,8 @@ class OrderItemsController < ApplicationController
       if @order_item.served?
         notify_role(:kitchen_staff,
           title: "Dish served",
-          body: "#{@order_item.quantity}x #{@order_item.food&.name} for table #{@order_item.order&.table&.table_number} has been served.")
+          body: "#{@order_item.quantity}x #{@order_item.food&.name} for table #{@order_item.order&.table&.table_number} has been served.",
+          redirect_url: admin_kitchen_queue_path(@order_item.order))
       end
       redirect_to @order_item.order, notice: "Table #{@order_item.order&.table&.table_number}: #{@order_item.food&.name} → #{target.humanize}."
     else

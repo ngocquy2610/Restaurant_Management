@@ -1,0 +1,41 @@
+  <div class="grid grid-cols-1 gap-6">
+    <div class="rounded-[12px] border border-[#e4d2ce] bg-white/60 p-5">
+      <%= form.label :food_id, class: "block text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#7c5d58]" do %>
+        Dish <span class="text-[#8f1f2a]">*</span>
+      <% end %>
+      <%= form.select :food_id,
+            (grouped || {}).map { |cat, dishes| [cat, dishes.map { |d| ["#{d.name} — $#{number_to_currency(d.base_price, precision: 2, unit: "")} · #{d.food_variants.size} #{'variant'.pluralize(d.food_variants.size)}", d.id] }] },
+            { prompt: "Select a dish…" },
+            data: { food_variant_form_target: "food", action: "change->food-variant-form#recompute" },
+            class: "mt-2 w-full rounded-md border border-[#d8c1bc] bg-[#fffdfc] px-4 py-3 text-[1rem] text-[#2c1c1a] focus:outline-none focus:ring-2 focus:ring-[#c0928d] #{'border-[#c0392b] ring-1 ring-[#c0392b]/40' if food_variant.errors[:food].any?}" %>
+      <p class="mt-2 text-sm leading-relaxed text-[#8a6f6a]">Grouped by category with base price and variant count.</p>
+      <% if food_variant.errors[:food].any? %>
+        <p class="mt-2 text-sm font-medium text-[#8f1f2a]"><%= food_variant.errors[:food].first %></p>
+      <% end %>
+    </div>
+
+    <div class="rounded-[12px] border border-[#e4d2ce] bg-white/60 p-5">
+      <div class="flex items-start justify-between gap-3">
+        <%= form.label :name, class: "block text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#7c5d58]" do %>
+          Variant name <span class="text-[#8f1f2a]">*</span>
+        <% end %>
+        <span class="shrink-0 rounded-full bg-[#efe0de] px-2.5 py-0.5 font-mono text-xs font-semibold text-[#7a5550]"><%= food_variant.name.to_s.length %> / 60</span>
+      </div>
+      <%= form.text_field :name,
+            placeholder: "e.g. Small, Large, Regular, Family",
+            autocomplete: "off", maxlength: 60,
+            class: "mt-2 w-full rounded-md border border-[#d8c1bc] bg-[#fffdfc] px-4 py-3 text-lg font-medium text-[#2c1c1a] placeholder:font-normal placeholder:text-[#a0817d] focus:outline-none focus:ring-2 focus:ring-[#c0928d] #{'border-[#c0392b] ring-1 ring-[#c0392b]/40' if food_variant.errors[:name].any?}" %>
+      <% if food_variant.errors[:name].any? %>
+        <p class="mt-2 text-sm font-medium text-[#8f1f2a]"><%= food_variant.errors[:name].first %></p>
+      <% else %>
+        <p class="mt-2 text-sm leading-relaxed text-[#8a6f6a]">Unique per dish (case-insensitive).</p>
+      <% end %>
+      <% if @same_dish_variants.present? %>
+        <div class="mt-3 flex flex-wrap items-center gap-2">
+          <span class="text-xs font-semibold uppercase tracking-[0.1em] text-[#9b6a63]">On this dish:</span>
+          <% @same_dish_variants.first(8).each do |sib| %>
+            <span class="rounded-full bg-[#efe0de] px-2.5 py-1 text-xs font-semibold text-[#7a5550]"><%= sib.name %></span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>

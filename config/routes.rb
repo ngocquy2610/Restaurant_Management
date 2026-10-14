@@ -135,7 +135,9 @@ Rails.application.routes.draw do
   get "terms-of-service", to: "home#terms_of_service", as: :terms_of_service
 
   get 'admin/users', to: "users#index"
-  get 'admin/dashboards', to: "dashboards#index"
+  get 'admin/dashboards', to: "dashboards#index", as: :admin_dashboards
+  get 'admin/dashboards/performance', to: "dashboards#performance", as: :performance_admin_dashboards
+
 # Admin/receptionist reservation review and confirmation (separate from the
   # public /reservations booking page).
   namespace :admin do

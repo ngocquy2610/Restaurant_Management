@@ -36,7 +36,8 @@ class FoodsController < ApplicationController
       notify_user(
         recipient: current_user,
         title: "Food created",
-        body: "The food #{@food.name} has been created."
+        body: "The food #{@food.name} has been created.",
+        redirect_url: food_path(@food)
       )
       redirect_to foods_path, notice: "Foods created"
     else
@@ -52,7 +53,8 @@ class FoodsController < ApplicationController
       notify_user(
         recipient: current_user,
         title: "Food updated",
-        body: "The food #{@food.name} has been updated."
+        body: "The food #{@food.name} has been updated.",
+        redirect_url: food_path(@food)
       )
       redirect_to foods_path, notice: "Foods updated."
     else
@@ -68,7 +70,8 @@ class FoodsController < ApplicationController
     notify_user(
       recipient: current_user,
       title: "Food destroyed",
-      body: "The food #{@food.name} has been destroyed."
+      body: "The food #{@food.name} has been destroyed.",
+      redirect_url: foods_path
     )
     redirect_to foods_path, notice: "Food removed."
   end

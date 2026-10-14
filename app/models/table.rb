@@ -5,11 +5,24 @@ class Table < ApplicationRecord
   after_update :seat_waiting_guests, if: -> { saved_change_to_status? && available? }
 
   has_many :reservations, dependent: :destroy
+  has_many :orders, dependent: :destroy
+  has_many :customer_queues, dependent: :destroy
 
   enum :shape, { square: 0, round: 1, rectangle: 2 }
   enum :status, { available: 0, occupied: 1, reserved: 2, out_of_service: 3 }
 
   def refresh_status_from_reservations!
+    return if destroyed? || marked_for_destruction?
+    # A checked-in guest is physically seated: keep the table occupied
+    # regardless of the 2-hour slot window, until the reservation is
+    # completed/cancelled. Otherwise a check-in outside the slot window
+    # would fall through to :available and disappear from the order form
+    # (which only lists occupied / checked-in tables).
+    if reservations.where(status: :checked_in).exists?
+      update!(status: :occupied) unless occupied?
+      return
+    end
+
     now = Time.zone.now
     active_now = reservations
       .where(status: Reservation::ACTIVE_STATUSES)
