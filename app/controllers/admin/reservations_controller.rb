@@ -18,7 +18,8 @@ class Admin::ReservationsController < ApplicationController
         notify_user(
           recipient: @reservation.user,
           title: "Reservation confirmed",
-          body: "Your reservation for #{@reservation.reservation_date.strftime('%d/%m')} at #{@reservation.reservation_time.strftime('%H:%M')} is confirmed — Table #{@reservation.table.table_number}."
+          body: "Your reservation for #{@reservation.reservation_date.strftime('%d/%m')} at #{@reservation.reservation_time.strftime('%H:%M')} is confirmed — Table #{@reservation.table.table_number}.",
+          redirect_url: reservation_path(@reservation)
         )
       end
       redirect_to admin_reservations_path,

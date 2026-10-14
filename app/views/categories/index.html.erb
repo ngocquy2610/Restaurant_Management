@@ -58,56 +58,127 @@
           <p class="mb-5 inline-block rounded-md bg-green-50 px-3 py-2 text-sm font-medium text-green-600" id="notice"><%= notice %></p>
         <% end %>
 
-        <div class="mb-8 flex items-end justify-between gap-4">
+        <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 class="font-serif text-[4rem] leading-none tracking-[-0.06em] text-[#2f1f1d]">Menu Categories</h2>
-            <p class="mt-3 text-[1.15rem] text-[#7a5a56]">Manage the structure of your dining experience.</p>
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#9b6a63]">Menu structure</p>
+            <h2 class="font-serif text-[2.75rem] leading-none tracking-tight text-[#2f1f1d]">Menu Categories</h2>
+            <p class="mt-2 text-[1.05rem] text-[#7a5a56]"><%= pluralize(@total_categories, "category") %> total · <%= pluralize(@total_dishes, "dish") %> linked · <%= pluralize(@categories.total_count, "result") %><%= @query.present? ? " for \u201C#{@query}\u201D" : "" %></p>
           </div>
-
+          <% if policy(Category.new).create? %>
+            <%= link_to new_category_path, class: "inline-flex items-center gap-2 rounded-md bg-[#7b1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#661a23]" do %><span class="text-lg leading-none">＋</span> New Category<% end %>
+          <% end %>
         </div>
 
-        <div id="categories" class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-          <% if @categories.any? %>
-            <% @categories.each do |category| %>
-              <% status_label = category.name.to_s.downcase.include?("wine") ? "Hidden" : "Visible" %>
-              <%= link_to category_path(category), class: "group block rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" do %>
-                <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-[12px] bg-[#f1e3df] text-[#7b1f2a]">
-                  <% case category.name.to_s.downcase %>
-                  <% when /starter|appetizer/ %>
-                    <svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12h12"/><path d="M9 5h6v7a3 3 0 0 1-6 0V5Z"/><path d="M9 19h6"/></svg>
-                  <% when /main|course|dish/ %>
-                    <svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><path d="M7 7h10v10H7z"/><path d="M9 4v3M15 4v3"/></svg>
-                  <% when /dessert|sweet/ %>
-                    <svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 14c0-2 1.5-3.5 5-3.5s5 1.5 5 3.5v2.5H7z"/><path d="M9 14V9c0-1.7 1.1-3 3-3s3 1.3 3 3v5"/><path d="M6 18h12"/></svg>
-                  <% when /wine|drink|beverage/ %>
-                    <svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v7a5 5 0 0 1-10 0z"/><path d="M9 19h6"/><path d="M12 15v4"/><path d="M7 9h10"/></svg>
-                  <% else %>
-                    <svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M5 8.5c0-1.8 2.2-3.2 7-3.2s7 1.4 7 3.2-2.2 3.2-7 3.2-7 1.4-7 3.2S5.8 15.3 12 15.3s7-1.4 7-3.2"/></svg>
-                  <% end %>
-                </div>
+        <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-5 shadow-sm">
+            <p class="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#9b6a63]">Total categories</p>
+            <p class="mt-1 font-serif text-4xl font-semibold"><%= @total_categories %></p>
+            <p class="mt-1 text-sm text-[#7a5a56]">Showing <%= @categories.size %> of <%= @categories.total_count %> (8 per page)</p>
+          </div>
+          <div class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-5 shadow-sm">
+            <p class="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#9b6a63]">Dishes linked</p>
+            <p class="mt-1 font-serif text-4xl font-semibold"><%= @total_dishes %></p>
+            <p class="mt-1 text-sm text-[#7a5a56]">Across all categories</p>
+          </div>
+          <div class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-5 shadow-sm">
+            <p class="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#9b6a63]">Empty categories</p>
+            <p class="mt-1 font-serif text-4xl font-semibold"><%= @empty_count %></p>
+            <p class="mt-1 text-sm text-[#7a5a56]">With no dishes yet</p>
+          </div>
+        </div>
 
-                <h3 class="font-serif text-[1.05rem] text-[1.7rem] font-semibold tracking-tight text-[#2f1f1d]"><%= category.name %></h3>
-
-                <div class="mt-5 flex items-center justify-center gap-3 text-[0.9rem] text-[#5e4b48]">
-                  <span><%= pluralize(category.foods.count, "item") %></span>
-                  <span class="inline-flex items-center rounded-full <%= status_label == 'Hidden' ? 'bg-[#d8d0cf] text-[#4f4a49]' : 'bg-[#6a4c4b] text-white' %> px-2.5 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.08em]">
-                    <%= status_label %>
-                  </span>
-                </div>
-              <% end %>
-            <% end %>
-          <% else %>
-            <div class="col-span-full flex min-h-[360px] items-center justify-center rounded-[20px] border-2 border-dashed border-[#d7b9b2] bg-[#f8f3f1]">
-              <div class="max-w-md text-center">
-                <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#f1e3df] text-[#7b1f2a]">
-                  <svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-                </div>
-                <h3 class="font-serif text-[2.2rem] font-semibold tracking-tight text-[#2f1f1d]">No categories yet</h3>
-                <p class="mt-3 text-[1.05rem] text-[#7a5a56]">Start by adding your first category to organize your menu.</p>
-                <%= link_to "Add First Category", new_category_path, class: "mt-6 inline-flex items-center justify-center rounded-md bg-[#7b1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#661a23]" %>
+        <%= form_with url: categories_path, method: :get, local: true, class: "mb-5 rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-4 shadow-sm" do %>
+          <div class="flex flex-col gap-3 lg:flex-row lg:items-center">
+            <label class="relative flex-1">
+              <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#9b6a63]"><svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+              <%= text_field_tag :q, @query, placeholder: "Search categories by name...", autocomplete: "off", class: "w-full rounded-md border border-[#d8c1bc] bg-white py-3 pl-11 pr-4 text-[1rem] placeholder:text-[#a0817d] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+            </label>
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <%= select_tag :sort, options_for_select([["Newest first","newest"],["Oldest first","oldest"],["Name A-Z","name_asc"],["Name Z-A","name_desc"],["Most dishes","most_items"],["Fewest dishes","fewest_items"]], @sort), class: "rounded-md border border-[#d8c1bc] bg-white px-4 py-3 text-[0.95rem] font-medium focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+              <div class="flex items-center gap-2">
+                <%= submit_tag "Search", class: "cursor-pointer rounded-md bg-[#7b1f2a] px-6 py-3 text-base font-semibold text-white hover:bg-[#661a23]" %>
+                <% if @query.present? || params[:sort].present? %>
+                  <%= link_to "Clear", categories_path, class: "rounded-md border border-[#d8c1bc] bg-white px-5 py-3 text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+                <% end %>
               </div>
             </div>
-          <% end %>
+          </div>
+        <% end %>
+
+        <div class="overflow-hidden rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] shadow-sm">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-[#e4d2ce] text-left">
+              <thead class="bg-[#efe0de]">
+                <tr class="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#7a5550]">
+                  <th scope="col" class="w-10 px-6 py-4">#</th>
+                  <th scope="col" class="px-6 py-4">Category</th>
+                  <th scope="col" class="px-6 py-4">Dishes</th>
+                  <th scope="col" class="px-6 py-4">Sample dishes</th>
+                  <th scope="col" class="px-6 py-4">Created</th>
+                  <th scope="col" class="px-6 py-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[#ecdfdc]">
+                <% if @categories.any? %>
+                  <% offset = @categories.offset_value || 0 %>
+                  <% @categories.each_with_index do |category, i| %>
+                    <% dish_count = category.try(:foods_count)&.to_i || category.foods.size %>
+                    <tr class="bg-[#f8f3f1] transition hover:bg-[#f3e7e4]">
+                      <td class="whitespace-nowrap px-6 py-4 text-sm font-semibold text-[#9b6a63]"><%= offset + i + 1 %></td>
+                      <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                          <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] bg-[#f1e3df] text-[#7b1f2a]">
+                            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                          </span>
+                          <div class="min-w-0">
+                            <%= link_to category.name, category_path(category), class: "block truncate font-serif text-xl font-semibold hover:text-[#7b1f2a] hover:underline" %>
+                            <p class="text-xs text-[#9b6a63]">ID #<%= category.id %></p>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="whitespace-nowrap px-6 py-4">
+                        <span class="inline-flex items-center rounded-full <%= dish_count.zero? ? "bg-[#ead9d6] text-[#7a5550]" : "bg-[#6a4c4b] text-white" %> px-3 py-1 text-[0.78rem] font-semibold"><%= pluralize(dish_count, "dish") %></span>
+                      </td>
+                      <td class="px-6 py-4">
+                        <% samples = category.foods.first(3) %>
+                        <% if samples.any? %>
+                          <div class="flex max-w-[280px] flex-wrap gap-1.5">
+                            <% samples.each do |food| %><%= link_to food.name, food_path(food), class: "max-w-full truncate rounded-full border border-[#d8c1bc] bg-white px-2.5 py-1 text-xs font-medium text-[#5c4543] hover:text-[#7b1f2a]" %><% end %>
+                            <% if dish_count > samples.size %><span class="rounded-full bg-[#efe0de] px-2.5 py-1 text-xs font-semibold text-[#7a5550]">+<%= dish_count - samples.size %> more</span><% end %>
+                          </div>
+                        <% else %><span class="text-sm italic text-[#a0817d]">No dishes yet</span><% end %>
+                      </td>
+                      <td class="whitespace-nowrap px-6 py-4 text-sm text-[#5e4b48]"><%= category.created_at.strftime("%b %d, %Y") %><p class="text-xs text-[#9b6a63]"><%= time_ago_in_words(category.created_at) %> ago</p></td>
+                      <td class="whitespace-nowrap px-6 py-4"><div class="flex items-center justify-end gap-2">
+                        <%= link_to "View", category_path(category), class: "rounded-md border border-[#d8c1bc] bg-white px-3 py-2 text-sm font-semibold hover:bg-[#f1dfdf]" %>
+                        <% if policy(category).update? %><%= link_to "Edit", edit_category_path(category), class: "rounded-md border border-[#7b1f2a]/30 bg-[#fbeeee] px-3 py-2 text-sm font-semibold text-[#7b1f2a] hover:bg-[#f3d9d6]" %><% end %>
+                        <% if policy(category).destroy? %><%= button_to "Delete", category_path(category), method: :delete, data: { turbo_confirm: "Delete this category? Its dishes will also be removed." }, class: "cursor-pointer rounded-md bg-[#8f1f2a] px-3 py-2 text-sm font-semibold text-white hover:bg-[#7a1a23]" %><% end %>
+                      </div></td>
+                    </tr>
+                  <% end %>
+                <% else %>
+                  <tr><td colspan="6" class="px-6 py-14"><div class="mx-auto max-w-md text-center">
+                    <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#f1e3df] text-[#7b1f2a]"><svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
+                    <% if @query.present? %>
+                      <h3 class="font-serif text-2xl font-semibold">No match for "<%= @query %>"</h3>
+                      <p class="mt-2 text-[#7a5a56]">Try a different spelling, or clear the search.</p>
+                      <div class="mt-6 flex items-center justify-center gap-3"><%= link_to "Clear search", categories_path(sort: @sort), class: "rounded-md border border-[#d8c1bc] bg-white px-5 py-3 font-semibold hover:bg-[#f1dfdf]" %></div>
+                    <% else %>
+                      <h3 class="font-serif text-2xl font-semibold">No categories yet</h3>
+                      <p class="mt-2 text-[#7a5a56]">Start by adding your first category.</p>
+                      <%= link_to "Add First Category", new_category_path, class: "mt-6 inline-flex rounded-md bg-[#7b1f2a] px-5 py-3 font-semibold text-white hover:bg-[#661a23]" %>
+                    <% end %>
+                  </div></td></tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+          <div class="flex flex-col gap-3 border-t border-[#e4d2ce] bg-[#f3e9e7] px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <p class="text-sm text-[#7a5a56]">
+              <% if @categories.total_count.positive? %>Showing <strong><%= @categories.offset_value + 1 %>-<%= @categories.offset_value + @categories.size %></strong> of <strong><%= @categories.total_count %></strong> · Page <strong><%= @categories.current_page %></strong> of <%= @categories.total_pages %><% else %>No categories to show<% end %>
+            </p>
+            <%= paginate @categories, params: { q: @query, sort: @sort } %>
+          </div>
         </div>
       </div>
     </main>

@@ -107,6 +107,20 @@ class ReservationTest < ActiveSupport::TestCase
     end
   end
 
+  test "checking in outside the slot window still keeps the table occupied" do
+    travel_to Time.zone.local(2026, 9, 10, 11, 30) do
+      r = build_reservation(reservation_date: Date.current + 1, reservation_time: "19:00", status: :approved)
+      r.save!
+      assert r.table.reload.available?, "future reservation should not hold the table yet"
+
+      r.update!(status: :checked_in)
+      assert r.table.reload.occupied?, "checked-in guest is seated: table must be occupied even outside the slot window"
+
+      r.update!(status: :completed)
+      assert r.table.reload.available?
+    end
+  end
+
   test "an out-of-service table has no available slots" do
     @bookable.update!(status: :out_of_service)
     assert_empty Reservation.available_slots(@bookable, Date.current + 1)

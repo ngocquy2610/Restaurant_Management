@@ -23,7 +23,8 @@ class Kitchen::LowStockRequestsController < Kitchen::BaseController
       notify_role(
         :inventory_manager,
         title: "Low stock request",
-        body: "#{current_user.full_name} requested more #{@low_stock_request.ingredient.name}."
+        body: "#{current_user.full_name} requested more #{@low_stock_request.ingredient.name}.",
+        redirect_url: inventory_low_stock_request_path(@low_stock_request)
       )
       redirect_to kitchen_low_stock_requests_path,
                   notice: "Request sent to the inventory manager."

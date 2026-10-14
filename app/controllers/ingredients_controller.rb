@@ -44,7 +44,8 @@ class IngredientsController < ApplicationController
       notify_user(
         recipient: current_user,
         title: "Ingredient created",
-        body: "The ingredient #{@ingredient.name} has been created."
+        body: "The ingredient #{@ingredient.name} has been created.",
+        redirect_url: ingredient_path(@ingredient)
       )
       redirect_to ingredients_path, notice: "Ingredient was successfully created."
     else
@@ -59,7 +60,8 @@ class IngredientsController < ApplicationController
       notify_user(
         recipient: current_user,
         title: "Ingredient updated",
-        body: "The ingredient #{@ingredient.name} has been updated."
+        body: "The ingredient #{@ingredient.name} has been updated.",
+        redirect_url: ingredient_path(@ingredient)
       )
       redirect_to ingredients_path, notice: "Ingredient was successfully updated."
     else
@@ -74,7 +76,8 @@ class IngredientsController < ApplicationController
     notify_user(
       recipient: current_user,
       title: "Ingredient destroyed",
-      body: "The ingredient #{@ingredient.name} has been destroyed."
+      body: "The ingredient #{@ingredient.name} has been destroyed.",
+      redirect_url: ingredients_path
     )
     redirect_to ingredients_path, notice: "Ingredient was successfully destroyed."
   end
@@ -84,7 +87,8 @@ class IngredientsController < ApplicationController
     @ingredient.deactivate!
     notify_user(recipient: current_user,
                 title: "Ingredient deactivated",
-                body: "#{@ingredient.name} was deactivated.")
+                body: "#{@ingredient.name} was deactivated.",
+                redirect_url: ingredient_path(@ingredient))
     redirect_to ingredients_path, notice: "Ingredient deactivated.", status: :see_other
   end
 

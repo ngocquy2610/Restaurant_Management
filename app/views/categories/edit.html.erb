@@ -1,23 +1,72 @@
 <% content_for :title, "Edit category" %>
 
 <div class="min-h-screen pt-[5.25rem] bg-[#f4e6e2] text-[#2f1f1d]">
-  <main class="mx-auto flex w-full max-w-[640px] flex-col px-6 py-12">
+  <main class="mx-auto flex w-full max-w-[880px] flex-col px-6 py-12">
     <%= link_to categories_path, class: "mb-8 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-[#7b1f2a] hover:text-[#661a23]" do %>
       <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
       Back to categories
     <% end %>
 
     <div class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-8 shadow-sm">
-      <h1 class="font-serif text-4xl font-semibold tracking-tight text-[#2f1f1d]">Edit category</h1>
-      <p class="mt-2 text-[1.05rem] text-[#7a5a56]">Update the name of this category.</p>
+      <div class="mb-1 flex flex-wrap items-center gap-2 text-sm font-semibold">
+        <span class="rounded-full bg-[#6a4c4b] px-2.5 py-1 text-[0.72rem] uppercase tracking-[0.1em] text-white">Editing</span>
+        <span class="text-xs uppercase tracking-[0.14em] text-[#9b6a63]">ID #<%= @category.id %></span>
+        <span class="rounded-full <%= @food_count.zero? ? "bg-[#ead9d6] text-[#7a5550]" : "bg-[#efe0de] text-[#5c4543]" %> px-2.5 py-1 text-xs font-semibold"><%= pluralize(@food_count, "dish") %></span>
+      </div>
+      <h1 class="font-serif text-4xl font-semibold tracking-tight">Edit “<%= @category.name %>”</h1>
+      <p class="mt-2 text-[1.05rem] text-[#7a5a56]">
+        Rename this category. Created <%= @category.created_at.strftime("%b %d, %Y") %>
+        (<%= time_ago_in_words(@category.created_at) %> ago)<% if @category.updated_at != @category.created_at %>, last updated <%= time_ago_in_words(@category.updated_at) %> ago<% end %>.
+      </p>
 
       <div class="mt-8">
-        <%= render "form", category: @category %>
+        <%= render "form", category: @category, existing_names: @existing_categories.map(&:name) %>
       </div>
 
-      <div class="mt-6 flex items-center gap-3 border-t border-[#e4d2ce] pt-6">
-        <%= link_to "Show this category", @category, class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
-        <%= button_to "Delete", @category, method: :delete, data: { turbo_confirm: "Delete this category? Its foods will also be removed." }, class: "cursor-pointer rounded-md bg-[#8f1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#7a1a23]" %>
+      <% if @category_foods.any? %>
+        <div class="mt-6 rounded-[12px] border border-[#e4d2ce] bg-white/60 p-5">
+          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#9b6a63]">
+            Dishes in this category (<%= @food_count %><% if @food_count > @category_foods.size %> — showing <%= @category_foods.size %><% end %>)
+          </p>
+          <div class="mt-2 flex flex-wrap gap-1.5">
+            <% @category_foods.each do |food| %>
+              <%= link_to food.name, food_path(food), class: "rounded-full border border-[#d8c1bc] bg-white px-2.5 py-1 text-xs font-medium text-[#5c4543] hover:text-[#7b1f2a]" %>
+            <% end %>
+            <% if @food_count > @category_foods.size %>
+              <span class="rounded-full bg-[#efe0de] px-2.5 py-1 text-xs font-semibold text-[#7a5550]">+<%= @food_count - @category_foods.size %> more</span>
+            <% end %>
+          </div>
+          <p class="mt-2 text-xs text-[#8a6f6a]">Renaming the category updates the label everywhere these dishes appear — no dishes are moved or deleted.</p>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-5 shadow-sm">
+        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#9b6a63]">Other categories</p>
+        <% if @existing_categories.any? %>
+          <div class="mt-2 flex flex-wrap gap-1.5">
+            <% @existing_categories.each do |c| %>
+              <%= link_to c.name, edit_category_path(c), title: "Edit #{c.name}", class: "rounded-full border border-[#d8c1bc] bg-white px-2.5 py-1 text-xs font-medium text-[#5c4543] hover:text-[#7b1f2a]" %>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="mt-2 text-sm text-[#8a6f6a]">This is the only category.</p>
+        <% end %>
+      </div>
+      <div class="rounded-[16px] border border-[#c0392b]/30 bg-[#fdf0ee] p-5 shadow-sm">
+        <p class="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#8f1f2a]">Danger zone</p>
+        <p class="mt-2 text-sm leading-relaxed text-[#5e4b48]">
+          Deleting removes this category and
+          <strong><%= pluralize(@food_count, "dish") %></strong>.
+          This cannot be undone.
+        </p>
+        <div class="mt-3 flex flex-wrap items-center gap-2">
+          <%= link_to "View details", @category, class: "rounded-md border border-[#d8c1bc] bg-white px-4 py-2.5 text-sm font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+          <%= button_to "Delete category", @category, method: :delete,
+                data: { turbo_confirm: "Delete “#{@category.name}”? Its #{pluralize(@food_count, 'dish')} will also be removed." },
+                class: "cursor-pointer rounded-md bg-[#8f1f2a] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#7a1a23]" %>
+        </div>
       </div>
     </div>
   </main>

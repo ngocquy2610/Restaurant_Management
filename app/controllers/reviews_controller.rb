@@ -57,7 +57,8 @@ class ReviewsController < ApplicationController
     authorize @review
 
     if @review.save
-      notify_role(:admin, title: "New customer review", body: review_notification_body(@review))
+      notify_role(:admin, title: "New customer review", body: review_notification_body(@review),
+          redirect_url: review_path(@review))
       redirect_to after_write_path(@review), notice: "Thank you for your review!"
     else
       render :new, status: :unprocessable_content

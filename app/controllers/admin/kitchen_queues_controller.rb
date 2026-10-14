@@ -28,7 +28,8 @@ class Admin::KitchenQueuesController < ApplicationController
 
     notify_role(:waiter,
       title: "Order ready",
-      body: "#{@item.quantity}x #{@item.food&.name} for Table #{@item.order&.table&.table_number} is ready to serve.") if @item.ready?
+      body: "#{@item.quantity}x #{@item.food&.name} for Table #{@item.order&.table&.table_number} is ready to serve.",
+      redirect_url: order_path(@item.order)) if @item.ready?
 
     redirect_to redirect_target_after_update,
                 notice: "Table #{@item.order&.table&.table_number}: #{@item.food&.name} → #{target.humanize}."

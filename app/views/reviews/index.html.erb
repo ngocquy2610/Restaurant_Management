@@ -30,8 +30,12 @@
     <% end %>
 
     <% if @reviews.any? %>
-      <div class="space-y-4"><%= render @reviews %></div>
-      <div class="mt-6"><%= paginate @reviews %></div>
+      <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <%= render @reviews %>
+      </div>
+      <div class="mt-6 flex justify-center">
+        <%= paginate @reviews %>
+      </div>
     <% else %>
       <div class="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-12 text-center shadow-sm">
         <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#8A1C2B]/10 text-2xl">⭐</div>

@@ -21,7 +21,8 @@ class PreordersController < ApplicationController
     if @order.release_to_kitchen!
       notify_role(:kitchen_staff,
         title: "Pre-order released early",
-        body: "#{@order.reservation&.guest_name} (Table #{@order.table&.table_number}) — #{@order.order_items.count} dish(es) moved to top of queue."
+        body: "#{@order.reservation&.guest_name} (Table #{@order.table&.table_number}) — #{@order.order_items.count} dish(es) moved to top of queue.",
+        redirect_url: admin_kitchen_queue_path(@order)
       )
       redirect_to preorders_path, notice: "Preorder have been put on top of queue"
     else
@@ -42,7 +43,8 @@ class PreordersController < ApplicationController
       @order.schedule_kitchen_release
       notify_role(:kitchen_staff,
         title: "Pre-order received",
-        body: "#{@order.reservation&.guest_name} pre-ordered dishes for table #{@order.table&.table_number}."
+        body: "#{@order.reservation&.guest_name} pre-ordered dishes for table #{@order.table&.table_number}.",
+        redirect_url: admin_kitchen_queue_path(@order)
       )
       redirect_to preorder_path(@order), notice: "Your pre-order was received. See you soon!"
     else

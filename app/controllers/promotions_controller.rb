@@ -32,7 +32,8 @@ class PromotionsController < ApplicationController
       notify_user(
         recipient: current_user,
         title: "Promotion created",
-        body: "The promotion #{@promotion.name} has been created."
+        body: "The promotion #{@promotion.name} has been created.",
+        redirect_url: promotion_path(@promotion)
       )
       redirect_to promotions_path, notice: "Promotion added."
     else
@@ -47,7 +48,8 @@ class PromotionsController < ApplicationController
       notify_user(
         recipient: current_user,
         title: "Promotion updated",
-        body: "The promotion #{@promotion.name} has been updated."
+        body: "The promotion #{@promotion.name} has been updated.",
+        redirect_url: promotion_path(@promotion)
       )
       redirect_to promotions_path, notice: "Promotion updated."
     else
@@ -62,7 +64,8 @@ class PromotionsController < ApplicationController
     notify_user(
       recipient: current_user,
       title: "Promotion destroyed",
-      body: "The promotion #{@promotion.name} has been destroyed."
+      body: "The promotion #{@promotion.name} has been destroyed.",
+      redirect_url: promotions_path
     )
     redirect_to promotions_path, notice: "Promotion removed."
   end

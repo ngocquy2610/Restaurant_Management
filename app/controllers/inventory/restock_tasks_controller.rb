@@ -56,6 +56,7 @@ class Inventory::RestockTasksController < Inventory::BaseController
     notify_role(:inventory_manager,
                 title: "Restock completed",
                 body: "#{@restock_task.ingredient.name}: received #{received}.",
+                redirect_url: inventory_restock_task_path(@restock_task),
                 exclude: current_user)
 
     redirect_to inventory_restock_task_path(@restock_task),

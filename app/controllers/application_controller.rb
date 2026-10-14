@@ -35,8 +35,8 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def notify_user(recipient:, title:, body: nil)
-    Notification.create!(recipient: recipient, title: title, body: body)
+  def notify_user(recipient:, title:, body: nil, redirect_url: nil)
+    Notification.create!(recipient: recipient, title: title, body: body, redirect_url: redirect_url)
     # Example how to use:
     # notify_user(
     #   recipient: @reservation.customer,
@@ -45,9 +45,9 @@ class ApplicationController < ActionController::Base
     # )
   end
 
-  def notify_role(role, title:, body: nil, exclude: nil)
+  def notify_role(role, title:, body: nil, redirect_url: nil, exclude: nil)
     User.where(role: role).where.not(id: exclude&.id).find_each do |user|
-      Notification.create!(recipient: user, title: title, body: body)
+      Notification.create!(recipient: user, title: title, body: body, redirect_url: redirect_url)
     end
     # Example how to use:
     # notify_role(:receptionist,

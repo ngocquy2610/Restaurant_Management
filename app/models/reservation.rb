@@ -105,6 +105,7 @@ class Reservation < ApplicationRecord
   private
 
   def sync_table_status
+    return if destroyed? || table.nil? || table.destroyed?
     table.refresh_status_from_reservations!
   end
 

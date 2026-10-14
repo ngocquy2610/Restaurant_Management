@@ -17,6 +17,21 @@ class OrdersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "new order form lists a table with a checked-in reservation" do
+    table = tables(:booked_a)
+    Reservation.create!(
+      user: users(:one), table: table,
+      guest_name: "Checked In", guest_phone: "0812345678",
+      reservation_date: Date.current + 1, reservation_time: "19:00",
+      status: :checked_in
+    )
+    assert table.reload.occupied?
+
+    get new_order_url
+    assert_response :success
+    assert_select "select[name='order[table_id]']"
+  end
+
   test "should create order with nested items for a customer" do
     assert_difference("Order.count") do
       post orders_url, params: {
@@ -35,6 +50,8 @@ class OrdersControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, order.order_items.size
     # per-unit base price for foods(:one); 2 units => 19.98 line total
     assert_in_delta 9.99, order.order_items.first.unit_price, 0.001
+    notification = Notification.find_by!(recipient: users(:kitchen_staff), title: "New order at #{order.table.table_number}")
+    assert_equal admin_kitchen_queue_path(order), notification.redirect_url
     assert_redirected_to order_url(order)
   end
 

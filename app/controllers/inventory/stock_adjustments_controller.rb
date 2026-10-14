@@ -34,6 +34,7 @@ class Inventory::StockAdjustmentsController < Inventory::BaseController
       notify_role(:inventory_manager,
                   title: "Stock adjusted",
                   body: "#{ingredient.name} set to #{physical} by #{current_user.full_name}.",
+                  redirect_url: ingredient_path(ingredient),
                   exclude: current_user)
       redirect_to ingredient_path(ingredient), notice: "Stock adjusted for #{ingredient.name}."
     end

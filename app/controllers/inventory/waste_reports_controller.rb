@@ -30,7 +30,8 @@ class Inventory::WasteReportsController < Inventory::BaseController
       recipient: @waste_report.user,
       title: "Waste report #{decision}",
       body: "Your waste report for #{@waste_report.ingredient.name} was #{decision}." \
-            "#{note.present? ? " Reason: #{note}" : ""}"
+        "#{note.present? ? " Reason: #{note}" : ""}",
+      redirect_url: inventory_waste_report_path(@waste_report)
     ) if @waste_report.user
 
     redirect_to inventory_waste_report_path(@waste_report), notice: "Waste report #{decision}."

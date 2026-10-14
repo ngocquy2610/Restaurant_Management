@@ -1,0 +1,31 @@
+    <div class="rounded-[12px] border border-[#e4d2ce] bg-white/60 p-5">
+      <%= form.label :price_adjustment, class: "block text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#7c5d58]" do %>
+        Price adjustment <span class="text-[#8f1f2a]">*</span>
+      <% end %>
+      <div class="relative mt-2">
+        <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 font-semibold text-[#7a5d5a]">$</span>
+        <%= form.number_field :price_adjustment,
+              step: 0.01, placeholder: "e.g. 2.50 (or -2.00 to discount)",
+              data: { food_variant_form_target: "adjustment", action: "input->food-variant-form#recompute" },
+              class: "w-full rounded-md border border-[#d8c1bc] bg-[#fffdfc] py-3 pl-8 pr-4 text-lg font-medium text-[#2c1c1a] placeholder:font-normal placeholder:text-[#a0817d] focus:outline-none focus:ring-2 focus:ring-[#c0928d] #{'border-[#c0392b] ring-1 ring-[#c0392b]/40' if food_variant.errors[:price_adjustment].any?}" %>
+      </div>
+      <% if food_variant.errors[:price_adjustment].any? %>
+        <p class="mt-2 text-sm font-medium text-[#8f1f2a]"><%= food_variant.errors[:price_adjustment].first %></p>
+      <% end %>
+      <div class="mt-3 flex flex-wrap gap-2">
+        <% [["No change", "0"], ["+$1", "1"], ["+$2.5", "2.5"], ["+$5", "5"], ["−$1", "-1"], ["−$2.5", "-2.5"]].each do |label, val| %>
+          <button type="button" data-action="click->food-variant-form#setAdjustment" data-value="<%= val %>" class="rounded-full border border-[#d8c1bc] bg-[#f8efee] px-3 py-1.5 text-sm font-semibold text-[#5c4543] hover:border-[#7b1f2a]/40 hover:bg-[#fbeeee] hover:text-[#7b1f2a]"><%= label %></button>
+        <% end %>
+      </div>
+      <p class="mt-2 text-sm leading-relaxed text-[#8a6f6a]">Added to (or subtracted from) the dish base price. Final must stay ≥ $0.</p>
+    </div>
+  </div>
+
+  <div class="flex flex-col-reverse gap-3 sm:flex-row sm:items-center border-t border-[#e4d2ce] pt-6">
+    <%= form.submit(food_variant.persisted? ? "Save changes" : "Create variant",
+          class: "cursor-pointer rounded-md bg-[#7b1f2a] px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#661a23]") %>
+    <% if food_variant.persisted? %>
+      <%= link_to "View", food_variant_path(food_variant), class: "rounded-md border border-[#d8c1bc] bg-white px-6 py-3 text-center text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+    <% end %>
+    <%= link_to "Cancel", food_variants_path, class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-6 py-3 text-center text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+  </div>

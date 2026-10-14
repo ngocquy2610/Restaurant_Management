@@ -4,14 +4,7 @@ class FoodVariantsControllerTest < ActionDispatch::IntegrationTest
   include Devise::Test::IntegrationHelpers
 
   setup do
-    @admin = User.create!(
-      full_name: "Admin User",
-      email: "fv-admin@example.com",
-      phone: "5551234567",
-      password: "password",
-      role: :admin
-    )
-    sign_in @admin
+    sign_in users(:admin)
 
     @food_variant = food_variants(:one)
   end
@@ -29,7 +22,7 @@ class FoodVariantsControllerTest < ActionDispatch::IntegrationTest
       assert_select "input[name='food_variant[name]']"
       assert_select "select[name='food_variant[food_id]']"
       assert_select "input[name='food_variant[price_adjustment]']"
-      assert_select "input[type='submit'][value='Create Food variant']"
+      assert_select "input[type='submit'][value='Create variant']"
     end
   end
 
@@ -71,7 +64,7 @@ class FoodVariantsControllerTest < ActionDispatch::IntegrationTest
       assert_select "input[name='food_variant[name]'][value='#{@food_variant.name}']"
       assert_select "select[name='food_variant[food_id]']"
       assert_select "input[name='food_variant[price_adjustment]']"
-      assert_select "input[type='submit'][value='Update Food variant']"
+      assert_select "input[type='submit'][value='Save changes']"
     end
   end
 
@@ -107,4 +100,3 @@ class FoodVariantsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to food_variants_url
   end
 end
-

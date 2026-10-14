@@ -1,24 +1,51 @@
 <% content_for :title, "Edit food variant" %>
 
 <div class="pt-[5.25rem] min-h-screen bg-[#f4e6e2] text-[#2f1f1d]">
-  <main class="mx-auto flex w-full max-w-[720px] flex-col px-6 py-12">
+  <main class="mx-auto flex w-full max-w-[1080px] flex-col px-6 py-12">
     <%= link_to food_variants_path, class: "mb-8 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-[#7b1f2a] hover:text-[#661a23]" do %>
       <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
       Back to menu variants
     <% end %>
 
-    <div class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-8 shadow-sm">
-      <h1 class="font-serif text-4xl font-semibold tracking-tight text-[#2f1f1d]">Edit food variant</h1>
-      <p class="mt-2 text-[1.05rem] text-[#7a5a56]">Update the details of this portion.</p>
+    <div class="mb-6">
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#9b6a63]">Menu structure · Edit #<%= @food_variant.id %></p>
+      <h1 class="font-serif text-4xl font-semibold tracking-tight text-[#2f1f1d]">Edit “<%= @food_variant.name %>”</h1>
+      <p class="mt-2 text-[1.05rem] text-[#7a5a56]">Update this portion. Dish: <strong><%= @food_variant.food&.name || "—" %></strong> · Base $<%= number_to_currency(@food_variant.food&.base_price || 0, precision: 2, unit: "") %></p>
+    </div>
 
-      <div class="mt-8">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_300px]">
+      <div class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-8 shadow-sm">
         <%= render "form", food_variant: @food_variant %>
+
+        <div class="mt-6 flex flex-col gap-3 border-t border-[#e4d2ce] pt-6 sm:flex-row sm:items-center">
+          <%= link_to "Show this food variant", @food_variant, class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 text-center text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+          <% if policy(@food_variant).destroy? %>
+            <%= button_to "Delete", @food_variant, method: :delete, data: { turbo_confirm: "Delete this food variant? This cannot be undone." }, class: "cursor-pointer rounded-md bg-[#8f1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#7a1a23]" %>
+          <% end %>
+        </div>
       </div>
 
-      <div class="mt-6 flex items-center gap-3 border-t border-[#e4d2ce] pt-6">
-        <%= link_to "Show this food variant", @food_variant, class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
-        <%= button_to "Delete", @food_variant, method: :delete, data: { turbo_confirm: "Delete this food variant? This cannot be undone." }, class: "cursor-pointer rounded-md bg-[#8f1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#7a1a23]" %>
-      </div>
+      <aside class="space-y-4">
+        <div class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-5 shadow-sm">
+          <p class="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#9b6a63]">Current pricing</p>
+          <% base = @food_variant.food&.base_price %>
+          <% adj = @food_variant.price_adjustment || 0 %>
+          <% final = (base.present? ? base + adj : nil) %>
+          <p class="mt-3 font-serif text-3xl font-semibold text-[#7b1f2a]"><%= final.present? ? "$#{number_to_currency(final, precision: 2, unit: "")}" : "—" %></p>
+          <p class="mt-1 text-sm text-[#7a5a56]">Base $<%= number_to_currency(base || 0, precision: 2, unit: "") %> <%= adj.negative? ? "−" : "+" %> $<%= number_to_currency(adj.abs, precision: 2, unit: "") %></p>
+          <p class="mt-2 text-xs text-[#9b6a63]">Created <%= @food_variant.created_at.strftime("%b %d, %Y") %> · Updated <%= @food_variant.updated_at.strftime("%b %d, %Y") %></p>
+        </div>
+        <% if @same_dish_variants.present? %>
+          <div class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-5 shadow-sm">
+            <p class="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#9b6a63]">Siblings (<%= @same_dish_variants.size %>)</p>
+            <div class="mt-3 space-y-2">
+              <% @same_dish_variants.first(5).each do |sib| %>
+                <%= link_to sib.name, edit_food_variant_path(sib), class: "block truncate rounded-md border border-[#e4d2ce] bg-white px-3 py-2 text-sm font-medium hover:border-[#7b1f2a]/40 hover:text-[#7b1f2a]" %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </aside>
     </div>
   </main>
 </div>

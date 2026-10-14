@@ -1,0 +1,16 @@
+<% selected_food ||= nil %>
+<% base_price = selected_food&.base_price %>
+<% adj_value = food_variant.price_adjustment %>
+<% preview_final = base_price.present? && !adj_value.nil? ? base_price + adj_value : nil %>
+  <div class="rounded-[12px] border border-[#7b1f2a]/25 bg-[#fbeeee] px-5 py-4">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-4 text-[0.95rem]">
+        <span class="text-[#7c5d58]">Base <strong data-food-variant-form-target="base" class="font-serif text-xl text-[#2f1f1d]"><%= base_price.present? ? "$#{number_to_currency(base_price, precision: 2, unit: "")}" : "—" %></strong></span>
+        <span class="font-bold text-[#9b6a63]">± adj.</span>
+        <span class="text-[#7c5d58]">= Final <strong data-food-variant-form-target="final" class="font-serif text-2xl text-[#7b1f2a]"><%= preview_final.present? ? "$#{number_to_currency(preview_final, precision: 2, unit: "")}" : base_price.present? ? "$#{number_to_currency(base_price, precision: 2, unit: "")}" : "—" %></strong></span>
+      </div>
+      <span class="rounded-full bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.1em] text-[#7b1f2a]">Live preview</span>
+    </div>
+    <p data-food-variant-form-target="hint" class="mt-2 text-sm text-[#7a5a56]"><%= selected_food.present? ? "Priced from #{selected_food.name}." : "Select a dish to preview pricing." %></p>
+    <p data-food-variant-form-target="warning" class="mt-2 hidden rounded-md border border-[#e5b3ad] bg-[#fbe9e6] px-3 py-2 text-sm font-semibold text-[#8f1f2a]"></p>
+  </div>
