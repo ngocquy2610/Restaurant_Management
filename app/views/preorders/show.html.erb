@@ -1,5 +1,4 @@
 <% content_for :title, "Pre-order received" %>
-<div class="relative"><%= render "layouts/header" %></div>
 <div class="min-h-screen bg-[#FBF0EC] px-4 py-10 pt-28">
   <div class="mx-auto max-w-3xl space-y-8">
     <div class="text-center">
@@ -39,6 +38,11 @@
         <p class="px-6 py-12 text-center text-sm text-gray-500">No dishes were chosen this time.</p>
       <% end %>
 
+      <div class="flex justify-between px-6 py-3 text-sm text-gray-600">
+        <span>Table charge (<%= @order.table&.table_type&.type.presence || "table" %>)</span>
+        <span><%= number_to_currency(@order.table_price, precision: 2) %></span>
+      </div>
+      
       <div class="flex justify-between px-6 py-3 text-sm text-gray-600">
         <span>
           Membership discount

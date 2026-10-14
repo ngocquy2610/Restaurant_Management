@@ -8,7 +8,7 @@ class OrderItemPolicy < ApplicationPolicy
   end
 
   def create?
-    order_taker?
+    order_taker? && !record.order&.completed?
   end
 
   def new?
@@ -16,7 +16,7 @@ class OrderItemPolicy < ApplicationPolicy
   end
 
   def update?
-    order_taker?
+    order_taker? && !record.order&.completed?
   end
 
   def update_status?
@@ -24,7 +24,7 @@ class OrderItemPolicy < ApplicationPolicy
   end
 
   def destroy?
-    order_taker?
+    order_taker? && !record.order&.completed?
   end
 
   # The kitchen console is only reachable by admins and kitchen staff.

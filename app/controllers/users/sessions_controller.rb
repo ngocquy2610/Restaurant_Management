@@ -13,7 +13,7 @@ class Users::SessionsController < Devise::SessionsController
     signed_out = (Devise.sign_out_all_scopes ? sign_out : sign_out(resource_name))
 
     respond_to do |format|
-      format.html { redirect_to root_path, notice: 'Logged out successfully.' }
+      format.html { redirect_to root_path, notice: 'Logged out successfully.', status: :see_other }
       format.json { render json: { status: 'ok' }, status: :ok }
     end
   end

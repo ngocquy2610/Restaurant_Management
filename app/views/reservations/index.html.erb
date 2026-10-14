@@ -141,6 +141,7 @@
                   <th scope="col" class="px-6 py-4">Shape</th>
                   <th scope="col" class="px-6 py-4">Seats</th>
                   <th scope="col" class="px-6 py-4">Status</th>
+                  <th scope="col" class="px-6 py-4 text-right"><span class="sr-only">Reserve</span></th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 bg-white">
@@ -162,6 +163,13 @@
                         <span class="h-2 w-2 rounded-full <%= status_dot_class(table.status) %>"></span>
                         <%= status_label(table.status) %>
                       </span>
+                    </td>
+                    <td class="px-6 py-5 text-right">
+                      <% unless table.out_of_service? %>
+                        <%= link_to "Reserve", new_reservation_path(table_id: table.id),
+                              class: "inline-flex items-center rounded-full bg-[#8A1C2B] px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#6d1420]",
+                              aria: { label: "Reserve table #{table.table_number}" } %>
+                      <% end %>
                     </td>
                   </tr>
                 <% end %>

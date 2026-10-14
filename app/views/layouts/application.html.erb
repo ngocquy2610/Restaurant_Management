@@ -26,13 +26,13 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.12.0/toastify.min.js"></script>
 
   </head>
-  <div class="relative"><%= render "layouts/header" %></div>
   <body class="font-serif">
-    <main class="mx-auto">
+    <div class="relative"><%= render "layouts/header" %></div>
+    <div class="mx-auto">
       <%= yield %>
-    </main>
+    </div>
 
     <%= render "layouts/loading_screen" %>
+    <%= render "layouts/footer" %>
   </body>
-  <%= render "layouts/footer" %>
 </html>

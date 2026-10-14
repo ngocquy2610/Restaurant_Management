@@ -127,8 +127,8 @@ export default class extends Controller {
       document.body.style.cursor = "default";
     });
 
-    // Click: report which table was selected + its position.
-    group.on("click", () => this.handleTable("click", table, group));
+    // Click/tap: report which table was selected + its position.
+    group.on("click tap", () => this.handleTable("click", table, group));
 
     // Keep a reference on the shape for programmatic lookups.
     shape.tableId = table.id;

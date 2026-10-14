@@ -100,7 +100,7 @@ class InvoicePdf < Prawn::Document
     move_down 8
 
     if @order.table_price.to_d.positive?
-      text "Includes table fee: #{format_currency(@order.table_price)}",
+      text "Includes table fee: #{format_usd(@order.table_price)}",
            size: 9, align: :right
     end
 
@@ -117,8 +117,8 @@ class InvoicePdf < Prawn::Document
       rows << [
         item_name(item),
         quantity.to_s,
-        format_currency(unit_price),
-        format_currency(unit_price * quantity)
+        format_usd(unit_price),
+        format_usd(unit_price * quantity)
       ]
     end
 
@@ -132,10 +132,10 @@ class InvoicePdf < Prawn::Document
     total = @payment.total_amount.to_d
 
     total_rows = [
-      ["Subtotal", format_currency(subtotal)],
-      [discount_label, "-#{format_currency(discount)}"],
+      ["Subtotal", format_usd(subtotal)],
+      [discount_label, "-#{format_usd(discount)}"],
       ["Total (USD)", format_usd(total)],
-      ["Total (VND)", format_currency(@payment.total_amount_vnd)]
+      ["Total (VND)", format_vnd(@payment.total_amount_vnd)]
     ]
 
     table(total_rows, width: 280, position: :right) do
@@ -204,7 +204,7 @@ class InvoicePdf < Prawn::Document
     variant.present? ? "#{base} (#{variant})" : base
   end
 
-  def format_currency(amount)
+  def format_vnd(amount)
     delimited = ActiveSupport::NumberHelper.number_to_delimited(amount.to_d.round(0).to_i)
     "#{delimited} ₫"
   end

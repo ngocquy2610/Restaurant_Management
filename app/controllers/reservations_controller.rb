@@ -1,4 +1,5 @@
 class ReservationsController < ApplicationController
+  before_action :authenticate_user!, except: :index
   before_action :set_reservation, only: %i[ show edit update destroy update_status ]
 
   # GET /reservations or /reservations.json
@@ -10,7 +11,7 @@ class ReservationsController < ApplicationController
     @area = if params[:area_id].present?
               @areas.find { |a| a.id == params[:area_id].to_i }
             end
-    @area ||= @areas.first
+    @area ||= @areas.first # if @area nil ? @area = @areas.first : @area = @area
 
     current_index = @area && @areas.index(@area)
     @prev_area = current_index && current_index.positive? ? @areas[current_index - 1] : nil
@@ -21,17 +22,20 @@ class ReservationsController < ApplicationController
 
   # GET /reservations/1 or /reservations/1.json
   def show
+    authorize @reservation
   end
 
   # GET /reservations/new
   def new
     @reservation = Reservation.new(table_id: params[:table_id])
+    authorize Reservation.new
     @slot_date = params[:date].present? ? Date.parse(params[:date]) : Date.current
     set_schedule
   end
 
   # GET /reservations/1/edit
   def edit
+    authorize @reservation
     @slot_date = @reservation.reservation_date || Date.current
     set_schedule
   end
@@ -41,6 +45,7 @@ class ReservationsController < ApplicationController
     @reservation = Reservation.new(reservation_params)
     @reservation.user ||= current_user
 
+    authorize @reservation
     if @reservation.save
       notify_role(:receptionist,
         title: "New reservation request",
@@ -63,6 +68,7 @@ class ReservationsController < ApplicationController
 
   # PATCH/PUT /reservations/1 or /reservations/1.json
   def update
+    authorize @reservation
     respond_to do |format|
       if @reservation.update(reservation_params)
         # Reschedule kitchen release for linked preorders (T-10 follows new slot_start).
@@ -93,6 +99,7 @@ class ReservationsController < ApplicationController
 
   # DELETE /reservations/1 or /reservations/1.json
   def destroy
+    authorize @reservation
     @reservation.destroy!
 
     respond_to do |format|

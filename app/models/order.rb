@@ -48,7 +48,7 @@ class Order < ApplicationRecord
   end
 
   def recalculate_total_price!
-    calculated_subtotal = table_price.to_d + order_items.sum do |order_item|
+    calculated_subtotal = table_price.to_d + order_items.reject(&:cancelled?).sum do |order_item|
       order_item.unit_price.to_d * order_item.quantity.to_i
     end
     calculated_subtotal = calculated_subtotal.round(2)

@@ -36,6 +36,13 @@ module OrdersHelper
     "cancelled" => [].freeze
   }.freeze
 
+  ORDER_ITEM_ACTION_LABELS = {
+    accepted: "Accept", preparing: "Start preparing",
+    ready: "Mark ready", served: "Mark served", cancelled: "Cancel"
+  }.freeze
+
+  def order_item_action_label(status) = ORDER_ITEM_ACTION_LABELS.fetch(status.to_sym)
+    
   def order_status_badge(status)
     meta = ORDER_STATUS_META.fetch(status.to_s, ORDER_STATUS_META["inserve"])
     badge_tag(meta)
@@ -59,6 +66,16 @@ module OrdersHelper
       return general & allowed
     end
     []
+  end
+
+  def orders_console_label(user)
+    kitchen = "Kitchen Console"
+    admin  = "Admin Console"
+    waiter = "Waiter Console"
+
+    return kitchen if user&.kitchen_staff?
+    return admin if user&.admin?
+    return waiter if user&.waiter?
   end
 
 
