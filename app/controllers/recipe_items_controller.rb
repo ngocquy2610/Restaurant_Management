@@ -64,14 +64,16 @@ class RecipeItemsController < ApplicationController
   # DELETE /recipe_items/1 or /recipe_items/1.json
   def destroy
     authorize @recipe_item
+    food  = @recipe_item.food
+    label = recipe_label(@recipe_item)
     @recipe_item.destroy!
     notify_user(
       recipient: current_user,
       title: "Recipe item destroyed",
-      body: "The recipe item #{label(@recipe_item)} has been destroyed.",
-      redirect_url: food_path(@recipe_item.food)
+      body: "#{label} has been removed.",
+      redirect_url: food_path(food)
     )
-    redirect_to recipe_items_path, notice: "Recipe item was successfully destroyed."
+    redirect_to food_path(food), notice: "Recipe item was successfully destroyed.", status: :see_other
   end
 
   private
