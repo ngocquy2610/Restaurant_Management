@@ -94,3 +94,48 @@
     transition: none;
   }
 }
+
+/* Notification toast (Toastify) */
+.toastify.toastify-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  max-width: 22rem;
+  padding: 0.875rem 2rem 0.875rem 1rem;
+  background: #f8f3f1;
+  color: #2f1f1d;
+  border: 1px solid #d8c1bc;
+  border-left: 4px solid #8a1c2b;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 25px rgba(47, 31, 29, 0.18);
+  font-family: inherit;
+  cursor: pointer;
+}
+.toastify-toast .toast-icon {
+  flex: none;
+  margin-top: 0.125rem;
+  color: #8a1c2b;
+}
+.toastify-toast .toast-title {
+  display: block;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #7b1f2a;
+}
+.toastify-toast .toast-body {
+  margin-top: 0.125rem;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: #7a5a56;
+}
+.toastify-toast .toast-close {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.6rem;
+  background: none;
+  border: 0;
+  color: #7a5a56;
+  font-size: 1.1rem;
+  opacity: 0.7;
+}
+.toastify-toast .toast-close:hover { opacity: 1; color: #8a1c2b; }

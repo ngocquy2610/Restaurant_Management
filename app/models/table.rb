@@ -18,7 +18,8 @@ class Table < ApplicationRecord
     # completed/cancelled. Otherwise a check-in outside the slot window
     # would fall through to :available and disappear from the order form
     # (which only lists occupied / checked-in tables).
-    if reservations.where(status: :checked_in).exists?
+    # An in-service order also keeps the table occupied (walk-ins have no reservation).
+    if reservations.where(status: :checked_in).exists? || orders.inserve.exists?
       update!(status: :occupied) unless occupied?
       return
     end

@@ -6,6 +6,11 @@ class NotificationsController < ApplicationController
   def index
   end
 
+  def mark_read
+    current_user.notifications.find(params[:id]).read!
+    head :no_content
+  end
+
   def mark_all_read
     current_user.notifications.unread.update_all(status: :read)
     redirect_to notifications_path(q: params[:q], status: params[:status]), notice: "All notifications marked as read."

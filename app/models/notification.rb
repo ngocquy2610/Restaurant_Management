@@ -25,6 +25,9 @@ class Notification < ApplicationRecord
   private
     def broadcast_new_notification
       broadcast_prepend_to recipient, target: "notifications-list" # helper của Turbo Streams
+      Turbo::StreamsChannel.broadcast_action_to recipient,
+        action: :toast,
+        attributes: { "notification-id": id, title: title, body: body.to_s, url: redirect_url.to_s }
       broadcast_replace_to recipient,
         target: "notification-badge",
         partial: "notifications/bell_badge",
