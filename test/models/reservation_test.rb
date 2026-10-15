@@ -132,10 +132,9 @@ class ReservationTest < ActiveSupport::TestCase
     assert_equal [11, 13, 19, 21], free.map(&:hour)
   end
 
-  test "an occupied table cannot be booked for today's slot" do
+  test "an occupied table can still be booked" do
     @bookable.update!(status: :occupied)
     r = build_reservation(reservation_date: Date.current, reservation_time: "19:00")
-    assert_not r.valid?
-    assert r.errors[:table].any?
+    assert r.valid?
   end
 end

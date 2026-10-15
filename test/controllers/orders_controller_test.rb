@@ -29,7 +29,7 @@ class OrdersControllerTest < ActionDispatch::IntegrationTest
 
     get new_order_url
     assert_response :success
-    assert_select "select[name='order[table_id]']"
+    assert_select "input[name='order[table_id]'][value='#{table.id}']"
   end
 
   test "should create order with nested items for a customer" do

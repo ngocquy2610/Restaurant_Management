@@ -1,6 +1,41 @@
 // Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
 import "@hotwired/turbo-rails";
 import "controllers";
+import { Turbo } from "@hotwired/turbo-rails";
+
+// <turbo-stream action="toast" ...> broadcast by Notification after create.
+Turbo.StreamActions.toast = function () {
+  const id = this.getAttribute("notification-id");
+  const url = this.getAttribute("url");
+  const node = document.createElement("div");
+  node.style.display = "contents";
+  node.innerHTML = `
+    <svg class="toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <div><strong class="toast-title"></strong><div class="toast-body"></div></div>`;
+  node.querySelector(".toast-title").textContent = this.getAttribute("title");
+  node.querySelector(".toast-body").textContent = this.getAttribute("body");
+
+  Toastify({
+    node,
+    selector: "toast-root", // permanent element survives Turbo body swaps
+    className: "toastify-toast",
+    duration: 6000,
+    gravity: "top",
+    position: "right",
+    offset: { x: 16, y: 112 }, // 112px = pt-28, clears the fixed header
+    stopOnFocus: true,
+    close: true,
+    onClick: async () => {
+      const token = document.querySelector("meta[name='csrf-token']")?.content;
+      await fetch(`/notifications/${id}/mark_read`, {
+        method: "PATCH",
+        headers: { "X-CSRF-Token": token },
+        credentials: "same-origin",
+      }).catch(() => {});
+      if (url) Turbo.visit(url);
+    },
+  }).showToast();
+};
 
 // Full-screen loading screen shown during Turbo page navigations.
 // The overlay lives in app/views/layouts/_loading_screen.html.erb and is
@@ -13,56 +48,7 @@ const loader = () => document.getElementById("loading-screen");
 const showLoader = () => loader()?.classList.add("is-loading");
 const hideLoader = () => loader()?.classList.remove("is-loading");
 
-// Track the pending toast timer so rapid successive notifications only
-// trigger one toast (for the latest notification) instead of stacking.
-let pendingToastTimer = null;
-
 document.addEventListener("turbo:before-visit", showLoader);
 document.addEventListener("turbo:before-render", hideLoader);
 document.addEventListener("turbo:load", hideLoader);
 document.addEventListener("turbo:fetch-request-error", hideLoader);
-document.addEventListener(
-  "turbo:before-stream-render",
-  (event) => {
-    // Event phóng trên <turbo-stream> element, chứa detail.newStream
-    const stream = event.detail?.newStream || event.target;
-    if (!stream || stream.tagName !== "TURBO-STREAM") return;
-
-    const action = stream.dataset.action; // "prepend"
-    const target = stream.dataset.target; // "notifications-list"
-
-    if (action === "prepend" && target === "notifications-list") {
-      const titleMatch = stream.innerHTML.match(/<h2[^>]*>([^<]+)<\/h2>/);
-      const bodyMatch = stream.innerHTML.match(
-        /<p[^>]*class="mt-1\.5[^"]*">([^<]+)<\/p>/,
-      );
-
-      const text =
-        (titleMatch ? titleMatch[1].trim() : "") +
-        (bodyMatch ? " — " + bodyMatch[1].trim() : "");
-
-      if (titleMatch || bodyMatch) {
-        // Show a toast 5 seconds AFTER the new notification is prepended to
-        // the notifications list. Clear any earlier pending toast so rapid
-        // notifications only trigger one toast (for the latest one) instead
-        // of stacking multiple toasts on top of each other.
-        if (pendingToastTimer) {
-          clearTimeout(pendingToastTimer);
-        }
-        pendingToastTimer = setTimeout(() => {
-          Toastify({
-            text,
-            className: "toastify-toast",
-            duration: 5000,
-            gravity: "top",
-            position: "right",
-            stopOnFocus: true,
-            close: true,
-          }).showToast();
-          pendingToastTimer = null;
-        }, 5000);
-      }
-    }
-  },
-  true,
-);

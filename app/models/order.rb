@@ -68,14 +68,11 @@ class Order < ApplicationRecord
 
   def sync_table!
     return if destroyed? || table.nil? || table.destroyed?
-    target =
-      case status.to_sym
-        when :preorder  then :reserved
-        when :inserve   then :occupied
-        when :completed then :available
-        else :available
-      end
-    table.update!(status: target) if table.present? && table.status.to_sym != target
+    # A finished order must not wipe out a booking that still holds the table.
+    return table.refresh_status_from_reservations! unless status.to_sym.in?(%i[preorder inserve])
+
+    target = inserve? ? :occupied : :reserved
+    table.update!(status: target) if table.status.to_sym != target
   end
 
   def sync_reservation
