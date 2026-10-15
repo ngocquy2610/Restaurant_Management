@@ -44,8 +44,10 @@
                   @open_restock_task ? inventory_restock_task_path(@open_restock_task) : inventory_restock_tasks_path,
                   class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
           <% end %>
-          <%= link_to "Full history", inventory_stock_transactions_path(ingredient_id: @ingredient.id),
-                class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+          <% if policy(StockTransaction).index? %>
+            <%= link_to "Full history", inventory_stock_transactions_path(ingredient_id: @ingredient.id),
+                  class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+          <% end %>
           <% if policy(@ingredient).edit? %>
             <%= link_to "Edit", edit_ingredient_path(@ingredient),
                   class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>

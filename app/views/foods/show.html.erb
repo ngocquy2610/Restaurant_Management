@@ -96,6 +96,11 @@
             </ul>
           </div>
         <% end %>
+
+        <% if current_user && policy(RecipeItem).new? %>
+          <%= link_to "Add ingredient to recipe", new_food_recipe_item_path(@food),
+                class: "mt-6 inline-block text-sm font-semibold text-[#7b1f2a] hover:underline" %>
+        <% end %>
       </div>
     </div>
   </main>

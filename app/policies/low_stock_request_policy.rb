@@ -2,7 +2,7 @@ class LowStockRequestPolicy < ApplicationPolicy
   def index?   = user.present? && (user.admin? || user.inventory_manager? || user.kitchen_staff?)
   def show?    = index? && (reviewer? || owner?)
   def create?  = user.present? && (user.kitchen_staff? || user.admin?)
-  def review?  = reviewer?
+  def review?  = reviewer? && (record.pending? || record.approved?)
   def update?  = review?
   def destroy? = user.present? && user.admin?
 

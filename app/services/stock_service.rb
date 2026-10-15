@@ -27,7 +27,7 @@ module StockService
           reason: reason, reference: reference
         )
         record.update!(current_quantity: after)
-        ensure_restock_task!(record)
+        sync_restock_task!(record)
         tx
       end
     end
@@ -57,17 +57,19 @@ module StockService
       reference = "order_item:#{order_item.id}"
       return if StockTransaction.exists?(reference: reference, transaction_type: :stock_out)
 
-      order_item.consumption_recipe_items.each do |recipe_item|
-        next if recipe_item.ingredient.blank?
-        apply_transaction(
-          ingredient: recipe_item.ingredient,
-          transaction_type: :stock_out,
-          quantity: recipe_item.quantity_required.to_d * order_item.quantity.to_i,
-          user: user,
-          reason: "Auto-deduct: #{order_item.food&.name} x#{order_item.quantity} (order ##{order_item.order_id})",
-          reference: reference,
-          strict: false
-        )
+      ActiveRecord::Base.transaction do
+        order_item.consumption_recipe_items.each do |recipe_item|
+          next if recipe_item.ingredient.blank?
+          apply_transaction(
+            ingredient: recipe_item.ingredient,
+            transaction_type: :stock_out,
+            quantity: recipe_item.quantity_required.to_d * order_item.quantity.to_i,
+            user: user,
+            reason: "Auto-deduct: #{order_item.food&.name} x#{order_item.quantity} (order ##{order_item.order_id})",
+            reference: reference,
+            strict: true
+          )
+        end
       end
     end
 
@@ -75,24 +77,40 @@ module StockService
       order.order_items.reject(&:cancelled?).each { |item| consume_order_item!(item, user: user) }
     end
 
-    private
+    def restore_order_item!(order_item, user: nil)
+      reference = "order_item:#{order_item.id}"
+      restore_ref = "#{reference}:restore"
 
-    def ensure_restock_task!(ingredient)
+      return if StockTransaction.exists?(reference: restore_ref)
+
+      StockTransaction.where(reference: reference, transaction_type: :stock_out)
+                      .includes(:ingredient).find_each do |tx|
+        apply_transaction(ingredient: tx.ingredient, transaction_type: :stock_in,
+                          quantity: tx.quantity, user: user,
+                          reason: "Restore: item ##{order_item.id} cancelled",
+                          reference: restore_ref)
+      end
+    end
+
+    def sync_restock_task!(ingredient)
       return unless ingredient.low_stock? || ingredient.out_of_stock?
       return if RestockTask.open.exists?(ingredient_id: ingredient.id)
 
-      threshold = ingredient.low_stock_threshold.to_d
-      suggested = threshold - ingredient.current_quantity.to_d
-      suggested = threshold if suggested <= 0
-      suggested = 1.to_d  if suggested <= 0   # fallback khi threshold = 0 và hết hàng
-
-      RestockTask.create!(
+      task = RestockTask.create!(
         ingredient: ingredient,
-        quantity:   suggested,
+        quantity:   ingredient.suggested_reorder_quantity,
         source:     :auto,
         status:     :pending
       )
+      Notification.notify_role(
+        %i[inventory_manager admin],
+        title: "Restock needed",
+        body: "#{ingredient.name} is #{ingredient.status.humanize.downcase} (#{ingredient.current_quantity.to_f} #{ingredient.unit}).",
+        redirect_url: Rails.application.routes.url_helpers.inventory_restock_task_path(task)
+      )
     end
+
+    private
 
     def signed_delta(type, quantity)
       qty = quantity.to_d

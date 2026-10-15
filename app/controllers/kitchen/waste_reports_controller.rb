@@ -21,7 +21,7 @@ class Kitchen::WasteReportsController < Kitchen::BaseController
 
     if @waste_report.save
       notify_role(
-        :inventory_manager,
+        %i[inventory_manager admin],
         title: "Waste reported",
         body: "#{current_user.full_name} reported #{@waste_report.quantity} #{@waste_report.ingredient.unit} of #{@waste_report.ingredient.name} wasted.",
         redirect_url: inventory_waste_report_path(@waste_report)

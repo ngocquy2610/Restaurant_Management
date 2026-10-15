@@ -43,11 +43,7 @@ class WasteReport < ApplicationRecord
   end
 
   def suggested_restock_quantity
-    threshold = ingredient.low_stock_threshold.to_d
-    suggested = threshold - ingredient.reload.current_quantity.to_d
-    suggested = threshold if suggested <= 0
-    suggested = 1.to_d  if suggested <= 0
-    suggested
+    ingredient.reload.suggested_reorder_quantity
   end
 
   private

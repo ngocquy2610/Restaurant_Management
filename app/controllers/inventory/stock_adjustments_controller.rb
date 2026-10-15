@@ -31,7 +31,7 @@ class Inventory::StockAdjustmentsController < Inventory::BaseController
       # Không có chênh lệch → service trả nil, không ghi ledger.
       redirect_to ingredient_path(ingredient), notice: "No difference — stock unchanged."
     else
-      notify_role(:inventory_manager,
+      notify_role(%i[inventory_manager admin],
                   title: "Stock adjusted",
                   body: "#{ingredient.name} set to #{physical} by #{current_user.full_name}.",
                   redirect_url: ingredient_path(ingredient),

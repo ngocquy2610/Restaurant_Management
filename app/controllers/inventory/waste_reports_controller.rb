@@ -35,7 +35,9 @@ class Inventory::WasteReportsController < Inventory::BaseController
     ) if @waste_report.user
 
     redirect_to inventory_waste_report_path(@waste_report), notice: "Waste report #{decision}."
-  rescue ActiveRecord::RecordInvalid, ArgumentError, StockService::Error => e
+  rescue ActiveRecord::RecordInvalid => e
+    redirect_to inventory_waste_report_path(@waste_report), alert: e.record.errors.full_messages.to_sentence
+  rescue ArgumentError, StockService::Error => e
     redirect_to inventory_waste_report_path(@waste_report), alert: e.message
   end
 end

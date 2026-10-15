@@ -18,7 +18,7 @@ export default class extends Controller {
 
     this.systemTarget.textContent = id ? String(system) : "—"
 
-    if (physicalRaw === "") {
+    if (!id || physicalRaw === "") {
       this.differenceTarget.textContent = "—"
       this.differenceTarget.className = "font-semibold text-[#7a5a56]"
       return

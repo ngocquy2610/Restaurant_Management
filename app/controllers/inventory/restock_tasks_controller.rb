@@ -35,6 +35,7 @@ class Inventory::RestockTasksController < Inventory::BaseController
       return render :refill, status: :unprocessable_content
     end
 
+    fulfilled = []
     ActiveRecord::Base.transaction do
       @restock_task.update!(
         status:            :completed,
@@ -51,9 +52,18 @@ class Inventory::RestockTasksController < Inventory::BaseController
         reason:     params.dig(:restock_task, :note).presence || "Restock task ##{@restock_task.id}",
         reference:  "restock_task:#{@restock_task.id}"
       )
+
+      fulfilled = LowStockRequest.approved.where(ingredient_id: @restock_task.ingredient_id).to_a
+      fulfilled.each(&:mark_completed!)
     end
 
-    notify_role(:inventory_manager,
+    fulfilled.each do |req|
+      notify_user(recipient: req.user, title: "Low stock request completed",
+                  body: "#{req.ingredient.name} has been restocked.",
+                  redirect_url: inventory_low_stock_request_path(req))
+    end
+
+    notify_role(%i[inventory_manager admin],
                 title: "Restock completed",
                 body: "#{@restock_task.ingredient.name}: received #{received}.",
                 redirect_url: inventory_restock_task_path(@restock_task),

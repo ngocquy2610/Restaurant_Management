@@ -16,6 +16,7 @@ class OrderItemsController < ApplicationController
       redirect_to @order_item.order, notice: "Item was successfully added."
     else
       @order = @order_item.order
+      flash.now[:alert] = @order_item.errors.full_messages.to_sentence
       render "orders/show", status: :unprocessable_entity
     end
   end
@@ -52,6 +53,8 @@ class OrderItemsController < ApplicationController
     else
       redirect_to @order_item.order, alert: @order_item.errors.full_messages.to_sentence
     end
+  rescue StockService::InsufficientStock => e
+    redirect_to @order_item.order, alert: "Cannot accept: #{e.message}"
   end
 
   # DELETE /order_items/1

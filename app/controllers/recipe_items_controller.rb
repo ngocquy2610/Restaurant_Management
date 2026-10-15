@@ -14,7 +14,7 @@ class RecipeItemsController < ApplicationController
 
   # GET /recipe_items/new
   def new
-    @recipe_item = RecipeItem.new
+    @recipe_item = RecipeItem.new(food_id: params[:food_id])
     authorize @recipe_item
     load_form_options
   end
@@ -34,10 +34,10 @@ class RecipeItemsController < ApplicationController
       notify_user(
         recipient: current_user,
         title: "Recipe item created",
-        body: "The recipe item #{label(@recipe_item)} has been created.",
+        body: "#{recipe_label(@recipe_item)} has been added.",
         redirect_url: food_path(@recipe_item.food)
       )
-      redirect_to foods_path, notice: "Recipe item was successfully created."
+      redirect_to food_path(@recipe_item.food), notice: "Recipe item was successfully created."
     else
       load_form_options
       render "recipe_items/new", status: :unprocessable_content
@@ -51,10 +51,10 @@ class RecipeItemsController < ApplicationController
       notify_user(
         recipient: current_user,
         title: "Recipe item updated",
-        body: "The recipe item #{label(@recipe_item)} has been updated.",
+        body: "#{recipe_label(@recipe_item)} has been updated.",
         redirect_url: food_path(@recipe_item.food)
       )
-      redirect_to foods_path, notice: "Recipe item was successfully updated."
+      redirect_to food_path(@recipe_item.food), notice: "Recipe item was successfully updated."
     else
       load_form_options
       render "recipe_items/edit", status: :unprocessable_content
@@ -77,6 +77,8 @@ class RecipeItemsController < ApplicationController
   end
 
   private
+
+    def recipe_label(item) = "#{item.ingredient&.name} in #{item.food&.name}"
 
     def load_form_options
       @foods = Food.order(:name)

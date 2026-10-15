@@ -22,6 +22,12 @@ class Notification < ApplicationRecord
 
   after_create_commit :broadcast_new_notification
 
+  def self.notify_role(role, title:, body: nil, redirect_url: nil, exclude: nil)
+    User.where(role: role).where.not(id: exclude&.id).find_each do |user|
+      create!(recipient: user, title: title, body: body, redirect_url: redirect_url)
+    end
+  end
+
   private
     def broadcast_new_notification
       broadcast_prepend_to recipient, target: "notifications-list" # helper của Turbo Streams
