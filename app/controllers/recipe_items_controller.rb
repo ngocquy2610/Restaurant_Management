@@ -34,7 +34,7 @@ class RecipeItemsController < ApplicationController
       notify_user(
         recipient: current_user,
         title: "Recipe item created",
-        body: "The recipe item #{@recipe_item.name} has been created.",
+        body: "The recipe item #{label(@recipe_item)} has been created.",
         redirect_url: food_path(@recipe_item.food)
       )
       redirect_to foods_path, notice: "Recipe item was successfully created."
@@ -51,7 +51,7 @@ class RecipeItemsController < ApplicationController
       notify_user(
         recipient: current_user,
         title: "Recipe item updated",
-        body: "The recipe item #{@recipe_item.name} has been updated.",
+        body: "The recipe item #{label(@recipe_item)} has been updated.",
         redirect_url: food_path(@recipe_item.food)
       )
       redirect_to foods_path, notice: "Recipe item was successfully updated."
@@ -68,7 +68,7 @@ class RecipeItemsController < ApplicationController
     notify_user(
       recipient: current_user,
       title: "Recipe item destroyed",
-      body: "The recipe item #{@recipe_item.name} has been destroyed.",
+      body: "The recipe item #{label(@recipe_item)} has been destroyed.",
       redirect_url: food_path(@recipe_item.food)
     )
     redirect_to recipe_items_path, notice: "Recipe item was successfully destroyed."
@@ -81,6 +81,8 @@ class RecipeItemsController < ApplicationController
       @ingredients = Ingredient.order(:name)
       @food_variants = FoodVariant.includes(:food).order(:name)
     end
+
+    def label(ri) = "#{ri.ingredient&.name} in #{ri.food&.name}"
 
     # Use callbacks to share common setup or constraints between actions.
     def set_recipe_item

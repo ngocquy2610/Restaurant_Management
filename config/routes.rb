@@ -84,11 +84,11 @@ Rails.application.routes.draw do
   resources :categories
 
   resources :foods do
-    resources :recipe_items, only: [:new, :edit, :create, :update, :destroy], shallow: true
+    resources :recipe_items, only: [:index, :show, :new, :edit, :create, :update, :destroy], shallow: true
   end
 
   resources :food_variants
-  resources :recipe_items, only: [:new, :edit, :create, :update, :destroy]
+  resources :recipe_items, only: [:index, :show, :new, :edit, :create, :update, :destroy]
 
   resources :ingredients do
     member do
