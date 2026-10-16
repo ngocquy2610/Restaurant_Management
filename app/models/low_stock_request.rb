@@ -14,7 +14,11 @@ class LowStockRequest < ApplicationRecord
   validates :note, length: { maximum: 500 }, allow_blank: true
   validate  :requester_must_be_kitchen_staff
 
-  REVIEW_TRANSITIONS = { "pending" => %w[approved rejected], "approved" => %w[completed] }.freeze
+  REVIEW_TRANSITIONS = {
+    "pending" => %w[approved rejected],
+    "rejected" => %w[approved],
+    "approved" => %w[completed]
+  }.freeze
 
   def review!(reviewer, decision, note: nil)
     decision = decision.to_s

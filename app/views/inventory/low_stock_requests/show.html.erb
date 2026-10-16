@@ -28,7 +28,7 @@
           <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Ingredient status</dt><dd><%= ingredient_status_badge(ingredient.status) %></dd></div>
         </dl>
 
-        <% if policy(@low_stock_request).review? && @low_stock_request.pending? %>
+        <% if policy(@low_stock_request).review? && (@low_stock_request.pending? || @low_stock_request.rejected?) %>
           <%= form_with(url: review_inventory_low_stock_request_path(@low_stock_request), method: :patch, class: "mt-4 space-y-4 rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-6 shadow-sm") do |form| %>
             <div>
               <%= form.label :review_note, "Reason (required when rejecting)", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>

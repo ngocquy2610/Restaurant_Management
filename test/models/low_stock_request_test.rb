@@ -78,11 +78,23 @@ class LowStockRequestTest < ActiveSupport::TestCase
     assert_equal "Enough stock", request.review_note
   end
 
-  test "a decided request cannot be reviewed again" do
+  test "a rejected request can be approved again" do
     request = low_stock_requests(:pending_request)
     request.review!(users(:one), "rejected", note: "Enough stock")
 
-    assert_raises(ArgumentError) { request.review!(users(:one), "approved") }
+    assert_no_difference("RestockTask.count") do
+      request.review!(users(:one), "approved")
+    end
+    assert request.reload.approved?
+    assert_equal users(:one), request.reviewed_by
+    assert_equal request, RestockTask.open.find_by!(ingredient: request.ingredient).low_stock_request
+  end
+
+  test "a rejected request cannot be rejected again" do
+    request = low_stock_requests(:pending_request)
+    request.review!(users(:one), "rejected", note: "Enough stock")
+
+    assert_raises(ArgumentError) { request.review!(users(:one), "rejected", note: "Still enough") }
     assert request.reload.rejected?
   end
 

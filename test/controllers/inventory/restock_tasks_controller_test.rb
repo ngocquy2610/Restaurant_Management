@@ -20,6 +20,8 @@ class Inventory::RestockTasksControllerTest < ActionDispatch::IntegrationTest
 
   test "complete creates an IN transaction and closes the task" do
     task = restock_tasks(:pending_auto)
+    request = LowStockRequest.create!(user: users(:kitchen_staff), ingredient: task.ingredient, note: "low")
+    request.review!(users(:admin), "approved")
 
     assert_difference -> { task.ingredient.stock_transactions.stock_in.count }, 1 do
       patch complete_inventory_restock_task_url(task),
@@ -32,6 +34,7 @@ class Inventory::RestockTasksControllerTest < ActionDispatch::IntegrationTest
     assert_equal "ACME Foods", task.supplier
     assert_equal "Morning delivery", task.note
     assert_not_nil task.completed_at
+    assert request.reload.completed?
     assert_redirected_to inventory_restock_task_url(task)
   end
 
