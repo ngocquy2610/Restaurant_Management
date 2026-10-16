@@ -83,3 +83,4 @@ gem 'redis', '~> 5.0'
 
 gem "prawn"
 gem "prawn-table"
+gem "matrix"
