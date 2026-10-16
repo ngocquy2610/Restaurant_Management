@@ -501,6 +501,7 @@ DEPENDENCIES
   kamal
   kaminari
   letter_opener
+  matrix
   pg (~> 1.1)
   prawn
   prawn-table
