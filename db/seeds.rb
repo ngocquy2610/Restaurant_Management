@@ -211,7 +211,7 @@ ApplicationRecord.transaction do
     "Salmon" => ["kg", 1.40, 4, 1],
     "Duck Breast" => ["kg", 1.20, 4, 1],
     "Pork Ribs" => ["kg", 0.60, 3, 1],
-    "Wagyu Beef" => ["kg", 3.00, 1, 1],
+    "Wagyu Beef" => ["kg", 3.00, 2, 1],
     "Beef" => ["kg", 0.80, 2, 1],
     "Lamb Chops" => ["kg", 1.20, 2, 1],
     "Veal" => ["kg", 1.20, 1, 1],
@@ -268,7 +268,7 @@ ApplicationRecord.transaction do
     "White Wine" => ["kg", 0.90, 2, 1],
     "Soy Sauce" => ["kg", 0.50, 3, 1],
     "Salt" => ["kg", 0.10, 5, 1],
-    "Green Peppercorn" => ["g", 0.40, 1, 1],
+    "Green Peppercorn" => ["g", 0.40, 2, 1],
     "Saffron" => ["g", 1.00, 1, 1],
     "Smoked Paprika" => ["g", 0.10, 1, 1],
     "Miso Paste" => ["kg", 1.00, 1, 1],
@@ -289,14 +289,16 @@ ApplicationRecord.transaction do
 
   ingredients_by_name = {}
   INGREDIENTS.each do |ingredient_name, attrs|
-    ingredient = Ingredient.find_or_create_by!(name: ingredient_name) do |record|
-      record.unit = attrs[0]
-      record.category = ingredient_category_for(ingredient_name)
-      record.unit_cost = attrs[1]
-      record.current_quantity = attrs[2]
-      record.low_stock_threshold = attrs[3]
-      record.active = true
-    end
+    ingredient = Ingredient.find_or_create_by!(name: ingredient_name)
+    ingredient.assign_attributes(
+      unit: attrs[0],
+      category: ingredient_category_for(ingredient_name),
+      unit_cost: attrs[1],
+      current_quantity: attrs[2],
+      low_stock_threshold: attrs[3],
+      active: true
+    )
+    ingredient.save!
     ingredients_by_name[ingredient_name] = ingredient
   end
 
@@ -435,7 +437,6 @@ ApplicationRecord.transaction do
   Review.find_or_create_by!(reservation: past_reservation, user_id: customer.id) do |record|
     record.rating = 5
     record.comment = "Excellent food and service."
-    record.review_type = :meal
   end
 
   low_stock_ingredient = ingredients_by_name["Lobster"]
