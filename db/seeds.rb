@@ -2,50 +2,167 @@
 
 puts "== Restaurant seed: base app data =="
 
+# ---------------------------------------------------------------------------
+# Helpers (đặt ngoài transaction cho gọn)
+# ---------------------------------------------------------------------------
+
+# Mật khẩu cho các tài khoản demo. Trên server NÊN đặt SEED_PASSWORD trong file env
+# để không ai đoán được mật khẩu admin.
 def default_password
-  "Password123!"
+  ENV.fetch("SEED_PASSWORD", "Password123!")
 end
 
-def ingredient_category_for(name)
-  meat = %w[
-    Scallops Foie
-    Gras Lobster Cod Salmon Duck
-    Breast Pork
-    Ribs Wagyu
-    Beef Beef Lamb
-    Chops Veal Octopus
-    Prawns Shrimp Mussels King
-    Crab
-  ].freeze
-
-  seafood = %w[
-    Scallops Lobster Cod Salmon Prawns Shrimp Mussels King Crab Octopus
-    Fish
-    Stock
-  ].freeze
-
-  dairy = %w[Butter Cream Milk Coconut Milk Parmesan Mascarpone Gruyere Egg]
-  produce = %w[
-    Lemon Lime Orange Green Apple Apple Peach Tomato Pumpkin Onion Shallot Garlic
-    Ginger Scallion Lemongrass Fennel Mushroom Wild Mushroom Truffle Parsley Dill
-    Cilantro Thyme Rosemary Mint
-  ]
-  dry = %w[Flour Rice Arborio Rice Linguine Udon Breadcrumbs Cocoa Sugar Honey Black Tea Salt Soy Sauce Seaweed Miso Paste Curry Paste Saffron Smoked Paprika Vegetable Stock Beef Broth Dashi]
-  bakery = %w[Baguette Ladyfinger Biscuits]
-  beverage = %w[Vanilla Espresso Red Wine White Wine Olive Oil Vegetable Oil Sesame Oil Fresh Orange Juice Fresh Green Apple Juice Peach, Orange & Lemongrass Tea]
-
-  return "meat" if meat.any? { |term| name.include?(term) }
-  return "seafood" if seafood.any? { |term| name.include?(term) }
-  return "dairy" if dairy.include?(name)
-  return "produce" if produce.include?(name)
-  return "dry" if dry.include?(name)
-  return "bakery" if bakery.include?(name)
-  return "beverage" if beverage.include?(name)
-
-  "other"
+if Rails.env.production? && ENV["SEED_PASSWORD"].blank?
+  puts "WARNING: SEED_PASSWORD is not set. Demo accounts will use the public default password!"
 end
+
+def create_user(email:, full_name:, phone:, role:, year_spend: 0)
+  user = User.find_or_initialize_by(email: email)
+  user.assign_attributes(
+    full_name: full_name,
+    phone: phone,
+    password: default_password,
+    role: role,
+    status: true,
+    year_spend: year_spend.to_d
+  )
+  user.save!
+  user
+end
+
+# Tồn kho ban đầu = số lượng gốc x STOCK_BOOST.
+# Lỗi cũ "Green Peppercorn: need 2.0 g, only 1.0 left" xảy ra vì tồn kho quá nhỏ
+# so với số lượng món trong đơn mẫu.
+STOCK_BOOST = 20
+
+# [tên, đơn vị, giá vốn, tồn kho gốc, ngưỡng cảnh báo, nhóm]
+INGREDIENT_SPECS = [
+  ["Scallops", "kg", 1.00, 12, 3, "seafood"],
+  ["Foie Gras", "kg", 3.00, 2, 1, "meat"],
+  ["Lobster", "kg", 2.80, 4, 2, "seafood"],
+  ["Cod", "kg", 1.00, 3, 1, "seafood"],
+  ["Salmon", "kg", 1.40, 4, 1, "seafood"],
+  ["Duck Breast", "kg", 1.20, 4, 1, "meat"],
+  ["Pork Ribs", "kg", 0.60, 3, 1, "meat"],
+  ["Wagyu Beef", "kg", 3.00, 2, 1, "meat"],
+  ["Beef", "kg", 0.80, 2, 1, "meat"],
+  ["Lamb Chops", "kg", 1.20, 2, 1, "meat"],
+  ["Veal", "kg", 1.20, 1, 1, "meat"],
+  ["Octopus", "kg", 1.00, 1, 1, "seafood"],
+  ["Prawns", "kg", 1.60, 2, 1, "seafood"],
+  ["Shrimp", "kg", 1.20, 2, 1, "seafood"],
+  ["Mussels", "kg", 1.00, 1, 1, "seafood"],
+  ["King Crab", "kg", 3.00, 1, 1, "seafood"],
+  ["Butter", "kg", 0.40, 8, 2, "dairy"],
+  ["Cream", "kg", 0.50, 1, 1, "dairy"],
+  ["Milk", "kg", 0.40, 1, 1, "dairy"],
+  ["Coconut Milk", "kg", 0.30, 1, 1, "dairy"],
+  ["Parmesan", "kg", 1.60, 2, 1, "dairy"],
+  ["Mascarpone", "kg", 0.90, 2, 1, "dairy"],
+  ["Gruyere", "kg", 1.40, 2, 1, "dairy"],
+  ["Egg", "piece", 0.20, 4, 1, "dairy"],
+  ["Lemon", "piece", 0.20, 4, 1, "produce"],
+  ["Lime", "piece", 0.20, 4, 1, "produce"],
+  ["Orange", "piece", 0.20, 6, 1, "produce"],
+  ["Green Apple", "piece", 0.20, 6, 1, "produce"],
+  ["Apple", "piece", 0.20, 4, 1, "produce"],
+  ["Peach", "piece", 0.30, 2, 1, "produce"],
+  ["Tomato", "piece", 0.15, 8, 2, "produce"],
+  ["Pumpkin", "kg", 0.30, 1, 1, "produce"],
+  ["Onion", "piece", 0.10, 3, 1, "produce"],
+  ["Shallot", "piece", 0.20, 2, 1, "produce"],
+  ["Garlic", "piece", 0.10, 3, 1, "produce"],
+  ["Ginger", "piece", 0.10, 2, 1, "produce"],
+  ["Scallion", "piece", 0.10, 3, 1, "produce"],
+  ["Lemongrass", "piece", 0.10, 1, 1, "produce"],
+  ["Fennel", "piece", 0.25, 1, 1, "produce"],
+  ["Mushroom", "kg", 1.20, 3, 1, "produce"],
+  ["Wild Mushroom", "kg", 2.50, 1, 1, "produce"],
+  ["Truffle", "kg", 12.00, 1, 1, "produce"],
+  ["Flour", "kg", 0.20, 3, 1, "dry"],
+  ["Rice", "kg", 0.40, 3, 1, "dry"],
+  ["Arborio Rice", "kg", 0.60, 1, 1, "dry"],
+  ["Linguine", "kg", 0.60, 2, 1, "dry"],
+  ["Udon", "kg", 0.50, 2, 1, "dry"],
+  ["Baguette", "kg", 0.50, 2, 1, "bakery"],
+  ["Breadcrumbs", "kg", 0.40, 1, 1, "dry"],
+  ["Ladyfinger Biscuits", "kg", 0.50, 1, 1, "bakery"],
+  ["Cocoa", "kg", 0.60, 2, 1, "dry"],
+  ["Chocolate", "kg", 1.00, 2, 1, "dry"],
+  ["Sugar", "kg", 0.30, 6, 1, "dry"],
+  ["Honey", "kg", 0.80, 2, 1, "dry"],
+  ["Vanilla", "piece", 0.20, 2, 1, "beverage"],
+  ["Espresso", "kg", 0.60, 1, 1, "beverage"],
+  ["Black Tea", "g", 0.10, 1, 1, "dry"],
+  ["Olive Oil", "kg", 0.60, 3, 1, "beverage"],
+  ["Vegetable Oil", "kg", 0.60, 2, 1, "beverage"],
+  ["Sesame Oil", "kg", 1.00, 1, 1, "beverage"],
+  ["Red Wine", "kg", 1.00, 2, 1, "beverage"],
+  ["White Wine", "kg", 0.90, 2, 1, "beverage"],
+  ["Soy Sauce", "kg", 0.50, 3, 1, "dry"],
+  ["Salt", "kg", 0.10, 5, 1, "dry"],
+  ["Green Peppercorn", "g", 0.40, 2, 1, "dry"],
+  ["Saffron", "g", 1.00, 1, 1, "dry"],
+  ["Smoked Paprika", "g", 0.10, 1, 1, "dry"],
+  ["Miso Paste", "kg", 1.00, 1, 1, "dry"],
+  ["Curry Paste", "kg", 1.00, 1, 1, "dry"],
+  ["Seaweed", "kg", 1.00, 1, 1, "dry"],
+  ["Tofu", "kg", 0.80, 1, 1, "other"],
+  ["Vegetable Stock", "kg", 0.40, 2, 1, "dry"],
+  ["Beef Broth", "kg", 0.40, 2, 1, "dry"],
+  ["Fish Stock", "kg", 0.40, 2, 1, "dry"],
+  ["Dashi", "kg", 0.50, 1, 1, "dry"],
+  ["Parsley", "g", 0.10, 2, 1, "produce"],
+  ["Dill", "g", 0.10, 2, 1, "produce"],
+  ["Cilantro", "g", 0.10, 2, 1, "produce"],
+  ["Thyme", "g", 0.10, 2, 1, "produce"],
+  ["Rosemary", "g", 0.10, 2, 1, "produce"],
+  ["Mint", "g", 0.10, 2, 1, "produce"]
+].freeze
+
+RECIPE_SPECS = {
+  "Pan-Seared Scallops with Lemon Butter Sauce" => [["Scallops", 0.20], ["Butter", 0.02], ["Lemon", 0.50], ["Garlic", 1.0], ["Parsley", 1.0]],
+  "Pan-Seared Foie Gras with Apple Sauce" => [["Foie Gras", 0.10], ["Apple", 0.50], ["Butter", 0.02], ["Sugar", 0.01], ["Cream", 0.02]],
+  "Grilled Wagyu Beef with Green Peppercorn Sauce" => [["Wagyu Beef", 0.20], ["Green Peppercorn", 1.0], ["Butter", 0.02], ["Cream", 0.02]],
+  "Japanese-Style Steamed Cod" => [["Cod", 0.20], ["Soy Sauce", 0.02], ["Ginger", 0.10], ["Scallion", 0.10], ["Dashi", 0.02]],
+  "Peking Roast Duck" => [["Duck Breast", 0.20], ["Honey", 0.01], ["Soy Sauce", 0.01], ["Ginger", 0.10], ["Sesame Oil", 0.01]],
+  "Miso-Glazed Seared Salmon" => [["Salmon", 0.15], ["Miso Paste", 0.02], ["Sugar", 0.01], ["Sesame Oil", 0.005]],
+  "Honey-Glazed Grilled Pork Ribs" => [["Pork Ribs", 0.20], ["Honey", 0.01], ["Soy Sauce", 0.02], ["Garlic", 1.0], ["Cilantro", 1.0]],
+  "Tiger Prawns with Garlic Butter" => [["Prawns", 0.20], ["Butter", 0.02], ["Garlic", 1.0], ["Parsley", 1.0], ["Lemon", 0.50]],
+  "Vietnamese Shaking Beef" => [["Beef", 0.20], ["Lemongrass", 0.10], ["Soy Sauce", 0.01], ["Green Peppercorn", 1.0], ["Mint", 1.0]],
+  "Royal Seafood Fried Rice" => [["Rice", 0.10], ["Shrimp", 0.05], ["Scallops", 0.05], ["Mussels", 0.05], ["Egg", 1.0], ["Scallion", 0.10], ["Sesame Oil", 0.01]],
+  "Wagyu Beef Udon" => [["Udon", 0.10], ["Wagyu Beef", 0.10], ["Dashi", 0.02], ["Scallion", 0.10], ["Soy Sauce", 0.01]],
+  "Thai-Style Prawn Curry" => [["Prawns", 0.15], ["Curry Paste", 0.02], ["Coconut Milk", 0.02], ["Lime", 0.10], ["Cilantro", 1.0]],
+  "Creamy Pumpkin Soup" => [["Pumpkin", 0.20], ["Onion", 0.50], ["Milk", 0.10], ["Butter", 0.02], ["Vegetable Stock", 0.02]],
+  "Truffle Mushroom Soup" => [["Mushroom", 0.15], ["Truffle", 0.01], ["Cream", 0.02], ["Onion", 0.50], ["Butter", 0.02]],
+  "Japanese Seafood Soup" => [["Shrimp", 0.10], ["Scallops", 0.10], ["Seaweed", 0.01], ["Tofu", 0.01], ["Dashi", 0.02]],
+  "French Onion Soup" => [["Onion", 2.00], ["Beef Broth", 0.30], ["Butter", 0.02], ["Baguette", 0.01], ["Gruyere", 0.01]],
+  "Classic Lobster Bisque" => [["Lobster", 0.20], ["Shrimp", 0.10], ["Cream", 0.02], ["Tomato", 0.10], ["Butter", 0.02], ["Fish Stock", 0.30]],
+  "Pan-Seared Duck Breast with Orange Sauce" => [["Duck Breast", 0.20], ["Orange", 0.50], ["Sugar", 0.02], ["Butter", 0.02]],
+  "Grilled Salmon with Lemon Butter Sauce" => [["Salmon", 0.15], ["Butter", 0.02], ["Lemon", 0.50], ["Garlic", 1.0], ["Dill", 1.0]],
+  "Lobster Linguine" => [["Lobster", 0.20], ["Linguine", 0.06], ["Tomato", 0.10], ["Garlic", 1.0], ["Cream", 0.02], ["Parsley", 1.0]],
+  "Truffle Mushroom Risotto" => [["Arborio Rice", 0.06], ["Truffle", 0.01], ["Mushroom", 0.05], ["Parmesan", 0.01], ["Butter", 0.02], ["White Wine", 0.02]],
+  "Herb-Crusted Lamb Chops" => [["Lamb Chops", 0.20], ["Garlic", 1.0], ["Rosemary", 1.0], ["Thyme", 1.0], ["Breadcrumbs", 0.01], ["Parmesan", 0.01]],
+  "Roasted Cod with Saffron Sauce" => [["Cod", 0.20], ["Saffron", 0.01], ["Fish Stock", 0.30], ["Cream", 0.02], ["Fennel", 0.10], ["Butter", 0.02]],
+  "Veal Tenderloin with Wild Mushroom Sauce" => [["Veal", 0.20], ["Wild Mushroom", 0.05], ["Cream", 0.02], ["Shallot", 0.10], ["Butter", 0.02], ["Red Wine", 0.02]],
+  "Grilled Lobster with Garlic Butter" => [["Lobster", 0.20], ["Garlic", 1.0], ["Butter", 0.02], ["Lemon", 0.50], ["Parsley", 1.0]],
+  "Seared Scallops with Saffron Sauce" => [["Scallops", 0.20], ["Saffron", 0.01], ["Cream", 0.02], ["Shallot", 0.10], ["Fennel", 0.10]],
+  "Mediterranean Grilled Octopus" => [["Octopus", 0.20], ["Olive Oil", 0.02], ["Garlic", 1.0], ["Red Wine", 0.02], ["Lemon", 0.50], ["Smoked Paprika", 1.0]],
+  "King Crab with Lemon Butter Sauce" => [["King Crab", 0.20], ["Butter", 0.02], ["Lemon", 0.50], ["Garlic", 1.0], ["Parsley", 1.0]],
+  "Fresh Orange Juice" => [["Orange", 2.00], ["Sugar", 0.01]],
+  "Fresh Green Apple Juice" => [["Green Apple", 2.00], ["Lemon", 0.05]],
+  "Peach, Orange & Lemongrass Tea" => [["Peach", 0.50], ["Orange", 0.50], ["Lemongrass", 0.05], ["Black Tea", 0.01], ["Honey", 0.01]],
+  "Classic Vanilla Crème Brûlée" => [["Cream", 0.10], ["Egg", 2.00], ["Sugar", 0.02], ["Vanilla", 0.50]],
+  "Chocolate Fondant" => [["Chocolate", 0.03], ["Flour", 0.02], ["Egg", 1.00], ["Butter", 0.02], ["Sugar", 0.01]],
+  "Classic Italian Tiramisu" => [["Mascarpone", 0.06], ["Espresso", 0.02], ["Ladyfinger Biscuits", 0.01], ["Cocoa", 0.005], ["Sugar", 0.01], ["Egg", 1.00]]
+}.freeze
+
+# ---------------------------------------------------------------------------
+# Seed
+# ---------------------------------------------------------------------------
 
 ApplicationRecord.transaction do
+  # --- Member tiers ---------------------------------------------------------
   member_tiers = {
     "Bronze" => { active_price: 0, discount: 5 },
     "Silver" => { active_price: 2000, discount: 10 },
@@ -60,40 +177,28 @@ ApplicationRecord.transaction do
     end
   end
 
-  def create_user(email:, full_name:, phone:, role:, year_spend: 0)
-    user = User.find_or_initialize_by(email: email)
-    user.assign_attributes(
-      full_name: full_name,
-      phone: phone,
-      password: default_password,
-      role: role,
-      status: true,
-      year_spend: year_spend.to_d
-    )
-    user.save!
-    user
-  end
-
+  # --- Users ----------------------------------------------------------------
   admin = create_user(email: "admin@restaurant.test", full_name: "Restaurant Admin", phone: "0900000000", role: :admin, year_spend: 15000)
-  inventory_manager = create_user(email: "inventory@restaurant.test", full_name: "Inventory Manager", phone: "0900000001", role: :inventory_manager, year_spend: 5000)
+  create_user(email: "inventory@restaurant.test", full_name: "Inventory Manager", phone: "0900000001", role: :inventory_manager, year_spend: 5000)
   kitchen_staff = create_user(email: "kitchen@restaurant.test", full_name: "Kitchen Lead", phone: "0900000002", role: :kitchen_staff, year_spend: 1200)
-  receptionist = create_user(email: "reception@restaurant.test", full_name: "Reception Desk", phone: "0900000003", role: :receptionist, year_spend: 800)
+  create_user(email: "reception@restaurant.test", full_name: "Reception Desk", phone: "0900000003", role: :receptionist, year_spend: 800)
   waiter = create_user(email: "waiter@restaurant.test", full_name: "Waiter Alex", phone: "0900000004", role: :waiter, year_spend: 1600)
   customer = create_user(email: "customer@restaurant.test", full_name: "Alicia Nguyen", phone: "0900000005", role: :customer, year_spend: 3500)
 
+  # --- Areas ----------------------------------------------------------------
   area_map = {}
   [
     ["Main Dining", :indoor, 1],
     ["Private Rooms", :indoor, 2],
     ["Terrace", :outdoor, 1]
   ].each do |name, area_type, floor_level|
-    area = Area.find_or_create_by!(name: name) do |record|
+    area_map[name] = Area.find_or_create_by!(name: name) do |record|
       record.area_type = area_type
       record.floor_level = floor_level
     end
-    area_map[name] = area
   end
 
+  # --- Table types ----------------------------------------------------------
   table_types = {
     "Standard" => 0.00,
     "VIP" => 25.00,
@@ -107,6 +212,7 @@ ApplicationRecord.transaction do
     end
   end
 
+  # --- Tables ---------------------------------------------------------------
   tables_to_seed = [
     { area: "Main Dining", type: "Standard", table_number: "A1", shape: :square, capacity: 2, pos_x: 80, pos_y: 80, width: 90, height: 90, status: :available },
     { area: "Main Dining", type: "Standard", table_number: "A2", shape: :square, capacity: 4, pos_x: 220, pos_y: 80, width: 90, height: 90, status: :available },
@@ -117,14 +223,12 @@ ApplicationRecord.transaction do
     { area: "Private Rooms", type: "Family", table_number: "P2", shape: :rectangle, capacity: 10, pos_x: 260, pos_y: 120, width: 140, height: 100, status: :available },
     { area: "Terrace", type: "Standard", table_number: "T1", shape: :square, capacity: 2, pos_x: 80, pos_y: 80, width: 90, height: 90, status: :available },
     { area: "Terrace", type: "Standard", table_number: "T2", shape: :round, capacity: 4, pos_x: 260, pos_y: 80, radius: 40, status: :available }
-  ].freeze
+  ]
 
   tables_to_seed.each do |attrs|
-    area = area_map.fetch(attrs[:area])
-    table_type = table_type_map.fetch(attrs[:type])
-    table = Table.find_or_initialize_by(area: area, table_number: attrs[:table_number])
+    table = Table.find_or_initialize_by(area: area_map.fetch(attrs[:area]), table_number: attrs[:table_number])
     table.assign_attributes(
-      table_type: table_type,
+      table_type: table_type_map.fetch(attrs[:type]),
       capacity: attrs[:capacity],
       shape: attrs[:shape],
       pos_x: attrs[:pos_x],
@@ -138,6 +242,7 @@ ApplicationRecord.transaction do
     table.save!
   end
 
+  # --- Categories & foods ---------------------------------------------------
   categories = {
     "Starters" => [
       ["Pan-Seared Scallops with Lemon Butter Sauce", 29.00],
@@ -183,6 +288,7 @@ ApplicationRecord.transaction do
     end
   end
 
+  # --- Food variants --------------------------------------------------------
   variant_map = {
     "Grilled Wagyu Beef with Green Peppercorn Sauce" => {
       "Medium Rare" => 0.00,
@@ -203,144 +309,28 @@ ApplicationRecord.transaction do
     end
   end
 
-  INGREDIENTS = {
-    "Scallops" => ["kg", 1.00, 12, 3],
-    "Foie Gras" => ["kg", 3.00, 2, 1],
-    "Lobster" => ["kg", 2.80, 4, 2],
-    "Cod" => ["kg", 1.00, 3, 1],
-    "Salmon" => ["kg", 1.40, 4, 1],
-    "Duck Breast" => ["kg", 1.20, 4, 1],
-    "Pork Ribs" => ["kg", 0.60, 3, 1],
-    "Wagyu Beef" => ["kg", 3.00, 2, 1],
-    "Beef" => ["kg", 0.80, 2, 1],
-    "Lamb Chops" => ["kg", 1.20, 2, 1],
-    "Veal" => ["kg", 1.20, 1, 1],
-    "Octopus" => ["kg", 1.00, 1, 1],
-    "Prawns" => ["kg", 1.60, 2, 1],
-    "Shrimp" => ["kg", 1.20, 2, 1],
-    "Mussels" => ["kg", 1.00, 1, 1],
-    "King Crab" => ["kg", 3.00, 1, 1],
-    "Butter" => ["kg", 0.40, 8, 2],
-    "Cream" => ["kg", 0.50, 1, 1],
-    "Milk" => ["kg", 0.40, 1, 1],
-    "Coconut Milk" => ["kg", 0.30, 1, 1],
-    "Parmesan" => ["kg", 1.60, 2, 1],
-    "Mascarpone" => ["kg", 0.90, 2, 1],
-    "Gruyere" => ["kg", 1.40, 2, 1],
-    "Egg" => ["piece", 0.20, 4, 1],
-    "Lemon" => ["piece", 0.20, 4, 1],
-    "Lime" => ["piece", 0.20, 4, 1],
-    "Orange" => ["piece", 0.20, 6, 1],
-    "Green Apple" => ["piece", 0.20, 6, 1],
-    "Apple" => ["piece", 0.20, 4, 1],
-    "Peach" => ["piece", 0.30, 2, 1],
-    "Tomato" => ["piece", 0.15, 8, 2],
-    "Pumpkin" => ["kg", 0.30, 1, 1],
-    "Onion" => ["piece", 0.10, 3, 1],
-    "Shallot" => ["piece", 0.20, 2, 1],
-    "Garlic" => ["piece", 0.10, 3, 1],
-    "Ginger" => ["piece", 0.10, 2, 1],
-    "Scallion" => ["piece", 0.10, 3, 1],
-    "Lemongrass" => ["piece", 0.10, 1, 1],
-    "Fennel" => ["piece", 0.25, 1, 1],
-    "Mushroom" => ["kg", 1.20, 3, 1],
-    "Wild Mushroom" => ["kg", 2.50, 1, 1],
-    "Truffle" => ["kg", 12.00, 1, 1],
-    "Flour" => ["kg", 0.20, 3, 1],
-    "Rice" => ["kg", 0.40, 3, 1],
-    "Arborio Rice" => ["kg", 0.60, 1, 1],
-    "Linguine" => ["kg", 0.60, 2, 1],
-    "Udon" => ["kg", 0.50, 2, 1],
-    "Baguette" => ["kg", 0.50, 2, 1],
-    "Breadcrumbs" => ["kg", 0.40, 1, 1],
-    "Ladyfinger Biscuits" => ["kg", 0.50, 1, 1],
-    "Cocoa" => ["kg", 0.60, 2, 1],
-    "Chocolate" => ["kg", 1.00, 2, 1],
-    "Sugar" => ["kg", 0.30, 6, 1],
-    "Honey" => ["kg", 0.80, 2, 1],
-    "Vanilla" => ["piece", 0.20, 2, 1],
-    "Espresso" => ["kg", 0.60, 1, 1],
-    "Black Tea" => ["g", 0.10, 1, 1],
-    "Olive Oil" => ["kg", 0.60, 3, 1],
-    "Vegetable Oil" => ["kg", 0.60, 2, 1],
-    "Sesame Oil" => ["kg", 1.00, 1, 1],
-    "Red Wine" => ["kg", 1.00, 2, 1],
-    "White Wine" => ["kg", 0.90, 2, 1],
-    "Soy Sauce" => ["kg", 0.50, 3, 1],
-    "Salt" => ["kg", 0.10, 5, 1],
-    "Green Peppercorn" => ["g", 0.40, 2, 1],
-    "Saffron" => ["g", 1.00, 1, 1],
-    "Smoked Paprika" => ["g", 0.10, 1, 1],
-    "Miso Paste" => ["kg", 1.00, 1, 1],
-    "Curry Paste" => ["kg", 1.00, 1, 1],
-    "Seaweed" => ["kg", 1.00, 1, 1],
-    "Tofu" => ["kg", 0.80, 1, 1],
-    "Vegetable Stock" => ["kg", 0.40, 2, 1],
-    "Beef Broth" => ["kg", 0.40, 2, 1],
-    "Fish Stock" => ["kg", 0.40, 2, 1],
-    "Dashi" => ["kg", 0.50, 1, 1],
-    "Parsley" => ["g", 0.10, 2, 1],
-    "Dill" => ["g", 0.10, 2, 1],
-    "Cilantro" => ["g", 0.10, 2, 1],
-    "Thyme" => ["g", 0.10, 2, 1],
-    "Rosemary" => ["g", 0.10, 2, 1],
-    "Mint" => ["g", 0.10, 2, 1]
-  }.freeze
-
+  # --- Ingredients ----------------------------------------------------------
+  # SỬA LỖI: trước đây dùng Ingredient.find_or_create_by!(name:) rồi mới gán unit/giá/số lượng.
+  # create! chạy validation ngay lúc đó nên báo "Unit can't be blank...".
+  # Giờ dùng find_or_initialize_by -> gán đủ thuộc tính -> save! một lần.
   ingredients_by_name = {}
-  INGREDIENTS.each do |ingredient_name, attrs|
-    ingredient = Ingredient.find_or_create_by!(name: ingredient_name)
+  INGREDIENT_SPECS.each do |name, unit, unit_cost, quantity, threshold, category|
+    ingredient = Ingredient.find_or_initialize_by(name: name)
     ingredient.assign_attributes(
-      unit: attrs[0],
-      category: ingredient_category_for(ingredient_name),
-      unit_cost: attrs[1],
-      current_quantity: attrs[2],
-      low_stock_threshold: attrs[3],
+      unit: unit,
+      category: category,
+      unit_cost: unit_cost,
+      low_stock_threshold: threshold,
       active: true
     )
+    # Chỉ đặt tồn kho khi tạo mới, chạy lại seed sẽ không ghi đè tồn kho thật.
+    ingredient.current_quantity = quantity * STOCK_BOOST if ingredient.new_record?
     ingredient.save!
-    ingredients_by_name[ingredient_name] = ingredient
+    ingredients_by_name[name] = ingredient
   end
 
-  RECIPES = {
-    "Pan-Seared Scallops with Lemon Butter Sauce" => [["Scallops", 0.20], ["Butter", 0.02], ["Lemon", 0.50], ["Garlic", 1.0], ["Parsley", 1.0]],
-    "Pan-Seared Foie Gras with Apple Sauce" => [["Foie Gras", 0.10], ["Apple", 0.50], ["Butter", 0.02], ["Sugar", 0.01], ["Cream", 0.02]],
-    "Grilled Wagyu Beef with Green Peppercorn Sauce" => [["Wagyu Beef", 0.20], ["Green Peppercorn", 1.0], ["Butter", 0.02], ["Cream", 0.02]],
-    "Japanese-Style Steamed Cod" => [["Cod", 0.20], ["Soy Sauce", 0.02], ["Ginger", 0.10], ["Scallion", 0.10], ["Dashi", 0.02]],
-    "Peking Roast Duck" => [["Duck Breast", 0.20], ["Honey", 0.01], ["Soy Sauce", 0.01], ["Ginger", 0.10], ["Sesame Oil", 0.01]],
-    "Miso-Glazed Seared Salmon" => [["Salmon", 0.15], ["Miso Paste", 0.02], ["Sugar", 0.01], ["Sesame Oil", 0.005]],
-    "Honey-Glazed Grilled Pork Ribs" => [["Pork Ribs", 0.20], ["Honey", 0.01], ["Soy Sauce", 0.02], ["Garlic", 1.0], ["Cilantro", 1.0]],
-    "Tiger Prawns with Garlic Butter" => [["Prawns", 0.20], ["Butter", 0.02], ["Garlic", 1.0], ["Parsley", 1.0], ["Lemon", 0.50]],
-    "Vietnamese Shaking Beef" => [["Beef", 0.20], ["Lemongrass", 0.10], ["Soy Sauce", 0.01], ["Green Peppercorn", 1.0], ["Mint", 1.0]],
-    "Royal Seafood Fried Rice" => [["Rice", 0.10], ["Shrimp", 0.05], ["Scallops", 0.05], ["Mussels", 0.05], ["Egg", 1.0], ["Scallion", 0.10], ["Sesame Oil", 0.01]],
-    "Wagyu Beef Udon" => [["Udon", 0.10], ["Wagyu Beef", 0.10], ["Dashi", 0.02], ["Scallion", 0.10], ["Soy Sauce", 0.01]],
-    "Thai-Style Prawn Curry" => [["Prawns", 0.15], ["Curry Paste", 0.02], ["Coconut Milk", 0.02], ["Lime", 0.10], ["Cilantro", 1.0]],
-    "Creamy Pumpkin Soup" => [["Pumpkin", 0.20], ["Onion", 0.50], ["Milk", 0.10], ["Butter", 0.02], ["Vegetable Stock", 0.02]],
-    "Truffle Mushroom Soup" => [["Mushroom", 0.15], ["Truffle", 0.01], ["Cream", 0.02], ["Onion", 0.50], ["Butter", 0.02]],
-    "Japanese Seafood Soup" => [["Shrimp", 0.10], ["Scallops", 0.10], ["Seaweed", 0.01], ["Tofu", 0.01], ["Dashi", 0.02]],
-    "French Onion Soup" => [["Onion", 2.00], ["Beef Broth", 0.30], ["Butter", 0.02], ["Baguette", 0.01], ["Gruyere", 0.01]],
-    "Classic Lobster Bisque" => [["Lobster", 0.20], ["Shrimp", 0.10], ["Cream", 0.02], ["Tomato", 0.10], ["Butter", 0.02], ["Fish Stock", 0.30]],
-    "Pan-Seared Duck Breast with Orange Sauce" => [["Duck Breast", 0.20], ["Orange", 0.50], ["Sugar", 0.02], ["Butter", 0.02]],
-    "Grilled Salmon with Lemon Butter Sauce" => [["Salmon", 0.15], ["Butter", 0.02], ["Lemon", 0.50], ["Garlic", 1.0], ["Dill", 1.0]],
-    "Lobster Linguine" => [["Lobster", 0.20], ["Linguine", 0.06], ["Tomato", 0.10], ["Garlic", 1.0], ["Cream", 0.02], ["Parsley", 1.0]],
-    "Truffle Mushroom Risotto" => [["Arborio Rice", 0.06], ["Truffle", 0.01], ["Mushroom", 0.05], ["Parmesan", 0.01], ["Butter", 0.02], ["White Wine", 0.02]],
-    "Herb-Crusted Lamb Chops" => [["Lamb Chops", 0.20], ["Garlic", 1.0], ["Rosemary", 1.0], ["Thyme", 1.0], ["Breadcrumbs", 0.01], ["Parmesan", 0.01]],
-    "Roasted Cod with Saffron Sauce" => [["Cod", 0.20], ["Saffron", 0.01], ["Fish Stock", 0.30], ["Cream", 0.02], ["Fennel", 0.10], ["Butter", 0.02]],
-    "Veal Tenderloin with Wild Mushroom Sauce" => [["Veal", 0.20], ["Wild Mushroom", 0.05], ["Cream", 0.02], ["Shallot", 0.10], ["Butter", 0.02], ["Red Wine", 0.02]],
-    "Grilled Lobster with Garlic Butter" => [["Lobster", 0.20], ["Garlic", 1.0], ["Butter", 0.02], ["Lemon", 0.50], ["Parsley", 1.0]],
-    "Seared Scallops with Saffron Sauce" => [["Scallops", 0.20], ["Saffron", 0.01], ["Cream", 0.02], ["Shallot", 0.10], ["Fennel", 0.10]],
-    "Mediterranean Grilled Octopus" => [["Octopus", 0.20], ["Olive Oil", 0.02], ["Garlic", 1.0], ["Red Wine", 0.02], ["Lemon", 0.50], ["Smoked Paprika", 1.0]],
-    "King Crab with Lemon Butter Sauce" => [["King Crab", 0.20], ["Butter", 0.02], ["Lemon", 0.50], ["Garlic", 1.0], ["Parsley", 1.0]],
-    "Fresh Orange Juice" => [["Orange", 2.00], ["Sugar", 0.01]],
-    "Fresh Green Apple Juice" => [["Green Apple", 2.00], ["Lemon", 0.05]],
-    "Peach, Orange & Lemongrass Tea" => [["Peach", 0.50], ["Orange", 0.50], ["Lemongrass", 0.05], ["Black Tea", 0.01], ["Honey", 0.01]],
-    "Classic Vanilla Crème Brûlée" => [["Cream", 0.10], ["Egg", 2.00], ["Sugar", 0.02], ["Vanilla", 0.50]],
-    "Chocolate Fondant" => [["Chocolate", 0.03], ["Flour", 0.02], ["Egg", 1.00], ["Butter", 0.02], ["Sugar", 0.01]],
-    "Classic Italian Tiramisu" => [["Mascarpone", 0.06], ["Espresso", 0.02], ["Ladyfinger Biscuits", 0.01], ["Cocoa", 0.005], ["Sugar", 0.01], ["Egg", 1.00]]
-  }.freeze
-
-  recipes_seeded = []
-  RECIPES.each do |food_name, ingredients_for_food|
+  # --- Recipes --------------------------------------------------------------
+  RECIPE_SPECS.each do |food_name, ingredients_for_food|
     food = foods_by_name[food_name]
     next if food.nil?
 
@@ -350,23 +340,22 @@ ApplicationRecord.transaction do
         record.quantity_required = quantity.to_d
       end
     end
-    recipes_seeded << food_name
   end
 
-  payment_methods = [
+  # --- Payment methods ------------------------------------------------------
+  [
     ["Cash", :cash],
     ["Card", :card],
     ["QR Code", :qr]
-  ]
-
-  payment_methods.each do |name, code|
+  ].each do |name, code|
     PaymentMethod.find_or_create_by!(code: code) do |record|
       record.name = name
       record.active = true
     end
   end
 
-  promotion = Promotion.find_or_create_by!(name: "Lunch Special") do |record|
+  # --- Promotion ------------------------------------------------------------
+  Promotion.find_or_create_by!(name: "Lunch Special") do |record|
     record.discount_type = true
     record.discount_value = 15
     record.start_date = Date.current.beginning_of_month
@@ -374,6 +363,7 @@ ApplicationRecord.transaction do
     record.status = :published
   end
 
+  # --- Reservations ---------------------------------------------------------
   future_date = Date.current + 2
   table_for_reservation = Table.where(status: :available).order(:id).first
   reservation = Reservation.find_or_initialize_by(
@@ -405,6 +395,7 @@ ApplicationRecord.transaction do
   )
   past_reservation.save!
 
+  # --- Order + payment ------------------------------------------------------
   order = Order.find_or_initialize_by(table: table_for_reservation, reservation: reservation, user_id: waiter.id)
   order.assign_attributes(waiter: waiter, status: :inserve)
   order.save!
@@ -434,12 +425,14 @@ ApplicationRecord.transaction do
   )
   completed_payment.save!
 
+  # --- Review ---------------------------------------------------------------
   Review.find_or_create_by!(reservation: past_reservation, user_id: customer.id) do |record|
     record.rating = 5
     record.comment = "Excellent food and service."
   end
 
-  low_stock_ingredient = ingredients_by_name["Lobster"]
+  # --- Low stock request & waste report (dữ liệu demo) ---------------------
+  low_stock_ingredient = ingredients_by_name.fetch("Lobster")
   low_stock_ingredient.update!(current_quantity: 1, low_stock_threshold: 2)
   LowStockRequest.find_or_create_by!(user: kitchen_staff, ingredient: low_stock_ingredient) do |record|
     record.note = "Need more lobster for weekend service."
@@ -447,7 +440,7 @@ ApplicationRecord.transaction do
     record.urgency = :high
   end
 
-  waste_ingredient = ingredients_by_name["Tomato"]
+  waste_ingredient = ingredients_by_name.fetch("Tomato")
   WasteReport.find_or_create_by!(ingredient: waste_ingredient, user: kitchen_staff) do |record|
     record.quantity = 1.5
     record.reason = "Damaged produce during prep."
