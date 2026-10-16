@@ -7,10 +7,10 @@ image: restaurant_management
 # Deploy to these servers.
 servers:
   web:
-    - 52.200.54.157
+    - <%= ENV.fetch("EC2_IP") %>
   job:
     hosts:
-      - 52.200.54.157
+      - <%= ENV.fetch("EC2_IP") %>
     cmd: bundle exec sidekiq -C config/sidekiq.yml
 
 # Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
@@ -53,7 +53,7 @@ env:
     # RDS endpoint (set DB_HOST in your shell or edit here), reachable from the EC2 security group.
     DB_HOST: <%= ENV.fetch("DB_HOST") %>
     DB_USERNAME: <%= ENV.fetch("DB_USERNAME", "postgres") %>
-    APP_HOST: 52.200.54.157
+    APP_HOST: <%= ENV.fetch("EC2_IP") %>
     # Redis accessory runs on the same EC2 host via the kamal docker network.
     # Background jobs run on a dedicated Sidekiq process (servers.job),
     # backed by Redis/Valkey (see accessories.redis below).
@@ -113,7 +113,7 @@ ssh:
 accessories:
   redis:
     image: valkey/valkey:8
-    host: 52.200.54.157
+    host: <%= ENV.fetch("EC2_IP") %>
     # Bound to localhost only; app reaches it over the docker network.
     port: "127.0.0.1:6379:6379"
     directories:
