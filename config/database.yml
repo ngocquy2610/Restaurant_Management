@@ -92,18 +92,20 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: restaurant_management_production
-    username: restaurant_management
-    password: <%= ENV["RESTAURANT_MANAGEMENT_DATABASE_PASSWORD"] %>
+    host: <%= ENV["DB_HOST"] %>
+    sslmode: <%= ENV.fetch("DB_SSLMODE", "require") %>
+    database: <%= ENV.fetch("DB_NAME", "restaurant_management_production") %>
+    username: <%= ENV.fetch("DB_USERNAME", "postgres") %>
+    password: <%= ENV["DB_PASSWORD"] %>
   cache:
     <<: *primary_production
-    database: restaurant_management_production_cache
+    database: <%= ENV.fetch("DB_NAME", "restaurant_management_production") %>_cache
     migrations_paths: db/cache_migrate
   queue:
     <<: *primary_production
-    database: restaurant_management_production_queue
+    database: <%= ENV.fetch("DB_NAME", "restaurant_management_production") %>_queue
     migrations_paths: db/queue_migrate
   cable:
     <<: *primary_production
-    database: restaurant_management_production_cable
+    database: <%= ENV.fetch("DB_NAME", "restaurant_management_production") %>_cable
     migrations_paths: db/cable_migrate

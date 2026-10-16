@@ -14,10 +14,19 @@ class LowStockRequest < ApplicationRecord
   validates :note, length: { maximum: 500 }, allow_blank: true
   validate  :requester_must_be_kitchen_staff
 
+  REVIEW_TRANSITIONS = {
+    "pending" => %w[approved rejected],
+    "rejected" => %w[approved],
+    "approved" => %w[completed]
+  }.freeze
+
   def review!(reviewer, decision, note: nil)
     decision = decision.to_s
     unless %w[approved rejected completed].include?(decision)
       raise ArgumentError, "invalid decision: #{decision}"
+    end
+    unless REVIEW_TRANSITIONS.fetch(status, []).include?(decision)
+      raise ArgumentError, "request is already #{status}"
     end
     if decision == "rejected" && note.blank?
       raise ArgumentError, "rejection reason is required"
@@ -30,18 +39,18 @@ class LowStockRequest < ApplicationRecord
     end
   end
 
-  def suggested_restock_quantity
-    threshold = ingredient.low_stock_threshold.to_d
-    suggested = threshold - ingredient.current_quantity.to_d
-    suggested = threshold if suggested <= 0
-    suggested = 1.to_d if suggested <= 0
-    suggested
-  end
+  def mark_completed! = update!(status: :completed)
+
+  def suggested_restock_quantity = ingredient.suggested_reorder_quantity
 
   private
 
   def create_restock_task!
-    return if RestockTask.open.exists?(ingredient_id: ingredient_id)
+    open_task = RestockTask.open.find_by(ingredient_id: ingredient_id)
+    if open_task
+      open_task.update!(low_stock_request: self) if open_task.low_stock_request_id.nil?
+      return
+    end
 
     RestockTask.create!(
       ingredient: ingredient,

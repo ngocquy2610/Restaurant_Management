@@ -77,4 +77,42 @@ class LowStockRequestTest < ActiveSupport::TestCase
     assert request.reload.rejected?
     assert_equal "Enough stock", request.review_note
   end
+
+  test "a rejected request can be approved again" do
+    request = low_stock_requests(:pending_request)
+    request.review!(users(:one), "rejected", note: "Enough stock")
+
+    assert_no_difference("RestockTask.count") do
+      request.review!(users(:one), "approved")
+    end
+    assert request.reload.approved?
+    assert_equal users(:one), request.reviewed_by
+    assert_equal request, RestockTask.open.find_by!(ingredient: request.ingredient).low_stock_request
+  end
+
+  test "a rejected request cannot be rejected again" do
+    request = low_stock_requests(:pending_request)
+    request.review!(users(:one), "rejected", note: "Enough stock")
+
+    assert_raises(ArgumentError) { request.review!(users(:one), "rejected", note: "Still enough") }
+    assert request.reload.rejected?
+  end
+
+  test "an approved request can only move to completed" do
+    request = low_stock_requests(:pending_request)
+    request.review!(users(:one), "approved")
+
+    assert_raises(ArgumentError) { request.review!(users(:one), "rejected", note: "x") }
+    request.mark_completed!
+    assert request.reload.completed?
+  end
+
+  test "approving links the request to an existing open task" do
+    request = low_stock_requests(:pending_request) # ingredient two already has an open task
+    task = RestockTask.open.find_by!(ingredient_id: request.ingredient_id)
+
+    request.review!(users(:one), "approved")
+
+    assert_equal request, task.reload.low_stock_request
+  end
 end

@@ -48,10 +48,17 @@
     </div>
 
     <div>
-      <%= form.label :current_quantity, "Current stock", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
-      <%= form.number_field :current_quantity,
-            step: 0.01, min: 0, placeholder: "0.00",
-            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] placeholder:text-[#7a5d5a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+      <% if form.object.new_record? %>
+        <%= form.label :initial_quantity, "Opening stock", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+        <%= form.number_field :initial_quantity,
+              step: 0.01, min: 0, placeholder: "0.00",
+              class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] placeholder:text-[#7a5d5a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+      <% else %>
+        <p class="mb-2 text-sm font-semibold uppercase tracking-wide text-[#7c5d58]">Current stock</p>
+        <p class="text-[1rem] text-[#2c1c1a]"><%= inventory_quantity(form.object.current_quantity, form.object.unit) %></p>
+        <%= link_to "Adjust stock", new_inventory_stock_adjustment_path(ingredient_id: form.object.id),
+              class: "mt-2 inline-block text-sm font-semibold text-[#7b1f2a] hover:underline" %>
+      <% end %>
     </div>
 
     <div>
@@ -60,6 +67,14 @@
             step: 0.01, min: 0, placeholder: "0.00",
             class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] placeholder:text-[#7a5d5a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
       <p class="mt-2 text-sm text-[#7a5d5a]">Alert when stock falls to or below this amount.</p>
+    </div>
+
+    <div>
+      <%= form.label :reorder_quantity, "Reorder quantity", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
+      <%= form.number_field :reorder_quantity,
+            step: 0.01, min: 0, placeholder: "0.00",
+            class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] placeholder:text-[#7a5d5a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
+      <p class="mt-2 text-sm text-[#7a5d5a]">Typical quantity to order when restocking.</p>
     </div>
   </div>
 

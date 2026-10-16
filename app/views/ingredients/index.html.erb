@@ -32,6 +32,13 @@
           </span>
           <span>Ingredients Management</span>
         <% end %>
+
+        <%= link_to recipe_items_path, class: "flex items-center gap-3 rounded-md px-3 py-3 text-[1.05rem] font-medium text-[#5c4543] hover:bg-[#f1e0dc]" do %>
+          <span class="flex h-5 w-5 items-center justify-center">
+            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v6M5 7h14l-1 13H6l-1-13Z"/><path d="M9 7v2a3 3 0 0 0 6 0V7"/></svg>
+          </span>
+          <span>Recipe Items Management</span>
+        <% end %>
       </nav>
 
       <div class="mt-6 border-t border-[#d8b6af] pt-5">
@@ -93,6 +100,13 @@
           <%= link_to "Clear", ingredients_path, class: "pb-2 text-sm font-semibold text-[#7b1f2a] hover:underline" %>
         <% end %>
 
+        <div class="mb-4 flex gap-4 text-sm font-semibold">
+          <%= link_to "Active", ingredients_path(request.query_parameters.except("inactive", "page")),
+                class: @show_inactive ? "text-[#5c4543] hover:underline" : "text-[#7b1f2a] underline" %>
+          <%= link_to "Deactivated", ingredients_path(request.query_parameters.except("page").merge("inactive" => "1")),
+                class: @show_inactive ? "text-[#7b1f2a] underline" : "text-[#5c4543] hover:underline" %>
+        </div>
+
         <div class="overflow-hidden rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] shadow-sm">
           <table class="w-full text-left text-sm">
             <thead class="bg-[#f1e3df] text-[0.72rem] uppercase tracking-[0.14em] text-[#9b6a63]">
@@ -126,6 +140,11 @@
                             form: { class: "inline" },
                             data: { turbo_confirm: "Deactivate #{ingredient.name}?" },
                             class: "ml-3 cursor-pointer font-semibold text-[#8f1f2a] hover:underline" %>
+                    <% end %>
+                    <% if policy(ingredient).reactivate? && !ingredient.active? %>
+                      <%= button_to "Reactivate", reactivate_ingredient_path(ingredient), method: :patch,
+                            form: { class: "inline" },
+                            class: "ml-3 cursor-pointer font-semibold text-[#25512d] hover:underline" %>
                     <% end %>
                   </td>
                 </tr>

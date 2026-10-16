@@ -23,6 +23,8 @@ class Ingredient < ApplicationRecord
 
   before_save :sync_status!
 
+  attribute :initial_quantity, :decimal, default: 0
+
   validates :name, presence: true, uniqueness: { case_sensitive: false }
   validates :unit, presence: true, inclusion: { in: %w[kg g liter ml piece] }
   validates :category, presence: true, inclusion: { in: CATEGORIES }
@@ -32,6 +34,15 @@ class Ingredient < ApplicationRecord
 
   def deactivate! = update!(active: false)
   def reactivate! = update!(active: true)
+
+  def suggested_reorder_quantity
+    return reorder_quantity if reorder_quantity.to_d.positive?
+
+    gap = low_stock_threshold.to_d - current_quantity.to_d
+    return gap if gap.positive?
+
+    [low_stock_threshold.to_d, 1.to_d].max
+  end
 
   private
 

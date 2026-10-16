@@ -10,14 +10,13 @@ class Admin::KitchenQueuesController < ApplicationController
   def show
     authorize OrderItem, :kitchen_queue?
     @order = Order.includes(order_items: [:food, :food_variant], table: :table_type).find(params[:id])
-    @grouped_recipes = build_recipe_map(@order) # { order_item_id => [recipe_items] }
+    @grouped_recipes = build_recipe_map(@order)
     @aggregated_ingredients = aggregate_ingredients(@order)
   end
 
   def update_status
     authorize @item, :update_status?
     target = params.require(:order_item).require(:status)
-    # must have order_item and just limit at status
 
     unless order_item_transition_allowed?(@item.status, target)
       return redirect_to redirect_target_after_update,
@@ -33,6 +32,8 @@ class Admin::KitchenQueuesController < ApplicationController
 
     redirect_to redirect_target_after_update,
                 notice: "Table #{@item.order&.table&.table_number}: #{@item.food&.name} → #{target.humanize}."
+  rescue StockService::InsufficientStock => e
+    redirect_to redirect_target_after_update, alert: "Cannot accept: #{e.message}"
   rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid => e
     redirect_to admin_kitchen_queues_path, alert: e.message
   end
@@ -71,8 +72,8 @@ class Admin::KitchenQueuesController < ApplicationController
 
   def aggregate_ingredients(order)
     totals = Hash.new { |h, k| h[k] = { ingredient: nil, total_qty: 0.to_d, unit: nil } }
-
-    build_recipe_map(order).each do |order_item_id, recipe_items|
+    pending_ids = order.order_items.select(&:pending?).map(&:id)
+    build_recipe_map(order).slice(*pending_ids).each do |order_item_id, recipe_items|
       quantity = order.order_items.find { |i| i.id == order_item_id }&.quantity.to_i
       recipe_items.each do |ri|
         key = ri.ingredient_id

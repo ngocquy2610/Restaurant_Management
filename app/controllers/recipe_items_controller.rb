@@ -14,7 +14,7 @@ class RecipeItemsController < ApplicationController
 
   # GET /recipe_items/new
   def new
-    @recipe_item = RecipeItem.new
+    @recipe_item = RecipeItem.new(food_id: params[:food_id])
     authorize @recipe_item
     load_form_options
   end
@@ -34,10 +34,10 @@ class RecipeItemsController < ApplicationController
       notify_user(
         recipient: current_user,
         title: "Recipe item created",
-        body: "The recipe item #{@recipe_item.name} has been created.",
+        body: "#{recipe_label(@recipe_item)} has been added.",
         redirect_url: food_path(@recipe_item.food)
       )
-      redirect_to foods_path, notice: "Recipe item was successfully created."
+      redirect_to food_path(@recipe_item.food), notice: "Recipe item was successfully created."
     else
       load_form_options
       render "recipe_items/new", status: :unprocessable_content
@@ -51,10 +51,10 @@ class RecipeItemsController < ApplicationController
       notify_user(
         recipient: current_user,
         title: "Recipe item updated",
-        body: "The recipe item #{@recipe_item.name} has been updated.",
+        body: "#{recipe_label(@recipe_item)} has been updated.",
         redirect_url: food_path(@recipe_item.food)
       )
-      redirect_to foods_path, notice: "Recipe item was successfully updated."
+      redirect_to food_path(@recipe_item.food), notice: "Recipe item was successfully updated."
     else
       load_form_options
       render "recipe_items/edit", status: :unprocessable_content
@@ -64,17 +64,21 @@ class RecipeItemsController < ApplicationController
   # DELETE /recipe_items/1 or /recipe_items/1.json
   def destroy
     authorize @recipe_item
+    food  = @recipe_item.food
+    label = recipe_label(@recipe_item)
     @recipe_item.destroy!
     notify_user(
       recipient: current_user,
       title: "Recipe item destroyed",
-      body: "The recipe item #{@recipe_item.name} has been destroyed.",
-      redirect_url: food_path(@recipe_item.food)
+      body: "#{label} has been removed.",
+      redirect_url: food_path(food)
     )
-    redirect_to recipe_items_path, notice: "Recipe item was successfully destroyed."
+    redirect_to food_path(food), notice: "Recipe item was successfully destroyed.", status: :see_other
   end
 
   private
+
+    def recipe_label(item) = "#{item.ingredient&.name} in #{item.food&.name}"
 
     def load_form_options
       @foods = Food.order(:name)
@@ -82,9 +86,11 @@ class RecipeItemsController < ApplicationController
       @food_variants = FoodVariant.includes(:food).order(:name)
     end
 
+    def label(ri) = "#{ri.ingredient&.name} in #{ri.food&.name}"
+
     # Use callbacks to share common setup or constraints between actions.
     def set_recipe_item
-      @recipe_item = RecipeItem.find(params.expect(:id))
+      @recipe_item = RecipeItem.find(params[:id])
     end
 
     # Only allow a list of trusted parameters through.

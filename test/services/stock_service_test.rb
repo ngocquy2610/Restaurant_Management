@@ -53,6 +53,35 @@ class StockServiceTest < ActiveSupport::TestCase
       StockService.apply_transaction(ingredient: ingredient, transaction_type: :stock_out, quantity: 1)
     end
   end
+
+  test "strict stock_out raises and leaves stock unchanged" do
+    ingredient = Ingredient.create!(name: "Service Strict", unit: "kg", category: "other",
+                                    unit_cost: 1, current_quantity: 1, low_stock_threshold: 0)
+
+    assert_raises(StockService::InsufficientStock) do
+      StockService.apply_transaction(ingredient: ingredient, transaction_type: :stock_out, quantity: 2)
+    end
+    assert_equal 1.to_d, ingredient.reload.current_quantity
+  end
+
+  test "restock task suggestion prefers the ingredient's reorder quantity" do
+    ingredient = Ingredient.create!(name: "Service Reorder", unit: "kg", category: "other", unit_cost: 1,
+                                    current_quantity: 10, low_stock_threshold: 5, reorder_quantity: 25)
+
+    StockService.apply_transaction(ingredient: ingredient, transaction_type: :stock_out, quantity: 6)
+
+    assert_equal 25.to_d, RestockTask.order(:id).last.quantity
+  end
+
+  test "sync_restock_task! notifies inventory manager and admin" do
+    ingredient = Ingredient.create!(name: "Service Notify", unit: "kg", category: "other",
+                                    unit_cost: 1, current_quantity: 0, low_stock_threshold: 2)
+    expected = User.where(role: %i[inventory_manager admin]).count
+
+    assert_difference("Notification.count", expected) do
+      StockService.sync_restock_task!(ingredient)
+    end
+  end
 end
 
 class RestaurantPerformanceServiceTest < ActiveSupport::TestCase

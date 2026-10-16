@@ -8,13 +8,15 @@ class OrderItem < ApplicationRecord
   validates :quantity, presence: true, numericality: { only_integer: true, greater_than: 0 }
   validates :unit_price, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :special_note, length: { maximum: 255 }, allow_nil: true
+  validate :ingredients_in_stock, on: :create, unless: :cancelled?
 
   validate :food_variant_belongs_to_food
 
   before_validation :assign_unit_price
   after_save :recalculate_order_total
   after_destroy :recalculate_order_total
-  after_update :auto_consume_stock, if: -> { saved_change_to_status? && served? }
+  after_update :auto_consume_stock, if: -> { saved_change_to_status? && accepted? }
+  after_update :restore_stock, if: -> { saved_change_to_status? && cancelled? && status_before_last_save != "pending" }
 
   IN_KITCHEN_STATUSES = %i[pending accepted preparing] #Array of Symbols
 
@@ -29,8 +31,6 @@ class OrderItem < ApplicationRecord
         orders.released_to_kitchen_at ASC NULLS LAST,
         order_items.created_at ASC
       SQL
-
-      # heredoc - allow to write in many lines
   }
 
   def assign_unit_price
@@ -40,20 +40,22 @@ class OrderItem < ApplicationRecord
     self.unit_price = price.round(2)
   end
 
-  def consumption_recipe_items
-    if food_variant_id.present?
-      variant_items = RecipeItem.includes(:ingredient)
-                                .where(food_id: food_id, food_variant_id: food_variant_id)
-      return variant_items.to_a if variant_items.any?
-    end
-    RecipeItem.includes(:ingredient).where(food_id: food_id, food_variant_id: nil).to_a
-  end
+  def consumption_recipe_items = RecipeItem.for_item(food_id: food_id, variant_id: food_variant_id)
 
   def auto_consume_stock
     StockService.consume_order_item!(self)
   end
 
   private
+
+  def restore_stock = StockService.restore_order_item!(self)
+
+  def ingredients_in_stock
+    return if food_id.blank?
+
+    StockAvailability.shortages(food_id: food_id, variant_id: food_variant_id, quantity: quantity)
+                     .each { |s| errors.add(:base, s.message) }
+  end
 
   def food_variant_belongs_to_food
     return if food_variant.blank? || food.blank?

@@ -46,9 +46,7 @@ class ApplicationController < ActionController::Base
   end
 
   def notify_role(role, title:, body: nil, redirect_url: nil, exclude: nil)
-    User.where(role: role).where.not(id: exclude&.id).find_each do |user|
-      Notification.create!(recipient: user, title: title, body: body, redirect_url: redirect_url)
-    end
+    Notification.notify_role(role, title: title, body: body, redirect_url: redirect_url, exclude: exclude)
     # Example how to use:
     # notify_role(:receptionist,
     #   title: "New reservation request",

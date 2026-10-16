@@ -5,14 +5,15 @@ class IngredientsController < ApplicationController
   # GET /ingredients or /ingredients.json
   def index
     authorize Ingredient, :index?
-    @ingredients = policy_scope(Ingredient)
-                  .active
-                  .search(params[:q])
-                  .by_category(params[:category])
-                  .by_status(params[:status])
-                  .order(:name)
-                  .page(params[:page])
-                  .per(10)
+    @show_inactive = params[:inactive] == "1"
+    base = policy_scope(Ingredient)
+    base = @show_inactive ? base.archived : base.active
+    @ingredients = base.search(params[:q])
+                       .by_category(params[:category])
+                       .by_status(params[:status])
+                       .order(:name)
+                       .page(params[:page])
+                       .per(10)
   end
 
   def show
@@ -37,26 +38,36 @@ class IngredientsController < ApplicationController
 
   # POST /ingredients or /ingredients.json
   def create
-    @ingredient = Ingredient.new(ingredient_params)
+    @ingredient = Ingredient.new(create_params)
     authorize @ingredient
+    initial = @ingredient.initial_quantity.to_d
+    @ingredient.current_quantity = 0
 
-    if @ingredient.save
-      notify_user(
-        recipient: current_user,
-        title: "Ingredient created",
-        body: "The ingredient #{@ingredient.name} has been created.",
-        redirect_url: ingredient_path(@ingredient)
-      )
-      redirect_to ingredients_path, notice: "Ingredient was successfully created."
-    else
-      render "ingredients/new", status: :unprocessable_content
+    Ingredient.transaction do
+      @ingredient.save!
+      if initial.positive?
+        StockService.restock(ingredient: @ingredient, quantity: initial,
+                             user: current_user, reason: "Opening balance")
+      end
+      StockService.sync_restock_task!(@ingredient.reload)
     end
+
+    notify_user(
+      recipient: current_user,
+      title: "Ingredient created",
+      body: "The ingredient #{@ingredient.name} has been created.",
+      redirect_url: ingredient_path(@ingredient)
+    )
+    redirect_to ingredients_path, notice: "Ingredient was successfully created."
+  rescue ActiveRecord::RecordInvalid
+    render "ingredients/new", status: :unprocessable_content
   end
 
   # PATCH/PUT /ingredients/1 or /ingredients/1.json
   def update
     authorize @ingredient
-    if @ingredient.update(ingredient_params)
+    if @ingredient.update(update_params)
+      StockService.sync_restock_task!(@ingredient)
       notify_user(
         recipient: current_user,
         title: "Ingredient updated",
@@ -104,8 +115,13 @@ class IngredientsController < ApplicationController
       @ingredient = Ingredient.find(params.expect(:id))
     end
 
-    # Only allow a list of trusted parameters through.
-    def ingredient_params
-      params.require(:ingredient).permit(:name, :unit, :category, :unit_cost, :current_quantity, :low_stock_threshold)
+    BASE_PARAMS = %i[name unit category unit_cost low_stock_threshold reorder_quantity].freeze
+
+    def create_params
+      params.require(:ingredient).permit(*BASE_PARAMS, :initial_quantity)
+    end
+
+    def update_params
+      params.require(:ingredient).permit(*BASE_PARAMS)
     end
 end
