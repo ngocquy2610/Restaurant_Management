@@ -7,10 +7,11 @@
     menu section shows its own pages instead of the admin list. %>
 <% admin_path = request.path.start_with?("/admin", "/inventory", "/kitchen") %>
 <% menu_section = %w[categories foods food_variants ingredients recipe_items].include?(controller.controller_name) %>
-<% is_admin_section = admin_path || controller.controller_path.start_with?("admin/", "inventory", "kitchen") || %w[promotions tables dashboards users].include?(controller.controller_name) %>
+<% is_admin_section = admin_path || controller.controller_path.start_with?("admin/", "inventory", "kitchen") || %w[promotions tables dashboards users reservations customer_queues].include?(controller.controller_name) %>
 <% inventory_section = controller.controller_path.start_with?("inventory") %>
 <% kitchen_section = controller.controller_path.start_with?("kitchen") %>
-<% if menu_section || is_admin_section %>
+<% staff_viewer = current_user&.admin? || current_user&.receptionist? || current_user&.inventory_manager? || current_user&.kitchen_staff? || current_user&.waiter? %>
+<% if (menu_section || is_admin_section) && staff_viewer %>
   <% if menu_section %>
     <% nav_label = "Menu section" %>
     <% nav_options = [

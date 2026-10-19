@@ -23,6 +23,7 @@ class OrdersController < ApplicationController
   def new
     @order = Order.new
     authorize @order
+    load_food_data
     load_booked_tables
   end
 
@@ -54,6 +55,7 @@ class OrdersController < ApplicationController
       )
       redirect_to @order, notice: "Order was successfully created."
     else
+      load_food_data
       load_booked_tables
       render :new, status: :unprocessable_entity
     end

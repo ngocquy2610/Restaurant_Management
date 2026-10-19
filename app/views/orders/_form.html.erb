@@ -30,7 +30,7 @@
   </div>
 
   <div class="mt-8">
-    <div class="mb-3 flex items-center justify-between">
+    <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
       <h3 class="font-serif text-2xl font-semibold text-gray-900">Food &amp; Drinks</h3>
       <span class="text-xs text-gray-500">Pick a dish, then a variation only if it has one.</span>
     </div>
@@ -53,8 +53,8 @@
     <%= render "orders/item_row", prefix: "order[order_items_attributes][__INDEX__]", item: nil %>
   </template>
 
-  <div class="mt-8 flex items-center gap-3">
-    <%= form.submit "Place order", class: "rounded-md bg-[#8A1C2B] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#6d1420]" %>
-    <%= link_to "Cancel", order.persisted? ? order : orders_path, class: "text-sm font-semibold text-gray-500 hover:text-[#8A1C2B]" %>
+  <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+    <%= form.submit "Place order", class: "w-full sm:w-auto text-center rounded-md bg-[#8A1C2B] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#6d1420]" %>
+    <%= link_to "Cancel", order.persisted? ? order : orders_path, class: "text-center text-sm font-semibold text-gray-500 hover:text-[#8A1C2B] sm:text-left" %>
   </div>
 <% end %>

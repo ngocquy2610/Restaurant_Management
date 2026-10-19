@@ -2,7 +2,7 @@
   <div class="w-full">
     <div class="admin-flex flex flex-col gap-4 md:flex-row md:gap-6">
 
-    <% if current_user.admin? %>
+    <% if current_user&.admin? || current_user&.receptionist? %>
       <%= render "layouts/admin_sidebar" %>
     <% end %>
 
@@ -15,7 +15,7 @@
             <p class="mt-4 text-sm text-gray-600">Review and confirm every booking. Approving keeps the table reserved; rejecting frees it; checking in marks it occupied.</p>
           </div>
 
-          <%= link_to "Back to dashboard", admin_dashboards_path, class: "inline-flex items-center justify-center rounded-full bg-[#8A1C2B] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#6d1420]" %>
+          <%= link_to current_user&.admin? ? "Back to dashboard" : "Back to floor plan", current_user&.admin? ? admin_dashboards_path : reservations_path, class: "inline-flex items-center justify-center rounded-full bg-[#8A1C2B] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#6d1420]" %>
         </div>
 
         <% if notice.present? %>
@@ -25,10 +25,10 @@
           <p class="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700" id="alert"><%= alert %></p>
         <% end %>
 
-        <div class="overflow-hidden rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm">
-          <div class="flex items-center justify-between border-b border-gray-200 px-6 py-5">
-            <h2 class="font-serif text-2xl font-semibold text-gray-900">All Reservations</h2>
-            <span class="inline-flex rounded-full bg-[#E9CFC7] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#8A1C2B]"><%= @reservations.size %> bookings</span>
+        <div class="overflow-hidden rounded-2xl sm:rounded-[2rem] border border-gray-200 bg-white p-4 sm:p-5 shadow-sm min-w-0">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 px-4 py-4 sm:px-6 sm:py-5">
+            <h2 class="font-serif text-xl sm:text-2xl font-semibold text-gray-900">All Reservations</h2>
+            <span class="inline-flex rounded-full bg-[#E9CFC7] px-2 sm:px-3 py-1 text-[0.65rem] sm:text-xs font-semibold uppercase tracking-[0.18em] text-[#8A1C2B]"><%= @reservations.size %> bookings</span>
           </div>
 
           <% if @reservations.any? %>
@@ -47,13 +47,13 @@
             <tbody class="divide-y divide-gray-200 bg-white">
               <% @reservations.each do |reservation| %>
                 <tr class="transition hover:bg-[#FAF5F1]">
-                  <td class="px-6 py-5">
-                    <div class="flex items-center gap-4">
-                      <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#8A1C2B]/10 font-serif text-base font-bold text-[#8A1C2B]">
+                  <td class="px-4 py-3 sm:px-6 sm:py-5">
+                    <div class="flex min-w-0 items-center gap-3 sm:gap-4">
+                      <div class="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-2xl bg-[#8A1C2B]/10 font-serif text-sm sm:text-base font-bold text-[#8A1C2B]">
                         <%= reservation.guest_name.to_s[0, 2].upcase %>
                       </div>
                       <div>
-                        <p class="text-sm font-semibold text-gray-900"><%= reservation.guest_name %></p>
+                        <p class="text-sm font-semibold text-gray-900 break-words"><%= reservation.guest_name %></p>
                         <% if reservation.user.present? %>
                           <p class="mt-1 text-xs text-gray-500"><%= reservation.user.full_name %></p>
                         <% end %>
@@ -61,12 +61,12 @@
                     </div>
                   </td>
                   <td class="px-3 py-3 text-sm text-gray-600 sm:px-6 sm:py-5 hidden sm:table-cell"><%= reservation.guest_phone %></td>
-                  <td class="px-4 py-3 text-sm text-gray-600 sm:px-6 sm:py-5">Table <%= reservation.table&.table_number %></td>
+                  <td class="px-4 py-3 text-sm whitespace-nowrap text-gray-600 sm:px-6 sm:py-5">Table <%= reservation.table&.table_number %></td>
                   <td class="px-4 py-3 text-sm text-gray-600 sm:px-6 sm:py-5">
                     <%= reservation.reservation_date %> · <%= reservation.reservation_time&.strftime("%I:%M %p") %>
                   </td>
                   <td class="px-4 py-3 sm:px-6 sm:py-5">
-                    <span class="inline-flex items-center gap-2 rounded-full <%= reservation_status_chip_class(reservation.status) %> px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] <%= reservation_status_meta(reservation.status)[:text] %>">
+                    <span class="inline-flex items-center gap-2 rounded-full <%= reservation_status_chip_class(reservation.status) %> px-2 sm:px-3 py-1 text-[0.65rem] sm:text-xs font-semibold uppercase tracking-[0.18em] <%= reservation_status_meta(reservation.status)[:text] %>">
                       <span class="h-2 w-2 rounded-full <%= reservation_status_dot_class(reservation.status) %>"></span>
                       <%= reservation_status_label(reservation.status) %>
                     </span>

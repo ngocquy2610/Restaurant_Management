@@ -13,6 +13,7 @@
   </div>
 
   <nav class="space-y-2 pt-3">
+    <% if current_user&.admin? %>
     <%= link_to admin_dashboards_path, class: sidebar_nav_class(admin_dashboards_path) do %>
       <span class="flex h-5 w-5 items-center justify-center">
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12.5 12 4l9 8.5"/><path d="M5 10.5V20h14v-9.5"/></svg>
@@ -26,21 +27,27 @@
       </span>
       <span>Restaurant Performance</span>
     <% end %>
+    <% end %>
 
+    <% if current_user&.admin? || current_user&.receptionist? %>
     <%= link_to tables_path, class: sidebar_nav_class(tables_path) do %>
       <span class="flex h-5 w-5 items-center justify-center">
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18"/><path d="M5 10V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3"/><path d="M7 10v8m10-8v8M3 18h18"/></svg>
       </span>
       <span>Tables</span>
     <% end %>
+    <% end %>
 
+    <% if current_user&.admin? %>
     <%= link_to admin_users_path, class: sidebar_nav_class(admin_users_path) do %>
       <span class="flex h-5 w-5 items-center justify-center">
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 19v-1a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v1"/><circle cx="10" cy="7" r="3"/><path d="M20 19v-1a4 4 0 0 0-3-3.87"/><path d="M16 4.13a4 4 0 0 1 0 7.75"/></svg>
       </span>
       <span>User Management</span>
     <% end %>
+    <% end %>
 
+    <% if current_user&.admin? || current_user&.receptionist? %>
     <%= link_to admin_reservations_path, class: sidebar_nav_class(admin_reservations_path) do %>
       <span class="flex h-5 w-5 items-center justify-center">
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
@@ -48,6 +55,15 @@
       <span>Reservations</span>
     <% end %>
 
+    <%= link_to admin_customer_queues_path, class: sidebar_nav_class(admin_customer_queues_path) do %>
+      <span class="flex h-5 w-5 items-center justify-center">
+        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 19v-1a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v1"/><circle cx="10" cy="7" r="3"/><path d="M21 11h-6"/></svg>
+      </span>
+      <span>Customer Queue</span>
+    <% end %>
+    <% end %>
+
+    <% if current_user&.admin? %>
     <%= link_to categories_path, class: sidebar_nav_class(categories_path) do %>
       <span class="flex h-5 w-5 items-center justify-center">
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5 12 3l9 4.5-9 4.5L3 7.5Z"/><path d="M3 12.5 12 17l9-4.5"/><path d="M3 17.5 12 22l9-4.5"/></svg>
@@ -67,6 +83,7 @@
         <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"/><path d="M4 19h17"/><path d="m7 15 4-4 3 2 6-7"/></svg>
       </span>
       <span>Inventory Reports</span>
+    <% end %>
     <% end %>
   </nav>
 </aside>
