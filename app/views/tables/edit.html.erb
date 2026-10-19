@@ -1,11 +1,12 @@
 <% content_for :title, "Editing table" %>
 
-<div class="min-h-screen bg-[#FBF0EC] py-10 pt-28">
+<div class="min-h-screen bg-[#FBF0EC] px-4 pb-10 pt-28 sm:px-6 lg:px-8">
   <div class="w-full">
-    <div class="flex gap-6">
+    <div class="admin-flex flex flex-col gap-4 md:flex-row md:gap-6">
       <%= render "layouts/admin_sidebar" %>
 
-      <main class="flex-1">
+      <main class="w-full min-w-0 max-w-full flex-1">
+        <%= render "layouts/admin_mobile_nav" %>
         <div class="max-w-4xl rounded-[2rem] border border-gray-200 bg-white p-8 shadow-sm">
           <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
             <div>

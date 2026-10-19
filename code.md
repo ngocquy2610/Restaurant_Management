@@ -108,7 +108,8 @@ app/
 
 ---
 
-## 5. Domain Models — Food & Recipes
+## 5. Domain Models
+### 5.1 Food & Recipes
 
 #### `Food` (app/models/food.rb)
 - **Associations:** `belongs_to :category`, `has_many :food_variants` (destroy), `has_many :recipe_items`, `has_many :ingredients` (through recipe), `has_many :order_items`, `has_one_attached :image`.

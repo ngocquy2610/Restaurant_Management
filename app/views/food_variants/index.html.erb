@@ -1,74 +1,11 @@
 <% content_for :title, "Food Variants" %>
 
-<div class="min-h-screen pt-[5.25rem] bg-[#f4e6e2] text-[#2f1f1d]">
-  <div class="flex min-h-screen">
-    <aside class="sticky top-[5.25rem] z-10 h-[calc(100vh-5.25rem)] w-[270px] shrink-0 self-start overflow-y-auto border-r border-[#d8b6af] bg-[#f8eeee] px-5 py-6">
+<div class="min-h-screen bg-[#f4e6e2] px-4 pb-10 pt-28 text-[#2f1f1d] sm:px-6 lg:px-8">
+  <div class="admin-flex flex flex-col gap-4 md:flex-row md:gap-6">
+    <%= render "layouts/menu_sidebar" %>
 
-      <nav class="space-y-2">
-        <%= link_to categories_path, class: "flex items-center gap-3 rounded-md px-3 py-3 text-[1.05rem] font-medium text-[#5c4543] hover:bg-[#f1e0dc]" do %>
-          <span class="flex h-5 w-5 items-center justify-center">
-            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-          </span>
-          <span>Categories Management</span>
-        <% end %>
-
-        <%= link_to foods_path, class: "flex items-center gap-3 rounded-md px-3 py-3 text-[1.05rem] font-medium text-[#5c4543] hover:bg-[#f1e0dc]" do %>
-          <span class="flex h-5 w-5 items-center justify-center">
-            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h.01M12 3h.01M17 3h.01"/><path d="M7 21h10"/><path d="M7 3c0 5-3 8-3 11a3 3 0 0 0 6 0c0-3-3-6-3-11"/><path d="M17 3c0 5-3 8-3 11a3 3 0 0 0 6 0c0-3-3-6-3-11"/></svg>
-          </span>
-          <span>Foods Management</span>
-        <% end %>
-
-        <%= link_to food_variants_path, class: "flex items-center gap-3 rounded-md bg-[#e9d4d0] px-3 py-3 text-[1.05rem] font-medium text-[#5a1a1b] shadow-inner" do %>
-          <span class="flex h-5 w-5 items-center justify-center">
-            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v5M12 21v-4M12 16v-8"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="17" r="2"/><path d="M7 6v2M7 8v6a2 2 0 0 0 2 2h0"/><circle cx="7" cy="5" r="2"/><path d="M17 6v2M17 8v6a2 2 0 0 1-2 2h0"/><circle cx="17" cy="5" r="2"/></svg>
-          </span>
-          <span>Food Variant Management</span>
-        <% end %>
-
-        <%= link_to ingredients_path, class: "flex items-center gap-3 rounded-md px-3 py-3 text-[1.05rem] font-medium text-[#5c4543] hover:bg-[#f1e0dc]" do %>
-          <span class="flex h-5 w-5 items-center justify-center">
-            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8h10v3H7z"/><path d="M5 8h14"/><path d="M8 3h8M9 11v8h6v-8"/></svg>
-          </span>
-          <span>Ingredients Management</span>
-        <% end %>
-
-        <%= link_to recipe_items_path, class: "flex items-center gap-3 rounded-md px-3 py-3 text-[1.05rem] font-medium text-[#5c4543] hover:bg-[#f1e0dc]" do %>
-          <span class="flex h-5 w-5 items-center justify-center">
-            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v6M5 7h14l-1 13H6l-1-13Z"/><path d="M9 7v2a3 3 0 0 0 6 0V7"/></svg>
-          </span>
-          <span>Recipe Items Management</span>
-        <% end %>
-      </nav>
-
-      <div class="mt-6 border-t border-[#d8b6af] pt-5">
-        <p class="mb-3 px-3 text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#9b6a63]">Add New</p>
-        <div class="space-y-2">
-          <%= link_to new_food_variant_path, class: "flex items-center gap-3 rounded-md px-3 py-3 text-[1.05rem] font-medium text-[#5c4543] hover:bg-[#f1e0dc]" do %>
-            <span class="flex h-5 w-5 items-center justify-center text-[#7b1f2a]">＋</span>
-            <span>Add New Variant</span>
-          <% end %>
-        </div>
-      </div>
-
-      <div class="mt-6 border-t border-[#d8b6af] pt-5">
-        <%= link_to "Back to dashboard", admin_dashboards_path, class: "flex justify-center items-center gap-3 rounded-md bg-[#7b1f2a] px-3 py-3 text-[1.05rem] font-semibold text-white shadow-sm hover:bg-[#661a23]"%>
-      </div>
-
-      <% if @foods_for_filter.any? %>
-        <div class="mt-6 border-t border-[#d8b6af] pt-5">
-          <p class="mb-3 px-3 text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#9b6a63]">Filter by dish</p>
-          <div class="max-h-64 space-y-1 overflow-y-auto pr-1">
-            <%= link_to "All dishes", food_variants_path(q: @query, sort: @sort), class: "block truncate rounded-md px-3 py-2 text-[0.95rem] font-medium #{@food_filter.blank? ? "bg-[#e9d4d0] text-[#5a1a1b]" : "text-[#5c4543] hover:bg-[#f1e0dc]"}" %>
-            <% @foods_for_filter.each do |food| %>
-              <%= link_to food.name, food_variants_path(q: @query, sort: @sort, food_id: food.id), title: food.name, class: "block truncate rounded-md px-3 py-2 text-[0.95rem] #{@food_filter.to_s == food.id.to_s ? "bg-[#e9d4d0] font-semibold text-[#5a1a1b]" : "text-[#5c4543] hover:bg-[#f1e0dc]"}" %>
-            <% end %>
-          </div>
-        </div>
-      <% end %>
-    </aside>
-
-    <main class="flex-1 bg-[#f6efee] px-8 py-6">
+    <main class="w-full min-w-0 max-w-full flex-1 bg-[#f6efee] px-4 py-5 sm:px-8 sm:py-6">
+      <%= render "layouts/admin_mobile_nav" %>
       <div class="mx-auto max-w-[1260px]">
 
         <% if notice.present? %>

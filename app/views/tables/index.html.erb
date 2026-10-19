@@ -1,11 +1,12 @@
 <% content_for :title, "Restaurant Tables" %>
 
-<div class="min-h-screen bg-[#FBF0EC] py-10 pt-28">
+<div class="min-h-screen bg-[#FBF0EC] px-4 pb-10 pt-28 sm:px-6 lg:px-8">
   <div class="w-full">
-    <div class="flex gap-6">
+    <div class="admin-flex flex flex-col gap-4 md:flex-row md:gap-6">
       <%= render "layouts/admin_sidebar" %>
 
-      <main class="flex-1 space-y-8">
+      <main class="w-full min-w-0 max-w-full flex-1 space-y-5 sm:space-y-8">
+        <%= render "layouts/admin_mobile_nav" %>
         <% tables = @area ? @area.tables.to_a : [] %>
         <% available   = tables.count(&:available?) %>
         <% occupied    = tables.count(&:occupied?) %>

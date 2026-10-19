@@ -1,5 +1,17 @@
-<aside class="sticky top-[5.25rem] z-10 h-[calc(100vh-5.25rem)] w-[270px] shrink-0 self-start overflow-y-auto border-r border-[#d8b6af] bg-[#f8eeee] px-5 py-6">
-  <p class="mb-3 px-3 text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#9b6a63]">Kitchen</p>
+<aside class="sticky top-[5.25rem] z-10 h-[calc(100vh-5.25rem)] w-[270px] shrink-0 self-start overflow-y-auto border-r border-[#d8b6af] bg-[#f8eeee] px-5 py-6"
+      data-admin-sidebar="true">
+  <div class="flex items-center justify-between px-3 pb-3 md:hidden">
+    <p class="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#9b6a63]">Kitchen</p>
+    <button type="button"
+            class="flex h-8 w-8 items-center justify-center rounded-lg text-[#8A1C2B] transition hover:bg-[#8A1C2B]/10"
+            data-action="click->mobile-nav#close"
+            aria-label="Close menu">
+      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" d="M18 6 6 18M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+  <p class="mb-3 hidden px-3 text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#9b6a63] md:block">Kitchen</p>
 
   <nav class="space-y-2">
     <%= link_to kitchen_root_path, class: sidebar_nav_class(kitchen_root_path) do %>

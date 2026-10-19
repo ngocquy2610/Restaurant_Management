@@ -1,6 +1,9 @@
-<nav class="fixed top-0 left-0 w-full z-30 flex items-center justify-between px-8 py-6 bg-[#FFF8F6] border">
-  <span class="text-[#8F000D] font-serif text-3xl font-bold"><%= link_to "Lumière Dining", root_path%></span>
-  <div class="flex gap-10 text-black">
+<nav class="fixed top-0 left-0 w-full z-30 flex items-center justify-between gap-3 px-4 py-4 sm:px-8 sm:py-6 bg-[#FFF8F6] border">
+  <div class="flex min-w-0 items-center gap-2 sm:gap-3">
+    <% sidebar_page = request.path.start_with?("/admin", "/inventory", "/kitchen") || controller.controller_path.start_with?("admin/", "inventory", "kitchen") || %w[categories foods food_variants ingredients recipe_items promotions tables dashboards users].include?(controller.controller_name) %>
+    <span class="truncate font-serif text-xl font-bold text-[#8F000D] sm:text-3xl"><%= link_to "Lumière Dining", root_path%></span>
+  </div>
+  <div class="hidden md:flex gap-10 text-black">
     <%= link_to "Menu", menus_path %>
     <%= link_to "Our Story", our_story_path %>
     <%= link_to "Reviews", reviews_path %>
@@ -11,6 +14,36 @@
   </div>
 
   <div class="flex items-center gap-3">
+    <div data-controller="dropdown" class="relative md:hidden">
+      <button
+        type="button"
+        data-action="click->dropdown#toggle keydown->dropdown#onKeydown"
+        class="flex items-center gap-2 rounded-full border border-[#d8b6af] bg-[#f8eeee] px-4 py-2 text-sm font-bold text-[#8A1C2B] transition hover:bg-[#8A1C2B]/10"
+        aria-haspopup="true"
+        aria-expanded="false"
+        aria-label="Site menu"
+      >
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+          <path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+        <span>Menu</span>
+      </button>
+
+      <div
+        data-dropdown-target="menu"
+        class="absolute right-0 top-full mt-2 hidden w-56 origin-top-right rounded-lg border border-black/10 bg-white py-2 shadow-lg"
+        role="menu"
+      >
+        <p class="px-4 pb-2 text-xs font-semibold uppercase tracking-widest text-gray-400">Explore</p>
+        <%= link_to "Menu", menus_path, class: "block px-4 py-2 text-sm text-gray-800 hover:bg-amber-50" %>
+        <%= link_to "Our Story", our_story_path, class: "block px-4 py-2 text-sm text-gray-800 hover:bg-amber-50" %>
+        <%= link_to "Reviews", reviews_path, class: "block px-4 py-2 text-sm text-gray-800 hover:bg-amber-50" %>
+        <%= link_to "Reservation", reservations_path, class: "block px-4 py-2 text-sm text-gray-800 hover:bg-amber-50" %>
+        <% if current_user && policy(Order).index? %>
+          <%= link_to "Orders", orders_path, class: "block px-4 py-2 text-sm text-gray-800 hover:bg-amber-50" %>
+        <% end %>
+      </div>
+    </div>
     <% if current_user&.waiter? %>
       <div data-controller="dropdown" class="relative">
         <button

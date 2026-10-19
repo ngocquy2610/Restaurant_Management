@@ -1,11 +1,12 @@
 <% content_for :title, "New promotion" %>
 
-<div class="min-h-screen bg-[#f4e6e2] py-10 pt-28 text-[#2f1f1d]">
+<div class="min-h-screen bg-[#f4e6e2] px-4 pb-10 pt-28 text-[#2f1f1d] sm:px-6 lg:px-8">
   <div class="w-full">
-    <div class="flex gap-6">
+    <div class="admin-flex flex flex-col gap-4 md:flex-row md:gap-6">
       <%= render "layouts/admin_sidebar" %>
 
-      <main class="flex-1">
+      <main class="w-full min-w-0 max-w-full flex-1">
+        <%= render "layouts/admin_mobile_nav" %>
         <div class="mx-auto max-w-[720px]">
           <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
             <%= link_to promotions_path, class: "inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-[#7b1f2a] hover:text-[#661a23]" do %>

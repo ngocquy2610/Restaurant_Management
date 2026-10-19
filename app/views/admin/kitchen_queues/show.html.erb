@@ -1,10 +1,11 @@
 <% content_for :title, "Order ##{@order.id} - Table #{@order.table&.table_number}" %>
-<div class="min-h-screen bg-[#FBF0EC] py-10 pt-28">
+<div class="min-h-screen bg-[#FBF0EC] px-4 pb-10 pt-28 sm:px-6 lg:px-8"><div class="mx-auto w-full max-w-7xl">
   <div class="w-full">
-    <div class="flex gap-6">
+    <div class="admin-flex flex flex-col gap-4 md:flex-row md:gap-6">
       <%= render "layouts/admin_sidebar" %>
 
-      <main class="flex-1 space-y-8">
+      <main class="w-full min-w-0 max-w-full flex-1 space-y-5 sm:space-y-8">
+        <%= render "layouts/admin_mobile_nav" %>
         <div>
           <div class="flex flex-wrap items-center gap-3">
             <%= link_to admin_dashboards_path, class: "inline-flex items-center justify-center rounded-full bg-[#8A1C2B] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#6d1420]" do %>
@@ -18,7 +19,7 @@
           <p class="mt-4 text-sm font-semibold uppercase tracking-[0.32em] text-[#8A1C2B]/80">Kitchen Console</p>
           <div class="mt-3 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h1 class="font-serif text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
+              <h1 class="font-serif text-2xl font-semibold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
                 Table <%= @order.table&.table_number || "?" %>
                 <span class="text-2xl text-gray-400">Order #<%= @order.id %></span>
               </h1>
@@ -56,7 +57,7 @@
           <% end %>
         </div>
 
-        <div class="overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-sm">
+        <div class="overflow-hidden rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm">
           <div class="flex items-center justify-between border-b border-gray-200 px-6 py-5">
             <h2 class="font-serif text-2xl font-semibold text-gray-900">Dishes and recipes</h2>
             <span class="inline-flex rounded-full bg-[#E9CFC7] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#8A1C2B]"><%= @order.order_items.size %> items</span>
@@ -66,10 +67,10 @@
             <div class="divide-y divide-gray-100">
               <% @order.order_items.each do |item| %>
                 <% recipes = @grouped_recipes[item.id] || [] %>
-                <div id="<%= dom_id(item) %>" class="px-6 py-5">
+                <div id="<%= dom_id(item) %>" class="px-4 sm:px-6 py-4 sm:py-5">
                   <div class="flex flex-wrap items-start justify-between gap-4">
                     <div>
-                      <p class="font-serif text-lg font-semibold text-gray-900"><%= item.quantity %>x <%= item.food&.name %></p>
+                      <p class="font-serif text-base sm:text-lg font-semibold text-gray-900"><%= item.quantity %>x <%= item.food&.name %></p>
                       <p class="mt-1 text-sm text-gray-500"><%= item.food_variant&.name || "Base recipe" %></p>
                       <% if item.special_note.present? %><p class="mt-1 text-xs italic text-amber-700"><%= item.special_note %></p><% end %>
                     </div>
@@ -77,18 +78,18 @@
                       <%= order_item_status_badge(item.status) %>
                       <div class="flex flex-wrap justify-end gap-2">
                         <% order_item_next_statuses(item.status).each do |ns| %>
-                          <%= button_to ns.to_s.humanize, admin_kitchen_queue_update_item_status_path(@order, item), method: :patch, params: { order_item: { status: ns }, from: "show" }, class: "cursor-pointer inline-flex rounded-full px-3 py-1.5 text-xs font-semibold bg-[#8A1C2B] text-white hover:bg-[#6d1420]" %>
+                          <%= button_to ns.to_s.humanize, admin_kitchen_queue_update_item_status_path(@order, item), method: :patch, params: { order_item: { status: ns }, from: "show" }, class: "cursor-pointer inline-flex rounded-full px-2.5 py-1 text-xs font-semibold bg-[#8A1C2B] text-white hover:bg-[#6d1420] sm:px-3 sm:py-1.5" %>
                         <% end %>
                       </div>
                     </div>
                   </div>
 
-                  <div class="mt-3 rounded-2xl border border-gray-100 bg-[#FAF5F1] px-4 py-3">
+                  <div class="mt-2 rounded-2xl border border-gray-100 bg-[#FAF5F1] px-3 py-2.5 sm:px-4 sm:py-3">
                     <p class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-400">Recipe - <%= recipes.size %> ingredients</p>
                     <% if recipes.any? %>
                       <ul class="mt-2 divide-y divide-gray-100">
                         <% recipes.each do |ri| %>
-                          <li class="flex items-center justify-between gap-3 py-1.5 text-sm">
+                          <li class="flex items-center justify-between gap-3 py-1.5 text-xs sm:text-sm">
                             <span class="font-medium text-gray-800"><%= ri.ingredient&.name %></span>
                             <span class="text-gray-500"><%= ri.quantity_required %> <%= ri.ingredient&.unit %> x <%= item.quantity %></span>
                           </li>
@@ -106,7 +107,7 @@
           <% end %>
         </div>
 
-        <div class="overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-sm">
+        <div class="overflow-hidden rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm">
           <div class="flex items-center justify-between border-b border-gray-200 px-6 py-5">
             <h2 class="font-serif text-2xl font-semibold text-gray-900">Prep list</h2>
             <span class="inline-flex rounded-full bg-[#E9CFC7] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#8A1C2B]"><%= @aggregated_ingredients.size %> lines</span>
@@ -115,15 +116,15 @@
           <% if @aggregated_ingredients.any? %>
             <table class="min-w-full text-left text-sm text-gray-700">
               <thead class="bg-[#FEF3E8] text-xs uppercase tracking-[0.16em] text-gray-500">
-                <tr><th class="px-6 py-4">Ingredient</th><th class="px-6 py-4 text-right">Needed</th><th class="px-6 py-4 text-right">Stock</th><th class="px-6 py-4 text-right">Status</th></tr>
+                <tr><th class="px-3 sm:px-6 py-3">Ingredient</th><th class="px-3 sm:px-6 py-3 text-right">Needed</th><th class="px-3 sm:px-6 py-3 text-right">Stock</th><th class="px-3 sm:px-6 py-3 text-right">Status</th></tr>
               </thead>
               <tbody class="divide-y divide-gray-100 bg-white">
                 <% @aggregated_ingredients.each do |entry| %>
                   <tr>
-                    <td class="px-6 py-4 font-semibold text-gray-900"><%= entry[:ingredient]&.name %></td>
-                    <td class="px-6 py-4 text-right"><%= entry[:total_qty].to_s("F") %> <%= entry[:unit] %></td>
-                    <td class="px-6 py-4 text-right text-gray-600"><%= entry[:ingredient]&.current_quantity %> <%= entry[:unit] %></td>
-                    <td class="px-6 py-4 text-right"><% if entry[:low_stock] %><span class="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">Low stock</span><% else %><span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">OK</span><% end %></td>
+                    <td class="px-3 sm:px-6 py-3 font-semibold text-gray-900"><%= entry[:ingredient]&.name %></td>
+                    <td class="px-3 sm:px-6 py-3 text-right"><%= entry[:total_qty].to_s("F") %> <%= entry[:unit] %></td>
+                    <td class="px-3 sm:px-6 py-3 text-right text-gray-600"><%= entry[:ingredient]&.current_quantity %> <%= entry[:unit] %></td>
+                    <td class="px-3 sm:px-6 py-3 text-right"><% if entry[:low_stock] %><span class="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">Low stock</span><% else %><span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">OK</span><% end %></td>
                   </tr>
                 <% end %>
               </tbody>
@@ -135,4 +136,5 @@
       </main>
     </div>
   </div>
+</div>
 </div>
