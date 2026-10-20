@@ -2,11 +2,11 @@
 <div class="min-h-screen bg-[#f4e6e2] pt-[5.25rem] text-[#2f1f1d]">
   <div class="flex min-h-screen">
     <%= render "layouts/inventory_sidebar" %>
-    <main class="flex-1 bg-[#f6efee] px-8 py-6">
+    <main class="min-w-0 flex-1 bg-[#f6efee] px-4 py-5 sm:px-8 sm:py-6">
       <div class="mx-auto max-w-[720px]">
         <%= render "layouts/flash" %>
         <%= link_to "Back to task", inventory_restock_task_path(@restock_task), class: "text-sm font-semibold text-[#7b1f2a] hover:underline" %>
-        <h2 class="mt-3 font-serif text-[2.4rem] leading-none">Receive stock</h2>
+        <h2 class="mt-3 font-serif text-2xl leading-none sm:text-4xl">Receive stock</h2>
         <p class="mt-3 text-[1.05rem] text-[#7a5a56]">
           <%= @restock_task.ingredient.name %> —
           planned <%= inventory_quantity(@restock_task.quantity, @restock_task.ingredient.unit) %>
@@ -32,7 +32,7 @@
                   class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3 text-[1rem] text-[#2c1c1a] placeholder:text-[#7a5d5a] focus:outline-none focus:ring-2 focus:ring-[#c0928d]" %>
           </div>
           <%= f.submit "Complete restock",
-                class: "cursor-pointer rounded-md bg-[#7b1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#661a23]" %>
+                class: "w-full cursor-pointer rounded-md bg-[#7b1f2a] px-5 py-3 text-center text-base font-semibold text-white shadow-sm hover:bg-[#661a23] sm:w-auto" %>
         <% end %>
       </div>
     </main>

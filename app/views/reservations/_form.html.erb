@@ -61,7 +61,7 @@
     <div data-controller="reservation-schedule"
          data-reservation-schedule-path-value="<%= new_reservation_path(table_id: reservation.table.id, date: "__DATE__") %>"
          data-reservation-schedule-date-value="<%= @slot_date %>"
-         class="rounded-md border border-[#d8c1bc] bg-[#f8efee] p-5">
+         class="rounded-md border border-[#d8c1bc] bg-[#f8efee] p-4 sm:p-5">
       <%= form.hidden_field :reservation_time, data: { reservation_schedule_target: "time" } %>
 
       <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -137,8 +137,8 @@
     </div>
   </div>
 
-  <div class="flex items-center gap-3 border-t border-[#e4d2ce] pt-6">
-    <%= form.submit class: "cursor-pointer rounded-md bg-[#7b1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#661a23]" %>
-    <%= link_to "Cancel", reservations_path, class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center border-t border-[#e4d2ce] pt-6">
+    <%= form.submit class: "w-full sm:w-auto text-center cursor-pointer rounded-md bg-[#7b1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#661a23]" %>
+    <%= link_to "Cancel", reservations_path, class: "w-full sm:w-auto text-center rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
   </div>
 <% end %>

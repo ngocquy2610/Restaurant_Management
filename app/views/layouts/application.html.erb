@@ -26,8 +26,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.12.0/toastify.min.js"></script>
 
   </head>
-  <body class="font-serif">
+  <body class="font-serif" data-controller="mobile-nav">
     <div class="relative"><%= render "layouts/header" %></div>
+    <div class="fixed inset-0 z-40 hidden md:hidden" data-admin-backdrop data-action="click->mobile-nav#close">
+      <div class="absolute inset-0 bg-black/40"></div>
+    </div>
     <div class="mx-auto">
       <%= yield %>
     </div>

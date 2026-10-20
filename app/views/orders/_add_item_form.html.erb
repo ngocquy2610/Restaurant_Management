@@ -5,5 +5,5 @@
   <div data-order-form-target="items" class="space-y-3">
     <%= render "orders/item_row", prefix: "order_item", item: @order_item %>
   </div>
-  <%= form.submit "Add to order", class: "mt-4 rounded-md bg-[#8A1C2B] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#6d1420]" %>
+  <%= form.submit "Add to order", class: "mt-4 w-full rounded-md bg-[#8A1C2B] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#6d1420] sm:w-auto" %>
 <% end %>

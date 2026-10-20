@@ -3,12 +3,12 @@
 <div class="min-h-screen bg-[#f4e6e2] pt-[5.25rem] text-[#2f1f1d]">
   <div class="flex min-h-screen">
     <%= render "layouts/inventory_sidebar" %>
-    <main class="flex-1 bg-[#f6efee] px-8 py-6">
+    <main class="min-w-0 flex-1 bg-[#f6efee] px-4 py-5 sm:px-8 sm:py-6">
       <div class="mx-auto max-w-[900px]">
         <%= render "layouts/flash" %>
         <%= link_to "Back to requests", inventory_low_stock_requests_path, class: "text-sm font-semibold text-[#7b1f2a] hover:underline" %>
-        <h2 class="mt-3 font-serif text-[2.6rem] leading-none">Request #<%= @low_stock_request.id %></h2>
-        <dl class="mt-6 space-y-3 rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-6 shadow-sm">
+        <h2 class="mt-3 font-serif text-2xl leading-none sm:text-4xl">Request #<%= @low_stock_request.id %></h2>
+        <dl class="mt-6 space-y-3 rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-4 shadow-sm sm:p-6">
           <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Ingredient</dt><dd class="font-semibold"><%= ingredient.name %></dd></div>
           <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">From</dt><dd class="font-semibold"><%= @low_stock_request.user.full_name %></dd></div>
           <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Urgency</dt><dd><%= low_stock_request_urgency_badge(@low_stock_request.urgency) %></dd></div>
@@ -22,21 +22,21 @@
         </dl>
 
         <h3 class="mt-6 font-serif text-[1.6rem] leading-none">Current stock</h3>
-        <dl class="mt-3 space-y-3 rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-6 shadow-sm">
+        <dl class="mt-3 space-y-3 rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-4 shadow-sm sm:p-6">
           <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Current stock</dt><dd class="font-semibold"><%= inventory_quantity(ingredient.current_quantity, ingredient.unit) %></dd></div>
           <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Low stock threshold</dt><dd><%= inventory_quantity(ingredient.low_stock_threshold, ingredient.unit) %></dd></div>
           <div class="flex justify-between gap-3"><dt class="text-[#7a5a56]">Ingredient status</dt><dd><%= ingredient_status_badge(ingredient.status) %></dd></div>
         </dl>
 
         <% if policy(@low_stock_request).review? && (@low_stock_request.pending? || @low_stock_request.rejected?) %>
-          <%= form_with(url: review_inventory_low_stock_request_path(@low_stock_request), method: :patch, class: "mt-4 space-y-4 rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-6 shadow-sm") do |form| %>
+          <%= form_with(url: review_inventory_low_stock_request_path(@low_stock_request), method: :patch, class: "mt-4 space-y-4 rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-4 shadow-sm sm:p-6") do |form| %>
             <div>
               <%= form.label :review_note, "Reason (required when rejecting)", class: "mb-2 block text-sm font-semibold uppercase tracking-wide text-[#7c5d58]" %>
               <%= form.text_area "low_stock_request[review_note]", rows: 3, placeholder: "e.g. Stock is sufficient, will handle in next cycle", class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-4 py-3" %>
             </div>
             <div class="flex flex-wrap gap-3">
-              <%= form.button "Approve", name: "low_stock_request[status]", value: "approved", class: "cursor-pointer rounded-md bg-[#25512d] px-5 py-3 font-semibold text-white hover:bg-[#1c4023]" %>
-              <%= form.button "Reject", name: "low_stock_request[status]", value: "rejected", class: "cursor-pointer rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 font-semibold" %>
+              <%= form.button "Approve", name: "low_stock_request[status]", value: "approved", class: "w-full cursor-pointer rounded-md bg-[#25512d] px-5 py-3 text-center font-semibold text-white hover:bg-[#1c4023] sm:w-auto" %>
+              <%= form.button "Reject", name: "low_stock_request[status]", value: "rejected", class: "w-full cursor-pointer rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 text-center font-semibold sm:w-auto" %>
             </div>
           <% end %>
         <% end %>

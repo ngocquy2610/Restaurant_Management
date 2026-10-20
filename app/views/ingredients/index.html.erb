@@ -1,62 +1,11 @@
 <% content_for :title, "Ingredients" %>
 
-<div class="min-h-screen bg-[#f4e6e2] pt-[5.25rem] text-[#2f1f1d]">
-  <div class="flex min-h-screen">
-    <aside class="sticky top-[5.25rem] z-10 h-[calc(100vh-5.25rem)] w-[270px] shrink-0 self-start overflow-y-auto border-r border-[#d8b6af] bg-[#f8eeee] px-5 py-6">
+<div class="min-h-screen bg-[#f4e6e2] pb-10 pt-28 text-[#2f1f1d]">
+  <div class="admin-flex flex flex-col gap-4 md:flex-row md:gap-6">
+    <%= render "layouts/menu_sidebar" %>
 
-      <nav class="space-y-2">
-        <%= link_to categories_path, class: "flex items-center gap-3 rounded-md px-3 py-3 text-[1.05rem] font-medium text-[#5c4543] hover:bg-[#f1e0dc]" do %>
-          <span class="flex h-5 w-5 items-center justify-center">
-            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-          </span>
-          <span>Categories Management</span>
-        <% end %>
-
-        <%= link_to foods_path, class: "flex items-center gap-3 rounded-md px-3 py-3 text-[1.05rem] font-medium text-[#5c4543] hover:bg-[#f1e0dc]" do %>
-          <span class="flex h-5 w-5 items-center justify-center">
-            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h.01M12 3h.01M17 3h.01"/><path d="M7 21h10"/><path d="M7 3c0 5-3 8-3 11a3 3 0 0 0 6 0c0-3-3-6-3-11"/><path d="M17 3c0 5-3 8-3 11a3 3 0 0 0 6 0c0-3-3-6-3-11"/></svg>
-          </span>
-          <span>Foods Management</span>
-        <% end %>
-
-        <%= link_to food_variants_path, class: "flex items-center gap-3 rounded-md px-3 py-3 text-[1.05rem] font-medium text-[#5c4543] hover:bg-[#f1e0dc]" do %>
-          <span class="flex h-5 w-5 items-center justify-center">
-            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v5M12 21v-4M12 16v-8"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="17" r="2"/><path d="M7 6v2M7 8v6a2 2 0 0 0 2 2h0"/><circle cx="7" cy="5" r="2"/><path d="M17 6v2M17 8v6a2 2 0 0 1-2 2h0"/><circle cx="17" cy="5" r="2"/></svg>
-          </span>
-          <span>Food Variant Management</span>
-        <% end %>
-
-        <%= link_to ingredients_path, class: "flex items-center gap-3 rounded-md bg-[#e9d4d0] px-3 py-3 text-[1.05rem] font-medium text-[#5a1a1b] shadow-inner" do %>
-          <span class="flex h-5 w-5 items-center justify-center">
-            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8h10v3H7z"/><path d="M5 8h14"/><path d="M8 3h8M9 11v8h6v-8"/></svg>
-          </span>
-          <span>Ingredients Management</span>
-        <% end %>
-
-        <%= link_to recipe_items_path, class: "flex items-center gap-3 rounded-md px-3 py-3 text-[1.05rem] font-medium text-[#5c4543] hover:bg-[#f1e0dc]" do %>
-          <span class="flex h-5 w-5 items-center justify-center">
-            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v6M5 7h14l-1 13H6l-1-13Z"/><path d="M9 7v2a3 3 0 0 0 6 0V7"/></svg>
-          </span>
-          <span>Recipe Items Management</span>
-        <% end %>
-      </nav>
-
-      <div class="mt-6 border-t border-[#d8b6af] pt-5">
-        <p class="mb-3 px-3 text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#9b6a63]">Add New</p>
-        <div class="space-y-2">
-          <%= link_to new_ingredient_path, class: "flex items-center gap-3 rounded-md px-3 py-3 text-[1.05rem] font-medium text-[#5c4543] hover:bg-[#f1e0dc]" do %>
-            <span class="flex h-5 w-5 items-center justify-center text-[#7b1f2a]">＋</span>
-            <span>Add New Ingredient</span>
-          <% end %>
-        </div>
-      </div>
-
-      <div class="mt-6 border-t border-[#d8b6af] pt-5">
-        <%= link_to "Back to dashboard", admin_dashboards_path, class: "flex justify-center items-center gap-3 rounded-md bg-[#7b1f2a] px-3 py-3 text-[1.05rem] font-semibold text-white shadow-sm hover:bg-[#661a23]"%>
-      </div>
-    </aside>
-
-    <main class="flex-1 bg-[#f6efee] px-8 py-6">
+    <main class="w-full min-w-0 max-w-full flex-1 bg-[#f6efee] px-4 py-5 sm:px-8 sm:py-6">
+      <%= render "layouts/admin_mobile_nav" %>
       <div class="mx-auto max-w-[1260px]">
 
         <% if notice.present? %>
@@ -68,11 +17,11 @@
 
         <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 class="font-serif text-[4rem] leading-none tracking-[-0.06em] text-[#2f1f1d]">Ingredients</h2>
+            <h2 class="font-serif text-2xl leading-none tracking-[-0.06em] sm:text-4xl lg:text-5xl text-[#2f1f1d]">Ingredients</h2>
             <p class="mt-3 text-[1.05rem] text-[#7a5a56]">Search, filter and manage the raw materials used across your menu.</p>
           </div>
           <% if policy(Ingredient).new? %>
-            <%= link_to "New ingredient", new_ingredient_path, class: "rounded-md bg-[#7b1f2a] px-5 py-3 font-semibold text-white shadow-sm hover:bg-[#661a23]" %>
+            <%= link_to "New ingredient", new_ingredient_path, class: "w-full rounded-md bg-[#7b1f2a] px-5 py-3 text-center font-semibold text-white shadow-sm hover:bg-[#661a23] sm:w-auto" %>
           <% end %>
         </div>
 
@@ -107,30 +56,30 @@
                 class: @show_inactive ? "text-[#7b1f2a] underline" : "text-[#5c4543] hover:underline" %>
         </div>
 
-        <div class="overflow-hidden rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] shadow-sm">
+        <div class="overflow-x-auto rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] shadow-sm">
           <table class="w-full text-left text-sm">
             <thead class="bg-[#f1e3df] text-[0.72rem] uppercase tracking-[0.14em] text-[#9b6a63]">
               <tr>
-                <th class="px-5 py-3">Name</th>
-                <th class="px-5 py-3">Category</th>
-                <th class="px-5 py-3">Unit cost</th>
-                <th class="px-5 py-3">Stock / Threshold</th>
-                <th class="px-5 py-3">Status</th>
-                <th class="px-5 py-3"></th>
+                <th class="px-3 sm:px-5 py-3">Name</th>
+                <th class="px-3 sm:px-5 py-3">Category</th>
+                <th class="px-3 sm:px-5 py-3">Unit cost</th>
+                <th class="px-3 sm:px-5 py-3">Stock / Threshold</th>
+                <th class="px-3 sm:px-5 py-3">Status</th>
+                <th class="px-3 sm:px-5 py-3"></th>
               </tr>
             </thead>
             <tbody class="divide-y divide-[#e4d6d2]">
               <% @ingredients.each do |ingredient| %>
                 <tr id="<%= dom_id ingredient %>">
-                  <td class="px-5 py-3 font-semibold"><%= link_to ingredient.name, ingredient_path(ingredient), class: "hover:underline" %></td>
-                  <td class="px-5 py-3 text-[#7a5a56]"><%= ingredient.category.humanize %></td>
-                  <td class="px-5 py-3">$<%= number_with_precision(ingredient.unit_cost, precision: 2) %></td>
-                  <td class="px-5 py-3">
+                  <td class="px-3 sm:px-5 py-3 font-semibold"><%= link_to ingredient.name, ingredient_path(ingredient), class: "hover:underline" %></td>
+                  <td class="px-3 sm:px-5 py-3 text-[#7a5a56]"><%= ingredient.category.humanize %></td>
+                  <td class="px-3 sm:px-5 py-3">$<%= number_with_precision(ingredient.unit_cost, precision: 2) %></td>
+                  <td class="px-3 sm:px-5 py-3">
                     <%= inventory_quantity(ingredient.current_quantity, ingredient.unit) %>
                     <span class="text-[#7a5a56]">/ <%= inventory_quantity(ingredient.low_stock_threshold, ingredient.unit) %></span>
                   </td>
-                  <td class="px-5 py-3"><%= ingredient_status_badge(ingredient.status) %></td>
-                  <td class="px-5 py-3 text-right whitespace-nowrap">
+                  <td class="px-3 sm:px-5 py-3"><%= ingredient_status_badge(ingredient.status) %></td>
+                  <td class="px-3 sm:px-5 py-3 text-right whitespace-nowrap">
                     <%= link_to "View", ingredient_path(ingredient), class: "font-semibold text-[#7b1f2a] hover:underline" %>
                     <% if policy(ingredient).edit? %>
                       <%= link_to "Edit", edit_ingredient_path(ingredient), class: "ml-3 font-semibold text-[#7b1f2a] hover:underline" %>

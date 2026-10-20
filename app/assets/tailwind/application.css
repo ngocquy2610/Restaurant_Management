@@ -138,4 +138,117 @@
   font-size: 1.1rem;
   opacity: 0.7;
 }
+/* ============================================================
+   Admin responsive layout
+   ============================================================ */
+
+/* The admin/inventory/kitchen sidebars are fixed, off-canvas drawers on
+   mobile and sticky sidebars on tablet/desktop. They slide in when the
+   document body carries the `mobile-nav-open` class (toggled by the
+   hamburger button in the header; the Stimulus controller lives on
+   <body> so open + close + backdrop all share one scope). */
+[data-admin-sidebar] {
+  top: 5.25rem;
+  bottom: 0;
+  left: 0;
+  z-index: 50;
+  width: 270px;
+  max-width: 85vw;
+  /* Above Tailwind's `sticky` utility (which lives in a cascade layer,
+     so this unlayered rule already wins — belt and suspenders). */
+  position: fixed !important;
+  transform: translateX(-105%) !important;
+  transition: transform 0.25s ease-in-out;
+}
+
+.mobile-nav-open [data-admin-sidebar] {
+  transform: translateX(0) !important;
+}
+
+@media (min-width: 768px) {
+  [data-admin-sidebar] {
+    position: sticky !important;
+    top: 5.25rem;
+    height: calc(100vh - 5.25rem);
+    transform: none !important;
+    transition: none;
+    z-index: 10;
+    max-width: none;
+  }
+}
+
+/* Mobile backdrop overlay. Hidden by default; shown when the
+   sidebar drawer is open. */
+[data-admin-backdrop] {
+  display: none;
+  z-index: 40;
+}
+
+.mobile-nav-open [data-admin-backdrop] {
+  display: block !important;
+}
+
+/* Admin content row: sidebar + main. Must be allowed to shrink,
+   otherwise flex-1 <main> is forced as wide as its widest child
+   (e.g. a table with min-w-full) and every card looks "longer than
+   the screen" on iPhone. */
+.admin-flex {
+  padding-left: 0;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* NOTE: on mobile the sidebar is an overlay drawer — do NOT push the
+   content (270px push would leave ~105px on a 375px iPhone and break
+   every card). Content stays full-width underneath the backdrop. */
+.mobile-nav-open .admin-flex {
+  padding-left: 0;
+}
+
+.admin-flex > main,
+div:has(> [data-admin-sidebar]) > main {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  min-height: 0;
+}
+
+@media (max-width: 767px) {
+  /* Never let admin cards/tables force horizontal page scroll.
+     Inner .overflow-x-auto wrappers still scroll internally. */
+  [data-admin-sidebar] + main,
+  main.flex-1 {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* iPhone guard: long headings / money values wrap instead of
+     stretching cards wider than the 375px viewport. */
+  main.flex-1 h1,
+  main.flex-1 h2 {
+    overflow-wrap: anywhere;
+  }
+}
+
+/* Bulletproof visibility for the mobile admin menu toggle + dropdown.
+   Plain CSS (not Tailwind) so they show on phones even if the compiled
+   Tailwind bundle is stale. Hidden on tablet/desktop (≥768px) where the
+   sticky sidebar is visible. */
+[data-admin-menu-toggle] {
+  display: inline-flex !important;
+}
+
+[data-admin-mobile-nav] {
+  display: block;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  [data-admin-menu-toggle],
+  [data-admin-mobile-nav] {
+    display: none !important;
+  }
+}
+
 .toastify-toast .toast-close:hover { opacity: 1; color: #8a1c2b; }

@@ -1,0 +1,61 @@
+<%# Mobile page-switcher dropdown for sidebar screens (admin, inventory,
+    kitchen, menu management, tables, promotions).
+    Visible only on phones / small tablets (md:hidden). A native <select>
+    is used on purpose: it is always visible, needs no Stimulus, and acts
+    as the explicit "dropdown" alternative to the hidden left sidebar so
+    users can change pages on small screens. Namespaced per section so the
+    menu section shows its own pages instead of the admin list. %>
+<% admin_path = request.path.start_with?("/admin", "/inventory", "/kitchen") %>
+<% menu_section = %w[categories foods food_variants ingredients recipe_items].include?(controller.controller_name) %>
+<% is_admin_section = admin_path || controller.controller_path.start_with?("admin/", "inventory", "kitchen") || %w[promotions tables dashboards users reservations customer_queues].include?(controller.controller_name) %>
+<% inventory_section = controller.controller_path.start_with?("inventory") %>
+<% kitchen_section = controller.controller_path.start_with?("kitchen") %>
+<% staff_viewer = current_user&.admin? || current_user&.receptionist? || current_user&.inventory_manager? || current_user&.kitchen_staff? || current_user&.waiter? %>
+<% if (menu_section || is_admin_section) && staff_viewer %>
+  <% if menu_section %>
+    <% nav_label = "Menu section" %>
+    <% nav_options = [
+      ["Categories Management", categories_path],
+      ["Foods Management", foods_path],
+      ["Food Variant Management", food_variants_path],
+      ["Ingredients Management", ingredients_path],
+      ["Recipe Items Management", recipe_items_path],
+      ["Back to dashboard", admin_dashboards_path]
+    ] %>
+  <% elsif inventory_section %>
+    <% nav_label = "Inventory section" %>
+    <% nav_options = [
+      ["Inventory Dashboard", inventory_root_path],
+      ["Stock Transactions", inventory_stock_transactions_path],
+      ["Stock Adjustments", new_inventory_stock_adjustment_path],
+      ["Low Stock Requests", inventory_low_stock_requests_path],
+      ["Restock Tasks", inventory_restock_tasks_path],
+      ["Waste Reports", inventory_waste_reports_path],
+      ["Reports", inventory_reports_path],
+      ["Back to dashboard", admin_dashboards_path]
+    ] %>
+  <% elsif kitchen_section %>
+    <% nav_label = "Kitchen section" %>
+    <% nav_options = [
+      ["Kitchen Dashboard", kitchen_root_path],
+      ["Kitchen Queue", admin_kitchen_queues_path],
+      ["Waste Reports", kitchen_waste_reports_path],
+      ["New Waste Report", new_kitchen_waste_report_path],
+      ["Back to dashboard", admin_dashboards_path]
+    ] %>
+  <% else %>
+    <% nav_label = "Admin section" %>
+    <% nav_options = [
+      ["Overview", admin_dashboards_path],
+      ["Restaurant Performance", performance_admin_dashboards_path],
+      ["Tables", tables_path],
+      ["User Management", admin_users_path],
+      ["Reservations", admin_reservations_path],
+      ["Customer Queue", admin_customer_queues_path],
+      ["Kitchen Queue", admin_kitchen_queues_path],
+      ["Menu Management", categories_path],
+      ["Promotions", promotions_path],
+      ["Inventory Reports", inventory_reports_path]
+    ] %>
+  <% end %>
+<% end %>

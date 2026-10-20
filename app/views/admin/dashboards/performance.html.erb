@@ -1,13 +1,14 @@
-<div class="min-h-screen bg-[#FBF0EC] py-10 pt-28">
+<div class="min-h-screen bg-[#FBF0EC] pb-10 pt-28"><div class="w-full">
   <div class="w-full">
-    <div class="flex gap-6">
+    <div class="admin-flex flex flex-col gap-4 md:flex-row md:gap-6">
       <%= render "layouts/admin_sidebar" %>
 
-      <main class="flex-1 space-y-8">
+      <main class="w-full min-w-0 max-w-full flex-1 space-y-5 sm:space-y-8">
+        <%= render "layouts/admin_mobile_nav" %>
         <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p class="text-sm font-semibold uppercase tracking-[0.32em] text-[#8A1C2B]/80">Management Suite</p>
-            <h1 class="mt-3 font-serif text-4xl font-semibold tracking-tight text-gray-900">Restaurant Performance</h1>
+            <h1 class="mt-3 font-serif text-2xl font-semibold tracking-tight text-gray-900 sm:text-4xl">Restaurant Performance</h1>
           </div>
 
           <%= form_with url: performance_admin_dashboards_path, method: :get, class: "flex flex-col gap-3 sm:flex-row sm:items-center" do %>
@@ -20,39 +21,39 @@
         </div>
 
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-6">
-          <div class="rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm">
+          <div class="rounded-[2rem] border border-gray-200 bg-white p-3 sm:p-5 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Net Revenue</p>
-            <p class="mt-4 font-serif text-3xl font-semibold text-gray-900"><%= money(@performance[:summary][:net_revenue]) %></p>
+            <p class="mt-2 break-words font-serif text-lg font-semibold text-gray-900 sm:mt-4 sm:text-3xl"><%= money(@performance[:summary][:net_revenue]) %></p>
           </div>
 
-          <div class="rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm">
+          <div class="rounded-[2rem] border border-gray-200 bg-white p-3 sm:p-5 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Gross Profit</p>
-            <p class="mt-4 font-serif text-3xl font-semibold text-gray-900"><%= money(@performance[:summary][:gross_profit]) %></p>
+            <p class="mt-2 break-words font-serif text-lg font-semibold text-gray-900 sm:mt-4 sm:text-3xl"><%= money(@performance[:summary][:gross_profit]) %></p>
           </div>
 
-          <div class="rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm">
+          <div class="rounded-[2rem] border border-gray-200 bg-white p-3 sm:p-5 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Gross Margin</p>
-            <p class="mt-4 font-serif text-3xl font-semibold text-gray-900"><%= percent(@performance[:summary][:gross_margin]) %>%</p>
+            <p class="mt-2 break-words font-serif text-lg font-semibold text-gray-900 sm:mt-4 sm:text-3xl"><%= percent(@performance[:summary][:gross_margin]) %>%</p>
           </div>
 
-          <div class="rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm">
+          <div class="rounded-[2rem] border border-gray-200 bg-white p-3 sm:p-5 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Waste Cost</p>
-            <p class="mt-4 font-serif text-3xl font-semibold text-gray-900"><%= money(@performance[:summary][:waste_cost]) %></p>
+            <p class="mt-2 break-words font-serif text-lg font-semibold text-gray-900 sm:mt-4 sm:text-3xl"><%= money(@performance[:summary][:waste_cost]) %></p>
           </div>
 
-          <div class="rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm">
+          <div class="rounded-[2rem] border border-gray-200 bg-white p-3 sm:p-5 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">AOV</p>
-            <p class="mt-4 font-serif text-3xl font-semibold text-gray-900"><%= money(@performance[:operations][:aov]) %></p>
+            <p class="mt-2 break-words font-serif text-lg font-semibold text-gray-900 sm:mt-4 sm:text-3xl"><%= money(@performance[:operations][:aov]) %></p>
           </div>
 
-          <div class="rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm">
+          <div class="rounded-[2rem] border border-gray-200 bg-white p-3 sm:p-5 shadow-sm">
             <p class="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Avg Rating</p>
-            <p class="mt-4 font-serif text-3xl font-semibold text-gray-900"><%= rating(@performance[:customer][:avg_rating]) %>/5</p>
+            <p class="mt-2 break-words font-serif text-lg font-semibold text-gray-900 sm:mt-4 sm:text-3xl"><%= rating(@performance[:customer][:avg_rating]) %>/5</p>
           </div>
         </div>
 
         <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <div class="rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm">
+          <div class="rounded-[2rem] border border-gray-200 bg-white p-4 sm:p-6 shadow-sm">
             <div class="flex items-center justify-between gap-4">
               <h2 class="font-serif text-2xl font-semibold text-gray-900">Revenue by day</h2>
               <span class="text-xs font-semibold uppercase tracking-[0.12em] text-[#8A1C2B]">Trend</span>
@@ -60,7 +61,7 @@
             <%= trend_chart(@performance[:daily_trend]) %>
           </div>
 
-          <div class="rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm">
+          <div class="rounded-[2rem] border border-gray-200 bg-white p-4 sm:p-6 shadow-sm">
             <div class="flex items-center justify-between gap-4">
               <h2 class="font-serif text-2xl font-semibold text-gray-900">Revenue by month</h2>
               <span class="text-xs font-semibold uppercase tracking-[0.12em] text-[#8A1C2B]">Trend</span>
@@ -70,7 +71,7 @@
         </div>
 
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div class="rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm">
+          <div class="rounded-[2rem] border border-gray-200 bg-white p-4 sm:p-6 shadow-sm">
             <h2 class="font-serif text-2xl font-semibold text-gray-900">Revenue</h2>
             <div class="mt-5 space-y-4 text-sm text-gray-700">
               <div class="flex items-center justify-between">
@@ -88,7 +89,7 @@
             </div>
           </div>
 
-          <div class="rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm">
+          <div class="rounded-[2rem] border border-gray-200 bg-white p-4 sm:p-6 shadow-sm">
             <h2 class="font-serif text-2xl font-semibold text-gray-900">Costs</h2>
             <div class="mt-5 space-y-4 text-sm text-gray-700">
               <div class="flex items-center justify-between">
@@ -106,7 +107,7 @@
             </div>
           </div>
 
-          <div class="rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm">
+          <div class="rounded-[2rem] border border-gray-200 bg-white p-4 sm:p-6 shadow-sm">
             <h2 class="font-serif text-2xl font-semibold text-gray-900">Operations</h2>
             <div class="mt-5 space-y-4 text-sm text-gray-700">
               <div class="flex items-center justify-between">
@@ -126,7 +127,7 @@
         </div>
 
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div class="rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm">
+          <div class="rounded-[2rem] border border-gray-200 bg-white p-4 sm:p-6 shadow-sm">
             <h2 class="font-serif text-2xl font-semibold text-gray-900">Reservation Funnel</h2>
             <div class="mt-5 space-y-4 text-sm text-gray-700">
               <% @performance[:reservation_funnel].each do |status, value| %>
@@ -138,7 +139,7 @@
             </div>
           </div>
 
-          <div class="rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm">
+          <div class="rounded-[2rem] border border-gray-200 bg-white p-4 sm:p-6 shadow-sm">
             <h2 class="font-serif text-2xl font-semibold text-gray-900">Inventory Health</h2>
             <div class="mt-5 space-y-4 text-sm text-gray-700">
               <div class="flex items-center justify-between">
@@ -157,7 +158,7 @@
           </div>
         </div>
 
-        <div class="rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm">
+        <div class="rounded-[2rem] border border-gray-200 bg-white p-4 sm:p-6 shadow-sm">
           <div class="flex items-center justify-between">
             <h2 class="font-serif text-2xl font-semibold text-gray-900">Recent Reservations</h2>
             <%= link_to "Back to overview", admin_dashboards_path, class: "inline-flex items-center justify-center rounded-full border border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50" %>
@@ -168,17 +169,17 @@
               <table class="min-w-full text-left text-sm text-gray-700">
                 <thead class="bg-[#FEF3E8] text-xs uppercase tracking-[0.16em] text-gray-500">
                   <tr>
-                    <th scope="col" class="px-6 py-4">Guest</th>
-                    <th scope="col" class="px-6 py-4">Party</th>
-                    <th scope="col" class="px-6 py-4">Time</th>
-                    <th scope="col" class="px-6 py-4">Table</th>
-                    <th scope="col" class="px-6 py-4">Status</th>
+                    <th scope="col" class="px-4 py-3 sm:px-6 sm:py-4">Guest</th>
+                    <th scope="col" class="px-4 py-3 sm:px-6 sm:py-4">Party</th>
+                    <th scope="col" class="px-4 py-3 sm:px-6 sm:py-4">Time</th>
+                    <th scope="col" class="px-4 py-3 sm:px-6 sm:py-4">Table</th>
+                    <th scope="col" class="px-4 py-3 sm:px-6 sm:py-4">Status</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white">
                   <% @reservations.each do |reservation| %>
                     <tr class="transition hover:bg-[#FAF5F1]">
-                      <td class="px-6 py-5">
+                      <td class="px-4 py-3 sm:px-6 sm:py-5">
                         <div class="flex items-center gap-4">
                           <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#8A1C2B]/10 text-sm font-semibold text-[#8A1C2B]">
                             <%= reservation.guest_name.to_s[0, 2].upcase %>
@@ -194,7 +195,7 @@
                       <td class="px-6 py-5 text-sm text-gray-600"><%= reservation.table&.capacity %> guests</td>
                       <td class="px-6 py-5 text-sm text-gray-600"><%= reservation.reservation_time&.strftime("%I:%M %p") %></td>
                       <td class="px-6 py-5 text-sm text-gray-600">Table <%= reservation.table&.table_number %></td>
-                      <td class="px-6 py-5">
+                      <td class="px-4 py-3 sm:px-6 sm:py-5">
                         <span class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-gray-700">
                           <span class="h-2 w-2 rounded-full bg-[#8A1C2B]"></span>
                           <%= reservation.status.to_s.humanize %>
@@ -213,4 +214,5 @@
       </main>
     </div>
   </div>
+</div>
 </div>

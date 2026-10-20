@@ -1,0 +1,58 @@
+<%# Shared sidebar for the menu-management section (categories / foods /
+    food variants / ingredients / recipe items). Same drawer behavior as
+    the admin sidebar: off-canvas on phones, sticky on tablet/desktop. %>
+<aside class="admin-sidebar sticky top-[5.25rem] z-10 h-[calc(100vh-5.25rem)] w-[270px] shrink-0 self-start overflow-y-auto border-r border-[#d8b6af] bg-[#f8eeee] px-0 py-6"
+      data-admin-sidebar="true">
+  <div class="flex items-center justify-between px-1 pb-3">
+    <p class="text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-[#9b6a63]">Menu</p>
+    <button type="button"
+            class="flex h-8 w-8 items-center justify-center rounded-lg text-[#8A1C2B] transition hover:bg-[#8A1C2B]/10 md:hidden"
+            data-action="click->mobile-nav#close"
+            aria-label="Close menu">
+      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" d="M18 6 6 18M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+
+  <nav class="space-y-2">
+    <%= link_to categories_path, class: "flex items-center gap-3 rounded-md px-3 py-3 text-[1.05rem] font-medium #{current_page?(categories_path) ? 'bg-[#e9d4d0] text-[#5a1a1b] shadow-inner' : 'text-[#5c4543] hover:bg-[#f1e0dc]'}" do %>
+      <span class="flex h-5 w-5 items-center justify-center">
+        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      </span>
+      <span>Categories Management</span>
+    <% end %>
+
+    <%= link_to foods_path, class: "flex items-center gap-3 rounded-md px-3 py-3 text-[1.05rem] font-medium #{current_page?(foods_path) ? 'bg-[#e9d4d0] text-[#5a1a1b] shadow-inner' : 'text-[#5c4543] hover:bg-[#f1e0dc]'}" do %>
+      <span class="flex h-5 w-5 items-center justify-center">
+        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h.01M12 3h.01M17 3h.01"/><path d="M7 21h10"/><path d="M7 3c0 5-3 8-3 11a3 3 0 0 0 6 0c0-3-3-6-3-11"/><path d="M17 3c0 5-3 8-3 11a3 3 0 0 0 6 0c0-3-3-6-3-11"/></svg>
+      </span>
+      <span>Foods Management</span>
+    <% end %>
+
+    <%= link_to food_variants_path, class: "flex items-center gap-3 rounded-md px-3 py-3 text-[1.05rem] font-medium #{current_page?(food_variants_path) ? 'bg-[#e9d4d0] text-[#5a1a1b] shadow-inner' : 'text-[#5c4543] hover:bg-[#f1e0dc]'}" do %>
+      <span class="flex h-5 w-5 items-center justify-center">
+        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v5M12 21v-4M12 16v-8"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="17" r="2"/><path d="M7 6v2M7 8v6a2 2 0 0 0 2 2h0"/><circle cx="7" cy="5" r="2"/><path d="M17 6v2M17 8v6a2 2 0 0 1-2 2h0"/><circle cx="17" cy="5" r="2"/></svg>
+      </span>
+      <span>Food Variant Management</span>
+    <% end %>
+
+    <%= link_to ingredients_path, class: "flex items-center gap-3 rounded-md px-3 py-3 text-[1.05rem] font-medium #{current_page?(ingredients_path) ? 'bg-[#e9d4d0] text-[#5a1a1b] shadow-inner' : 'text-[#5c4543] hover:bg-[#f1e0dc]'}" do %>
+      <span class="flex h-5 w-5 items-center justify-center">
+        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8h10v3H7z"/><path d="M5 8h14"/><path d="M8 3h8M9 11v8h6v-8"/></svg>
+      </span>
+      <span>Ingredients Management</span>
+    <% end %>
+
+    <%= link_to recipe_items_path, class: "flex items-center gap-3 rounded-md px-3 py-3 text-[1.05rem] font-medium #{current_page?(recipe_items_path) ? 'bg-[#e9d4d0] text-[#5a1a1b] shadow-inner' : 'text-[#5c4543] hover:bg-[#f1e0dc]'}" do %>
+      <span class="flex h-5 w-5 items-center justify-center">
+        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v6M5 7h14l-1 13H6l-1-13Z"/><path d="M9 7v2a3 3 0 0 0 6 0V7"/></svg>
+      </span>
+      <span>Recipe Items Management</span>
+    <% end %>
+  </nav>
+
+  <div class="mt-6 border-t border-[#d8b6af] pt-5">
+    <%= link_to "Back to dashboard", admin_dashboards_path, class: "flex justify-center items-center gap-3 rounded-md bg-[#7b1f2a] px-3 py-3 text-[1.05rem] font-semibold text-white shadow-sm hover:bg-[#661a23]"%>
+  </div>
+</aside>
