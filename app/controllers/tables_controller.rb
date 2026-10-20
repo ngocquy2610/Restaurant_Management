@@ -56,7 +56,7 @@ class TablesController < ApplicationController
         recipient: current_user,
         title: "Table created",
         body: "The table #{@table.table_number} has been created.",
-        redirect_url: table_path(@table)
+        redirect_url: tables_path
       )
       redirect_to tables_path, notice: "Table added."
     else
