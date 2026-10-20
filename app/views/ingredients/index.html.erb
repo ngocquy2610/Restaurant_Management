@@ -17,11 +17,11 @@
 
         <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 class="font-serif text-[4rem] leading-none tracking-[-0.06em] text-[#2f1f1d]">Ingredients</h2>
+            <h2 class="font-serif text-2xl leading-none tracking-[-0.06em] sm:text-4xl lg:text-5xl text-[#2f1f1d]">Ingredients</h2>
             <p class="mt-3 text-[1.05rem] text-[#7a5a56]">Search, filter and manage the raw materials used across your menu.</p>
           </div>
           <% if policy(Ingredient).new? %>
-            <%= link_to "New ingredient", new_ingredient_path, class: "rounded-md bg-[#7b1f2a] px-5 py-3 font-semibold text-white shadow-sm hover:bg-[#661a23]" %>
+            <%= link_to "New ingredient", new_ingredient_path, class: "w-full rounded-md bg-[#7b1f2a] px-5 py-3 text-center font-semibold text-white shadow-sm hover:bg-[#661a23] sm:w-auto" %>
           <% end %>
         </div>
 
@@ -56,30 +56,30 @@
                 class: @show_inactive ? "text-[#7b1f2a] underline" : "text-[#5c4543] hover:underline" %>
         </div>
 
-        <div class="overflow-hidden rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] shadow-sm">
+        <div class="overflow-x-auto rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] shadow-sm">
           <table class="w-full text-left text-sm">
             <thead class="bg-[#f1e3df] text-[0.72rem] uppercase tracking-[0.14em] text-[#9b6a63]">
               <tr>
-                <th class="px-5 py-3">Name</th>
-                <th class="px-5 py-3">Category</th>
-                <th class="px-5 py-3">Unit cost</th>
-                <th class="px-5 py-3">Stock / Threshold</th>
-                <th class="px-5 py-3">Status</th>
-                <th class="px-5 py-3"></th>
+                <th class="px-3 sm:px-5 py-3">Name</th>
+                <th class="px-3 sm:px-5 py-3">Category</th>
+                <th class="px-3 sm:px-5 py-3">Unit cost</th>
+                <th class="px-3 sm:px-5 py-3">Stock / Threshold</th>
+                <th class="px-3 sm:px-5 py-3">Status</th>
+                <th class="px-3 sm:px-5 py-3"></th>
               </tr>
             </thead>
             <tbody class="divide-y divide-[#e4d6d2]">
               <% @ingredients.each do |ingredient| %>
                 <tr id="<%= dom_id ingredient %>">
-                  <td class="px-5 py-3 font-semibold"><%= link_to ingredient.name, ingredient_path(ingredient), class: "hover:underline" %></td>
-                  <td class="px-5 py-3 text-[#7a5a56]"><%= ingredient.category.humanize %></td>
-                  <td class="px-5 py-3">$<%= number_with_precision(ingredient.unit_cost, precision: 2) %></td>
-                  <td class="px-5 py-3">
+                  <td class="px-3 sm:px-5 py-3 font-semibold"><%= link_to ingredient.name, ingredient_path(ingredient), class: "hover:underline" %></td>
+                  <td class="px-3 sm:px-5 py-3 text-[#7a5a56]"><%= ingredient.category.humanize %></td>
+                  <td class="px-3 sm:px-5 py-3">$<%= number_with_precision(ingredient.unit_cost, precision: 2) %></td>
+                  <td class="px-3 sm:px-5 py-3">
                     <%= inventory_quantity(ingredient.current_quantity, ingredient.unit) %>
                     <span class="text-[#7a5a56]">/ <%= inventory_quantity(ingredient.low_stock_threshold, ingredient.unit) %></span>
                   </td>
-                  <td class="px-5 py-3"><%= ingredient_status_badge(ingredient.status) %></td>
-                  <td class="px-5 py-3 text-right whitespace-nowrap">
+                  <td class="px-3 sm:px-5 py-3"><%= ingredient_status_badge(ingredient.status) %></td>
+                  <td class="px-3 sm:px-5 py-3 text-right whitespace-nowrap">
                     <%= link_to "View", ingredient_path(ingredient), class: "font-semibold text-[#7b1f2a] hover:underline" %>
                     <% if policy(ingredient).edit? %>
                       <%= link_to "Edit", edit_ingredient_path(ingredient), class: "ml-3 font-semibold text-[#7b1f2a] hover:underline" %>

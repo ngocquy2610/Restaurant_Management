@@ -10,7 +10,7 @@
         <div class="absolute inset-0 bg-gradient-to-t from-[#2f1f1d]/90 via-[#2f1f1d]/35 to-transparent"></div>
 
         <div class="absolute inset-0 flex items-end justify-center pb-16 sm:items-center sm:pb-0">
-          <div class="mx-6 max-w-2xl rounded-[12px] bg-black/50 py-6 px-12 text-center">
+          <div class="mx-6 max-w-2xl rounded-[12px] bg-black/50 px-6 py-6 text-center sm:px-12">
             <p class="text-sm font-semibold uppercase tracking-[0.3em] text-[#e8c9c2]">Welcome to Lumière Dining</p>
             <h1 class="mt-5 font-serif text-4xl font-semibold leading-tight text-white sm:text-6xl">A Symphony of Flavors, A Legacy of Taste</h1>
             <p class="mt-5 text-lg text-[#f1e3df]/85">Experience the timeless art of French fine dining in the heart of the city.</p>
@@ -30,7 +30,7 @@
           <div class="absolute inset-0 bg-gradient-to-t from-[#2f1f1d]/90 via-[#2f1f1d]/35 to-transparent"></div>
 
           <div class="absolute inset-0 flex items-end justify-center pb-16 sm:items-center sm:pb-0">
-            <div class="mx-6 max-w-2xl rounded-[12px] bg-black/50 py-6 px-12 text-center">
+            <div class="mx-6 max-w-2xl rounded-[12px] bg-black/50 px-6 py-6 text-center sm:px-12">
               <% if promo.discount_type == "percentage" %>
                 <span class="mb-4 inline-flex items-center rounded-full bg-[#8f1f2a] px-4 py-1.5 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-sm"><%= number_to_currency(promo.discount_value, precision: 0, unit: "") %>% OFF</span>
               <% else %>
@@ -136,7 +136,7 @@
                 <% end %>
               </div>
               <div class="p-6">
-                <div class="flex items-baseline justify-between gap-3">
+                <div class="flex flex-wrap items-baseline justify-between gap-3">
                   <h3 class="font-serif text-xl font-semibold"><%= food.name %></h3>
                   <span class="font-serif text-lg text-[#8f1f2a]"><%= number_to_currency(food.base_price, unit: "$") %></span>
                 </div>

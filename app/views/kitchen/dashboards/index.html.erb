@@ -2,18 +2,18 @@
 <div class="min-h-screen bg-[#f4e6e2] pt-[5.25rem] text-[#2f1f1d]">
   <div class="flex min-h-screen">
     <%= render "layouts/kitchen_sidebar" %>
-    <main class="flex-1 bg-[#f6efee] px-8 py-6">
+    <main class="min-w-0 flex-1 bg-[#f6efee] px-4 py-5 sm:px-8 sm:py-6">
       <div class="mx-auto max-w-[1260px]">
         <%= render "layouts/flash" %>
-        <h2 class="font-serif text-[3rem] leading-none tracking-[-0.06em]">Kitchen Overview</h2>
+        <h2 class="font-serif text-2xl leading-none tracking-[-0.06em] sm:text-4xl lg:text-5xl">Kitchen Overview</h2>
         <p class="mt-3 text-[1.05rem] text-[#7a5a56]">Your requests and waste reports.</p>
         <div class="mt-6 flex flex-wrap gap-3">
-          <%= link_to "New low stock request", new_kitchen_low_stock_request_path, class: "rounded-md bg-[#7b1f2a] px-5 py-3 font-semibold text-white hover:bg-[#661a23]" %>
-          <%= link_to "New waste report", new_kitchen_waste_report_path, class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+          <%= link_to "New low stock request", new_kitchen_low_stock_request_path, class: "w-full rounded-md bg-[#7b1f2a] px-5 py-3 text-center font-semibold text-white hover:bg-[#661a23] sm:w-auto" %>
+          <%= link_to "New waste report", new_kitchen_waste_report_path, class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 text-center font-semibold text-[#5c4543] hover:bg-[#f1dfdf] sm:w-auto" %>
         </div>
         <div class="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <section class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-6 shadow-sm">
-            <div class="mb-4 flex items-center justify-between">
+          <section class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-4 sm:p-6 shadow-sm">
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
               <h3 class="font-serif text-[1.4rem] font-semibold">My requests</h3>
               <%= link_to "All", kitchen_low_stock_requests_path, class: "text-sm font-semibold text-[#7b1f2a] hover:underline" %>
             </div>
@@ -29,8 +29,8 @@
               </ul>
             <% else %><p class="rounded-md bg-[#f1e3df] px-4 py-3 text-sm text-[#7a5a56]">No requests yet.</p><% end %>
           </section>
-          <section class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-6 shadow-sm">
-            <div class="mb-4 flex items-center justify-between">
+          <section class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-4 sm:p-6 shadow-sm">
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
               <h3 class="font-serif text-[1.4rem] font-semibold">My waste reports</h3>
               <%= link_to "All", kitchen_waste_reports_path, class: "text-sm font-semibold text-[#7b1f2a] hover:underline" %>
             </div>

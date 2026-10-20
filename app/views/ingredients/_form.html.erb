@@ -78,8 +78,8 @@
     </div>
   </div>
 
-  <div class="flex items-center gap-3 border-t border-[#e4d2ce] pt-6">
-    <%= form.submit class: "cursor-pointer rounded-md bg-[#7b1f2a] px-5 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#661a23]" %>
-    <%= link_to "Cancel", ingredients_path, class: "rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf]" %>
+  <div class="flex flex-wrap items-center gap-3 border-t border-[#e4d2ce] pt-6">
+    <%= form.submit class: "w-full cursor-pointer rounded-md bg-[#7b1f2a] px-5 py-3 text-center text-base font-semibold text-white shadow-sm hover:bg-[#661a23] sm:w-auto" %>
+    <%= link_to "Cancel", ingredients_path, class: "w-full rounded-md border border-[#d8c1bc] bg-[#f8efee] px-5 py-3 text-center text-base font-semibold text-[#5c4543] hover:bg-[#f1dfdf] sm:w-auto" %>
   </div>
 <% end %>

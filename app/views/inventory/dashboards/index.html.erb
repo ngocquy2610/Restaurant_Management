@@ -2,10 +2,10 @@
 <div class="min-h-screen bg-[#f4e6e2] pt-[5.25rem] text-[#2f1f1d]">
   <div class="flex min-h-screen">
     <%= render "layouts/inventory_sidebar" %>
-    <main class="flex-1 bg-[#f6efee] px-8 py-6">
+    <main class="min-w-0 flex-1 bg-[#f6efee] px-4 py-5 sm:px-8 sm:py-6">
       <div class="mx-auto max-w-[1260px]">
         <%= render "layouts/flash" %>
-        <h2 class="font-serif text-[3rem] leading-none tracking-[-0.06em]">Inventory Overview</h2>
+        <h2 class="font-serif text-2xl leading-none tracking-[-0.06em] sm:text-4xl lg:text-5xl">Inventory Overview</h2>
         <p class="mt-3 text-[1.05rem] text-[#7a5a56]">Stock levels, open restock work, and pending reviews.</p>
         <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           <%= render "summary_card", count: @summary[:total_ingredients], label: "Total ingredients",
@@ -22,8 +22,8 @@
                 path: inventory_waste_reports_path(status: "pending") %>
         </div>
         <div class="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <section class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-6 shadow-sm">
-            <div class="mb-4 flex items-center justify-between">
+          <section class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-4 shadow-sm sm:p-6">
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
               <h3 class="font-serif text-[1.4rem] font-semibold">Needs restock</h3>
               <%= link_to "Manage ingredients", ingredients_path, class: "text-sm font-semibold text-[#7b1f2a] hover:underline" %>
             </div>
@@ -39,8 +39,8 @@
               </ul>
             <% else %><p class="rounded-md bg-[#f1e3df] px-4 py-3 text-sm text-[#7a5a56]">All ingredients above threshold.</p><% end %>
           </section>
-          <section class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-6 shadow-sm">
-            <div class="mb-4 flex items-center justify-between">
+          <section class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-4 shadow-sm sm:p-6">
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
               <h3 class="font-serif text-[1.4rem] font-semibold">Open restock tasks</h3>
               <%= link_to "All tasks", inventory_restock_tasks_path, class: "text-sm font-semibold text-[#7b1f2a] hover:underline" %>
             </div>
@@ -56,8 +56,8 @@
               </ul>
             <% else %><p class="rounded-md bg-[#f1e3df] px-4 py-3 text-sm text-[#7a5a56]">No open tasks.</p><% end %>
           </section>
-          <section class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-6 shadow-sm">
-            <div class="mb-4 flex items-center justify-between">
+          <section class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-4 shadow-sm sm:p-6">
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
               <h3 class="font-serif text-[1.4rem] font-semibold">Pending requests</h3>
               <%= link_to "All requests", inventory_low_stock_requests_path, class: "text-sm font-semibold text-[#7b1f2a] hover:underline" %>
             </div>
@@ -73,8 +73,8 @@
               </ul>
             <% else %><p class="rounded-md bg-[#f1e3df] px-4 py-3 text-sm text-[#7a5a56]">No pending requests.</p><% end %>
           </section>
-          <section class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-6 shadow-sm">
-            <div class="mb-4 flex items-center justify-between">
+          <section class="rounded-[16px] border border-[#d7b9b2] bg-[#f8f3f1] p-4 shadow-sm sm:p-6">
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
               <h3 class="font-serif text-[1.4rem] font-semibold">Pending waste</h3>
               <%= link_to "All reports", inventory_waste_reports_path, class: "text-sm font-semibold text-[#7b1f2a] hover:underline" %>
             </div>

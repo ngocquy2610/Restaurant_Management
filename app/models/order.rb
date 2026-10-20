@@ -81,7 +81,7 @@ class Order < ApplicationRecord
   end
 
   def customer
-    reservation&.user || (waiter if waiter&.customer?)
+    reservation&.user
   end
 
   # Discount percentage granted by the customer's current membership tier.
