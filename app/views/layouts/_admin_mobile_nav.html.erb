@@ -58,14 +58,4 @@
       ["Inventory Reports", inventory_reports_path]
     ] %>
   <% end %>
-  <div class="w-full md:hidden" data-admin-mobile-nav>
-    <label for="admin-mobile-nav-select" class="mb-1.5 block text-xs font-bold uppercase tracking-[0.14em] text-[#9b6a63]">Navigate · <%= nav_label %></label>
-    <select id="admin-mobile-nav-select"
-            class="w-full appearance-none rounded-xl border border-[#d8b6af] bg-white px-4 py-3 pr-10 text-sm font-semibold text-[#8A1C2B] shadow-sm"
-            onchange="if (window.Turbo) { Turbo.visit(this.value); } else { window.location.href = this.value; }">
-      <% nav_options.each do |name, path| %>
-        <option value="<%= path %>"<%= " selected" if current_page?(path) %>><%= name %></option>
-      <% end %>
-    </select>
-  </div>
 <% end %>
