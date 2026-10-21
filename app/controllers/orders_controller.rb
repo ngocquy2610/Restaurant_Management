@@ -103,13 +103,18 @@ class OrdersController < ApplicationController
       @order = Order.find(params.expect(:id))
     end
 
-    # Tables with a booking today plus tables already being served.
     def load_booked_tables
+      busy_table_ids = Order.where(status: [:preorder, :inserve]).select(:table_id)
+
       booked_ids = Reservation.where(status: Reservation::ACTIVE_STATUSES, reservation_date: Date.current).select(:table_id)
+
       @tables = Table.includes(:area)
-                     .where(id: booked_ids).or(Table.where(status: :occupied))
-                     .order(:table_number)
+                    .where(id: booked_ids).or(Table.where(status: :occupied))
+                    .where.not(id: busy_table_ids) # <-- CHỈ CẦN THÊM DÒNG NÀY ĐỂ LOẠI TRỪ
+                    .order(:table_number)
+
       @reservations_by_table = Reservation.where(status: Reservation::ACTIVE_STATUSES, reservation_date: Date.current)
+                                          .where.not(table_id: busy_table_ids) # Loại trừ khỏi map nếu cần
                                           .order(:reservation_time).group_by(&:table_id)
     end
 

@@ -24,7 +24,7 @@ class CategoriesController < ApplicationController
             when "name_desc"    then scope.order("categories.name DESC")
             when "most_items"   then scope.order(Arel.sql("#{dishes_count_sql} DESC, categories.name ASC"))
             when "fewest_items" then scope.order(Arel.sql("#{dishes_count_sql} ASC, categories.name ASC"))
-            else                     scope.order("categories.created_at DESC")
+            else scope.order("categories.created_at DESC")
             end
 
     @categories = scope.includes(:foods).page(params[:page]).per(8)

@@ -23,12 +23,12 @@ class FoodVariantsController < ApplicationController
     scope = scope.where(food_id: @food_filter) if @food_filter.present?
 
     scope = case @sort
-    when "oldest" then scope.order("food_variants.created_at ASC")
-    when "name_asc" then scope.order("food_variants.name ASC")
-    when "name_desc" then scope.order("food_variants.name DESC")
-    when "price_asc" then scope.order("food_variants.price_adjustment ASC")
-    when "price_desc" then scope.order("food_variants.price_adjustment DESC")
-    else scope.order("food_variants.created_at DESC")
+            when "oldest" then scope.order("food_variants.created_at ASC")
+            when "name_asc" then scope.order("food_variants.name ASC")
+            when "name_desc" then scope.order("food_variants.name DESC")
+            when "price_asc" then scope.order("food_variants.price_adjustment ASC")
+            when "price_desc" then scope.order("food_variants.price_adjustment DESC")
+      else scope.order("food_variants.created_at DESC")
     end
 
     @food_variants = scope.page(params[:page]).per(8)
