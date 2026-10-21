@@ -1,4 +1,4 @@
-class DashboardsController < ApplicationController
+class Admin::DashboardsController < ApplicationController
   before_action :authenticate_user!
 
   def index
@@ -20,7 +20,6 @@ class DashboardsController < ApplicationController
       .page(params[:page])
       .per(5)
 
-    render "admin/dashboards/index"
   end
 
   def performance
@@ -42,7 +41,6 @@ class DashboardsController < ApplicationController
       .page(params[:page])
       .per(5)
 
-    render "admin/dashboards/performance"
   end
 
   private

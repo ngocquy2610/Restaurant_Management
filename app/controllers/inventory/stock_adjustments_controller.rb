@@ -28,8 +28,8 @@ class Inventory::StockAdjustmentsController < Inventory::BaseController
     )
 
     if tx.nil?
-      # Không có chênh lệch → service trả nil, không ghi ledger.
-      redirect_to ingredient_path(ingredient), notice: "No difference — stock unchanged."
+      # Không có chênh lệch - service trả nil, không ghi ledger.
+      redirect_to ingredient_path(ingredient), notice: "No difference - stock unchanged."
     else
       notify_role(%i[inventory_manager admin],
                   title: "Stock adjusted",
@@ -53,6 +53,8 @@ class Inventory::StockAdjustmentsController < Inventory::BaseController
     @ingredients    = policy_scope(Ingredient).active.order(:name)
     @quantities     = quantity_map(@ingredients)
     @selected       = params.dig(:stock_adjustment, :ingredient_id)
+    # search for the key stock_adjustment, if exist, continue to find ingredient_id inside - nested hash
+    # if no stock_adjustment --> return nil and stop
     @physical_count = params.dig(:stock_adjustment, :physical_count)
     @reason         = params.dig(:stock_adjustment, :reason)
     flash.now[:alert] = message

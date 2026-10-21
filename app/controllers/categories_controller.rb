@@ -5,7 +5,7 @@ class CategoriesController < ApplicationController
   def index
     authorize Category, :index?
 
-    @query = params[:q].to_s.strip
+    @query = params[:q].to_s.strip # remove blank from head and tail of a string
     @sort = params[:sort].presence_in(%w[newest oldest name_asc name_desc most_items fewest_items]) || "newest"
 
     dishes_count_sql = "(SELECT COUNT(*) FROM foods WHERE foods.category_id = categories.id)"

@@ -1,6 +1,6 @@
 require "test_helper"
 
-class DashboardsControllerTest < ActionDispatch::IntegrationTest
+class Admin::DashboardsControllerTest < ActionDispatch::IntegrationTest
   setup do
     sign_in users(:admin)
   end
