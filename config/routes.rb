@@ -118,6 +118,11 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+
+  namespace :auth do
+    post :refresh, to: "refresh_tokens#create"
+  end
+
   devise_for :users,
     controllers: {
       sessions: 'users/sessions',

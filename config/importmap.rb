@@ -8,4 +8,7 @@ pin "konva", to: "https://cdn.jsdelivr.net/npm/konva@10.3.0/konva.js"
 pin "@hotwired/turbo-rails", to: "turbo.min.js"
 pin "@hotwired/stimulus", to: "stimulus.min.js"
 pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
+# Import tất cả controller
 pin_all_from "app/javascript/controllers", under: "controllers"
+# Import tất cả service (auth.js, v.v.)
+pin_all_from "app/javascript/services", under: "services"

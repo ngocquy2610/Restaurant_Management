@@ -1,7 +1,12 @@
 class User < ApplicationRecord
-  devise :database_authenticatable, :registerable,
-    :recoverable, :rememberable, :validatable, :jwt_authenticatable,
-    jwt_revocation_strategy: JwtDenylist
+  devise :database_authenticatable, # encode password using bcrypt
+        :registerable,
+        :recoverable,
+        :rememberable,
+        :validatable,
+        :jwt_authenticatable, # generate/read token JWT when login
+        jwt_revocation_strategy: JwtDenylist
+        # revoke, when logout, save jti (ID of JWT) + exp into jwt_denylists table
 
   # Recompute the member tier whenever `year_spend` changes. Uses `after_save`
   # (not `after_update`) so the tier is also assigned when a user is first created

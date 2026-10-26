@@ -1,6 +1,6 @@
 module StockService
   class Error < StandardError; end
-  class InsufficientStock < Error; end
+  class InsufficientStock < Error; end # custom
 
   class << self
     def apply_transaction(ingredient:, transaction_type:, quantity:, user: nil,

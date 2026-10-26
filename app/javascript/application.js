@@ -52,3 +52,14 @@ document.addEventListener("turbo:before-visit", showLoader);
 document.addEventListener("turbo:before-render", hideLoader);
 document.addEventListener("turbo:load", hideLoader);
 document.addEventListener("turbo:fetch-request-error", hideLoader);
+
+const csrfToken = document.querySelector('[name="_csrf_token"]')?.value;
+// hoặc đọc từ cookie
+fetch("/login", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "X-CSRF-Token": csrfToken,
+  },
+  body: JSON.stringify({ email, password }),
+});

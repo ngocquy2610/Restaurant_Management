@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_15_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_23_061846) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -245,6 +245,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_15_090000) do
     t.index ["ingredient_id"], name: "index_recipe_items_on_ingredient_id"
   end
 
+  create_table "refresh_tokens", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "device_name", default: "", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "revoked_at"
+    t.string "token_hash", null: false
+    t.datetime "updated_at", null: false
+    t.string "user_agent", default: "", null: false
+    t.bigint "user_id", null: false
+    t.index ["token_hash"], name: "index_refresh_tokens_on_token_hash", unique: true
+    t.index ["user_id", "expires_at"], name: "index_refresh_tokens_on_user_id_and_expires_at"
+    t.index ["user_id"], name: "index_refresh_tokens_on_user_id"
+  end
+
   create_table "reservations", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "guest_name"
@@ -403,6 +417,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_15_090000) do
   add_foreign_key "recipe_items", "food_variants"
   add_foreign_key "recipe_items", "foods"
   add_foreign_key "recipe_items", "ingredients"
+  add_foreign_key "refresh_tokens", "users"
   add_foreign_key "reservations", "tables"
   add_foreign_key "reservations", "users"
   add_foreign_key "restock_tasks", "ingredients"

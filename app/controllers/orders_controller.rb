@@ -4,7 +4,7 @@ class OrdersController < ApplicationController
   # GET /orders
   def index
     authorize Order, :index?
-    @orders = Order.includes(:table, :waiter).order(created_at: :desc)
+    @orders = Order.includes(:table, :waiter).order(created_at: :desc).page(params[:page]).per(5)
     @orders = @orders.where(status: params[:status]) if Order.statuses.key?(params[:status])
     @orders = @orders.where(table_id: params[:table_id]) if params[:table_id].present?
     @orders = @orders.where("DATE(orders.created_at) = ?", params[:date]) if params[:date].present?
