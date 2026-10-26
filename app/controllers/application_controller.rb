@@ -15,6 +15,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def authenticate_user!
+    if request.headers["Session-Expired"] == "true"
+      flash[:alert] = "Please login again."
+    end
+    super
+  end
+
   protected
 
   def user_not_authorized

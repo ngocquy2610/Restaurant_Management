@@ -1,5 +1,8 @@
 require_relative "boot"
 
+require_relative "../lib/jwt_cookie_bridge"
+# Add middleware from lib to apply on website
+
 require "rails/all"
 
 # Require the gems listed in Gemfile, including any gems
@@ -18,6 +21,8 @@ module RestaurantManagement
 
     config.time_zone = "Asia/Ho_Chi_Minh"
     config.active_record.default_timezone = :utc
+
+    config.middleware.use JwtCookieBridge #TODO
 
     # Background jobs go through Sidekiq (Redis/Valkey). Solid Queue gems are
     # kept installed for an easy rollback, but are no longer the adapter.

@@ -315,13 +315,22 @@ Devise.setup do |config|
   # config.sign_in_after_change_password = true
 
   config.jwt do |jwt|
+
     jwt.secret = Rails.application.secret_key_base
+    # use for en/decode
+    # when create token, server take header + payload, mix with this key to generate token
+
+    # API send token when user POST on /login && login success
     jwt.dispatch_requests = [
       ['POST', %r{^/login$}]
     ]
+
+    # API remove token when user DELETE /logout && logout success --> revoke
     jwt.revocation_requests = [
       ['DELETE', %r{^/logout$}]
     ]
-    jwt.expiration_time = 24.hours.to_i
+
+    # expiration of token out of time, token will dead
+    jwt.expiration_time = 15.minutes.to_i
   end
 end
