@@ -6,7 +6,7 @@ class RefreshToken < ApplicationRecord
   scope :available, -> { where(revoked_at: nil).where("expires_at > ?", Time.current) }
 
   TTL = 7.days
-  
+
   def self.digest(raw_token)
     Digest::SHA256.hexdigest(raw_token)
   end

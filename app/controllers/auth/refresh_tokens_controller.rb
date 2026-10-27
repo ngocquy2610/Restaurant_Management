@@ -8,7 +8,7 @@ module Auth
       raw_token = cookies[REFRESH_COOKIE].presence || request.headers["X-Refresh-Token"].presence
 
       return render json: {error: "Refresh token is required"},
-        status: :bad_request if raw_token.blank?
+        status: :bad_request if raw_token.blank? # 400
 
       digest = RefreshToken.digest(raw_token)
       current_token = RefreshToken.find_by(token_hash: digest)
