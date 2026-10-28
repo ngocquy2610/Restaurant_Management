@@ -1,7 +1,6 @@
 class PaymentsController < ApplicationController
   before_action :set_order
   before_action :set_payment, only: [:confirm, :success]
-  skip_forgery_protection only: :callback
 
   def create
     authorize @order, :update?

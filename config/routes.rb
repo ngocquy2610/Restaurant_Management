@@ -74,6 +74,7 @@ Rails.application.routes.draw do
   resources :notifications do
     member do
       patch :mark_read
+      get :open
     end
     collection do
       patch :mark_all_read

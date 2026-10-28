@@ -7,8 +7,48 @@ class NotificationsController < ApplicationController
   end
 
   def mark_read
-    current_user.notifications.find(params[:id]).read!
-    head :no_content
+    @notification = current_user.notifications.find(params[:id])
+    @notification.read! if @notification.unread?
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.replace(
+            helpers.dom_id(@notification),
+            partial: "notifications/notification",
+            locals: { notification: @notification }
+          ),
+          turbo_stream.replace(
+            "notification-badge",
+            partial: "notifications/bell_badge",
+            locals: { user: current_user }
+          ),
+          turbo_stream.replace(
+            "notifications-header-stats",
+            partial: "notifications/header_stats",
+            locals: {
+              total_count: current_user.notifications.count,
+              unread_count: current_user.notifications.unread.count,
+              read_count: current_user.notifications.read.count,
+              query: nil,
+              status_filter: "all"
+            }
+          )
+        ]
+      end
+      format.html { redirect_back fallback_location: notifications_path }
+      format.json { head :no_content }
+    end
+  end
+
+  def open
+    @notification = current_user.notifications.find(params[:id])
+    @notification.read! if @notification.unread?
+    if @notification.redirect_url.present?
+      redirect_to @notification.redirect_url, allow_other_host: true
+    else
+      redirect_to notifications_path
+    end
   end
 
   def mark_all_read

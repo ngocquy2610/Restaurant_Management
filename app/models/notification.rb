@@ -38,5 +38,15 @@ class Notification < ApplicationRecord
         target: "notification-badge",
         partial: "notifications/bell_badge",
         locals: { user: recipient }
+      broadcast_replace_to recipient,
+        target: "notifications-header-stats",
+        partial: "notifications/header_stats",
+        locals: {
+          total_count: recipient.notifications.count,
+          unread_count: recipient.notifications.unread.count,
+          read_count: recipient.notifications.read.count,
+          query: nil,
+          status_filter: "all"
+        }
     end
 end

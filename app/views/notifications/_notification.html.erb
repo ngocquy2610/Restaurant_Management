@@ -1,22 +1,36 @@
 <%
   link_url = notification.redirect_url.presence
   external = link_url.present? && link_url.match?(%r{\Ahttps?://}i)
+  # Nếu có link, đích đến sẽ đi qua action :open để vừa mark read vừa redirect
+  target_destination = link_url.present? ? open_notification_path(notification) : nil
 %>
 
-<% if link_url.present? %>
-  <%= link_to link_url,
-      target: external ? "_blank" : nil,
-      rel: external ? "noopener noreferrer" : nil,
-      class: "block cursor-pointer" do %>
-    <%= render partial: "notifications/notification_card", locals: { card: notification } %>
-    <div class="flex items-center justify-between px-5 py-3 text-xs font-semibold <%= external ? "text-white bg-[#8f1f2a]" : "text-[#5c4543] bg-[#eef3ec]" %>">
-      <span class="flex items-center gap-1.5">
-        <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 19l14-10"/></svg>
-        <%= external ? "Open in new tab" : "Open" %>
-      </span>
-      <%= external ? "↗" : "" %>
-    </div>
+<div id="<%= dom_id(notification) %>" class="notification-item">
+  <% if target_destination %>
+    <%= link_to target_destination,
+        target: external ? "_blank" : nil,
+        rel: external ? "noopener noreferrer" : nil,
+        class: "block cursor-pointer transition hover:opacity-95" do %>
+      <%= render partial: "notifications/notification_card", locals: { card: notification } %>
+      <div class="flex items-center justify-between px-5 py-3 text-xs font-semibold <%= external ? "text-white bg-[#8f1f2a]" : "text-[#5c4543] bg-[#eef3ec]" %>">
+        <span class="flex items-center gap-1.5">
+          <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 19l14-10"/></svg>
+          <%= external ? "Open in new tab" : "Open" %>
+        </span>
+        <%= external ? "↗" : "" %>
+      </div>
+    <% end %>
+  <% else %>
+    <%# Nếu thông báo không có link: click vào sẽ đổi thành Read tại chỗ %>
+    <% if notification.unread? %>
+      <%= button_to mark_read_notification_path(notification),
+            method: :patch,
+            class: "w-full text-left cursor-pointer bg-transparent border-0 p-0 block transition hover:opacity-95",
+            form_class: "w-full" do %>
+        <%= render partial: "notifications/notification_card", locals: { card: notification } %>
+      <% end %>
+    <% else %>
+      <%= render partial: "notifications/notification_card", locals: { card: notification } %>
+    <% end %>
   <% end %>
-<% else %>
-  <%= render partial: "notifications/notification_card", locals: { card: notification } %>
-<% end %>
+</div>
