@@ -138,8 +138,6 @@ class Reservation < ApplicationRecord
 
     if table.out_of_service?
       errors.add(:table, "is not currently bookable")
-    elsif table.occupied? && slot_start&.to_date == Date.current
-      errors.add(:table, "is currently occupied — please pick another date or slot")
     end
   end
 
