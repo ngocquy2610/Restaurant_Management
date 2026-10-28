@@ -22,6 +22,7 @@ class Order < ApplicationRecord
   after_create  :sync_table!
   after_update  :sync_table!, if: -> { saved_change_to_status? }
   after_update  :sync_reservation, if: -> { saved_change_to_status? && completed? }
+  after_update  :complete_meal, if: -> { saved_change_to_status? && completed? }
   after_save    :recalculate_total_price!, if: -> { table_price_changed? || order_items.any? }
 
   scope :unreleased_preorders, -> { preorder.where(released_to_kitchen_at: nil) }
@@ -64,6 +65,11 @@ class Order < ApplicationRecord
       self.discount_amount = discount
       self.total_price = total
     end
+  end
+
+  def complete_meal
+    return if destroyed? || table.nil? || table.destroyed?
+    table&.update!(status: :available)
   end
 
   def sync_table!

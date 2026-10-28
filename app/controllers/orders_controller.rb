@@ -25,6 +25,7 @@ class OrdersController < ApplicationController
     authorize @order
     load_food_data
     load_booked_tables
+    load_linkable_reservations
   end
 
   # GET /orders/1/edit
@@ -44,7 +45,6 @@ class OrdersController < ApplicationController
     #   - a waiter/admin takes it on-site -> in service
     #   - a customer pre-orders online    -> preorder
     @order.status = order_status_for(current_user)
-    @order.reservation ||= current_reservation_for(@order.table)
     authorize @order
 
     if @order.save
@@ -57,6 +57,7 @@ class OrdersController < ApplicationController
     else
       load_food_data
       load_booked_tables
+      load_linkable_reservations
       render :new, status: :unprocessable_entity
     end
   end
@@ -98,6 +99,11 @@ class OrdersController < ApplicationController
   end
 
   private
+
+    def load_linkable_reservations
+      @linkable_reservations = Reservation.where(status: Reservation::ACTIVE_STATUSES, reservation_date: Date.current)
+                                          .where.not(id: Order.where.not(reservation_id: nil).select(:reservation_id))
+    end
 
     def set_order
       @order = Order.find(params.expect(:id))
@@ -144,7 +150,7 @@ class OrdersController < ApplicationController
 
     def order_params
       params.require(:order).permit(
-        :table_id, :status,
+        :table_id, :status, :reservation_id,
         order_items_attributes: [
           :id, :food_id, :food_variant_id, :quantity, :special_note, :_destroy
         ]
